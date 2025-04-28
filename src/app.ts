@@ -15,7 +15,7 @@ async function dbConnector(app: FastifyInstance)
   db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      username TEXT UNIQUE,
+      nickname TEXT UNIQUE,
       email TEXT UNIQUE,
       password TEXT
     )
@@ -35,7 +35,7 @@ async function dbConnector(app: FastifyInstance)
     done();
   });
 
-  console.log("Database users and retings created successfully");
+  console.log("Database users and ratings created successfully");
 }
 
 async function main() 

@@ -7,10 +7,10 @@ exports.registrationHandler = registrationHandler;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 // <{ Body: RegisterBody }>
 async function registrationHandler(request, reply) {
-    const { name, email, password } = request.body;
+    const { nickname, email, password } = request.body;
     // Простейшая валидация (можно использовать схемы JSON Schema или zod позже)
-    if (!name || !email || !password) {
-        return reply.code(400).send({ error: 'Missing name, email or password' });
+    if (!nickname || !email || !password) {
+        return reply.code(400).send({ error: 'Missing nickname, email or password' });
     }
     // Хешируем пароль
     const hashedPassword = bcryptjs_1.default.hashSync(password, 10);
@@ -18,8 +18,8 @@ async function registrationHandler(request, reply) {
     const db = request.server.sqlite;
     try {
         // Сохраняем нового пользователя в таблицу
-        const stmt = db.prepare('INSERT INTO users (username, email, password) VALUES (?, ?, ?)');
-        stmt.run(name, email, hashedPassword);
+        const stmt = db.prepare('INSERT INTO users (nickname, email, password) VALUES (?, ?, ?)');
+        stmt.run(nickname, email, hashedPassword);
         return reply.code(201).send({ message: 'User registered successfully' });
     }
     catch (err) {

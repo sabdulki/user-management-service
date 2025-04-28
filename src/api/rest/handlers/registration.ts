@@ -1,8 +1,12 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import bcrypt from 'bcryptjs'
+import { plainToInstance } from 'class-transformer';
+import { validateOrReject } from 'class-validator';
+import { ValidationError } from 'class-validator';
+import { UserCreateForm } from './../../models/UserCreateForm.ts';
 
 interface RegisterBody {
-  name: string
+  nickname: string
   email: string
   password: string
 }
@@ -10,18 +14,35 @@ interface RegisterBody {
 
 export async function registrationHandler(request: FastifyRequest, reply: FastifyReply) 
 {
-  const { name, email, password } = request.body as RegisterBody
-
-  if (!name || !email || !password) {
-    return reply.code(400).send({ error: 'Missing name, email or password' })
+  // use class UserCreateForm instead
+  const form = plainToInstance(UserCreateForm, request.body) as UserCreateForm;
+  try {
+    await validateOrReject(form);
   }
+  catch (errors) {
+    return reply.status(400).send(errors);
+  }
+  // // initialaize nickname, email, password as UserCreateForm fileds?
+  // const { nickname, email, password } = request.body as RegisterBody
 
-  const hashedPassword = bcrypt.hashSync(password, 10)
+  // // call class private method to validate data or validate it automatically n class constructor
+  // if (!nickname || !email || !password) {
+  //   return reply.code(400).send({ error: 'Invalid data' })
+  // }
+
+  // // create class'es private method to encrypt the passwoed and return it or place it in password filed instead of the actual one inside the class
+  // const hashedPassword = bcrypt.hashSync(password, 10)
+  
+  // //form instance of UserCreateForm class
+
+
+  //call it in interface method
   const db = request.server.sqlite
 
   try {
-    const stmt = db.prepare('INSERT INTO users (username, email, password) VALUES (?, ?, ?)')
-    const result = stmt.run(name, email, hashedPassword)
+    // const userData = request.server.storage.getUserData();
+    const stmt = db.prepare('INSERT INTO users (nickname, email, password) VALUES (?, ?, ?)')
+    const result = stmt.run(nickname, email, hashedPassword)
     const user_id = result.lastInsertRowid
     const ratingInsert = db.prepare('INSERT INTO ratings (user_id) VALUES (?)')
     ratingInsert.run(user_id)
