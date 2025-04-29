@@ -1,4 +1,3 @@
-import { FastifyRequest, FastifyReply } from 'fastify'
 import { plainToInstance } from 'class-transformer';
 import { validateOrReject } from 'class-validator';
 import { IsEmail, IsString, MinLength, MaxLength, IsNotEmpty } from 'class-validator';

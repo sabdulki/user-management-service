@@ -35,6 +35,14 @@ export default class DatabaseStorage implements IStorage {
         }
     }
 
-
+    getUserByNickname(nickname: string): any {
+        try {
+            const user = this._db.prepare('SELECT * FROM users WHERE nickname = ?').get(nickname);
+            return user;
+        } catch (error) {
+            console.error('User not found', error);
+            throw new Error('Failed to get user');
+        }
+    }
 
 };

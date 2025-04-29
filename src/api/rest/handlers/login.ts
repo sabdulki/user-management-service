@@ -1,4 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
+import { UserLoginForm } from '../../../models/UserLoginForm';
 import bcrypt from 'bcryptjs'
 
 interface LoginBody {
@@ -8,22 +9,16 @@ interface LoginBody {
   
 export async function loginHandler(request: FastifyRequest, reply: FastifyReply) 
 {
-  //TODO: create user login form
-  const { nickname, password } = request.body as LoginBody
+  const { nickname, password } = request.body as { nickname: string, password: string };
+  const form = new UserLoginForm(nickname, password, request.server.storage);
 
-  if (!nickname || !password) {
-	  return reply.code(400).send({ error: 'Missing nickname or password' })
+  const user = await form.authenticate();
+  if (!user) {
+      return reply.code(401).send({ error: 'Invalid credentials' });
   }
-  // const db = request.server.sqlite
-  // // class User instead
-  // const user = db.prepare('SELECT * FROM users WHERE nickname = ?').get(nickname)
-  // if (!user) {
-	//   return reply.status(404).send({ message: 'User not found' })
-  // }
-  // const isValid = await bcrypt.compare(password, user.password) // user.password — хэш в БД
-  // if (!isValid) {
-	//   return reply.status(401).send({ message: 'Invalid password' })
-  // }
+
+  // Optionally: generate JWT or session here
+  return reply.send({ message: 'Login successful' });
   // return reply.send({ message: 'Login successful', user: { id: user.id, nickname: user.nickname } })
 
 }
