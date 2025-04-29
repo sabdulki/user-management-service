@@ -20,6 +20,7 @@ export async function registrationHandler(request: FastifyRequest, reply: Fastif
 
   try {
     // const userData = request.server.storage.getUserData();
+    
     const stmt = db.prepare('INSERT INTO users (nickname, email, password) VALUES (?, ?, ?)')
     const result = stmt.run(form.nickname, form.email, form.hashedPassword)
     const user_id = result.lastInsertRowid

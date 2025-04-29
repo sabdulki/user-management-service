@@ -3,10 +3,24 @@ import { FastifyInstance } from 'fastify'
 import { registerRestRoutes } from './api/rest/rest'
 import fp from "fastify-plugin";
 import Database from "better-sqlite3";
+import DatabaseStorage from './storage/DatabaseStorage'
 
 const app = Fastify()
 const registerRoutesPlugin = fp(registerRestRoutes)
 const dbConnectorPlugin = fp(dbConnector)
+
+async function setupDatabaseStorage() {
+  const isProduction = process.env.MODE === 'production'
+  
+  const storage = new DatabaseStorage(isProduction ? "/app/data/database.sqlite3" : "./data/database.sqlite3") 
+  
+  app.decorate('storage', storage)  
+
+  app.addHook('onClose', (app, done) => {
+    storage.close()
+    done()
+  })
+}
 
 async function dbConnector(app: FastifyInstance) 
 {
