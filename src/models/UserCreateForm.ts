@@ -1,43 +1,52 @@
+import { FastifyRequest, FastifyReply } from 'fastify'
 import { plainToInstance } from 'class-transformer';
+import { validateOrReject } from 'class-validator';
 import { IsEmail, IsString, MinLength, MaxLength, IsNotEmpty } from 'class-validator';
 import bcrypt from 'bcryptjs';
+
+//  in JavaScript/TypeScript, setters are called whenever you assign a value to a property.
 
 // POST
 class UserCreateForm {
     @IsString()
-    nickname: string;
+    _nickname: string;
   
     @IsEmail()
-    email: string;
+    _email: string;
   
-    //  in JavaScript/TypeScript, setters are called whenever you assign a value to a property.
-    private _password: string;
     @IsString()
     @MinLength(8)
-    set password(value: string) {
-      // Hash the password before storing it in the class
-      const saltRounds = 10;
-      bcrypt.hash(value, saltRounds)
-        .then((hashedPassword) => {
-          this._password = hashedPassword; // Store the hashed password
-        })
-        .catch((err) => {
-          throw new Error('Error encrypting password: ' + err.message);
-        });
-    }
-    // Getter to retrieve the hashed password
+    _password: string;
+
+    private _hashedPassword: string;
+
     get password(): string {
-      return this._password;
+      return this._hashedPassword;
   }
     constructor(nick: string, mail: string, pass: string) {
-      this.nickname = nick;
-      this.email = mail;
+      this._nickname = nick;
+      this._email = mail;
       this._password = '';
-      this.password = pass; //equal to password(pass)
+      this._hashedPassword = pass;
+    }
+
+    static async create(rawData: unknown): Promise <UserCreateForm> {
+        const form = plainToInstance(UserCreateForm, rawData);
+        try {
+          await validateOrReject(form);
+        } catch (errors) {
+          throw new Error(`Validation failed: ${JSON.stringify(errors)}`);
+        }
+
+        try {
+          const hashed = await bcrypt.hash(form.password, 10);
+          return new UserCreateForm(form._nickname, form._email, hashed);
+        } catch (hashError) {
+          throw new Error('Password hashing failed');
+        }
     }
 };
 
-   
 export {
-    UserCreateForm
+  UserCreateForm
 };

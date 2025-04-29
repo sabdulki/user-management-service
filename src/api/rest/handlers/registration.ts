@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs'
 import { plainToInstance } from 'class-transformer';
 import { validateOrReject } from 'class-validator';
 import { ValidationError } from 'class-validator';
-import { UserCreateForm } from './../../models/UserCreateForm.ts';
+import { UserCreateForm } from '../../../models/UserCreateForm';
 
 interface RegisterBody {
   nickname: string
@@ -15,13 +15,14 @@ interface RegisterBody {
 export async function registrationHandler(request: FastifyRequest, reply: FastifyReply) 
 {
   // use class UserCreateForm instead
-  const form = plainToInstance(UserCreateForm, request.body) as UserCreateForm;
-  try {
-    await validateOrReject(form);
-  }
-  catch (errors) {
-    return reply.status(400).send(errors);
-  }
+  const form = await UserCreateForm.create(request.body) as UserCreateForm;
+  // const form = plainToInstance(UserCreateForm, request.body) as UserCreateForm;
+  // try {
+  //   await validateOrReject(form);
+  // }
+  // catch (errors) {
+  //   return reply.status(400).send(errors);
+  // }
   // // initialaize nickname, email, password as UserCreateForm fileds?
   // const { nickname, email, password } = request.body as RegisterBody
 
@@ -42,7 +43,7 @@ export async function registrationHandler(request: FastifyRequest, reply: Fastif
   try {
     // const userData = request.server.storage.getUserData();
     const stmt = db.prepare('INSERT INTO users (nickname, email, password) VALUES (?, ?, ?)')
-    const result = stmt.run(nickname, email, hashedPassword)
+    const result = stmt.run(form._nickname, form._email, form.password)
     const user_id = result.lastInsertRowid
     const ratingInsert = db.prepare('INSERT INTO ratings (user_id) VALUES (?)')
     ratingInsert.run(user_id)
