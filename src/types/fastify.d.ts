@@ -1,11 +1,12 @@
 import 'fastify'
 import Database from 'better-sqlite3'
+import IStorage from '../models/storage'
 
 declare module 'fastify' {
-  interface FastifyInstance {
-    sqlite: Database
-  }
   interface FastifyRequest {
-    server: FastifyInstance // Make sure this is declared
+    server: FastifyInstance
+  }
+  interface FastifyInstance {
+    storage: IStorage
   }
 }

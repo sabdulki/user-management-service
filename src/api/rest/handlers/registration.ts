@@ -16,16 +16,11 @@ export async function registrationHandler(request: FastifyRequest, reply: Fastif
 {
   const form = await UserCreateForm.create(request.body) as UserCreateForm;
 
-  const db = request.server.sqlite
-
+  const storage = request.server.storage;
   try {
-    // const userData = request.server.storage.getUserData();
-    
-    const stmt = db.prepare('INSERT INTO users (nickname, email, password) VALUES (?, ?, ?)')
-    const result = stmt.run(form.nickname, form.email, form.hashedPassword)
-    const user_id = result.lastInsertRowid
-    const ratingInsert = db.prepare('INSERT INTO ratings (user_id) VALUES (?)')
-    ratingInsert.run(user_id)
+    const userId = storage.insertUserData(form.nickname, form.email, form.hashedPassword);
+    storage.insertBasicRatingForUser(userId);
+
     // the server generates a JWT containing the user's information (in a claim) and signs it with a secret key.
     //The server sends the JWT back to the user.
     return reply.code(201).send({ message: 'User registered successfully' })

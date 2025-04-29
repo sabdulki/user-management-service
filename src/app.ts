@@ -7,12 +7,12 @@ import DatabaseStorage from './storage/DatabaseStorage'
 
 const app = Fastify()
 const registerRoutesPlugin = fp(registerRestRoutes)
-const dbConnectorPlugin = fp(dbConnector)
+const dbConnectorPlugin = fp(setupDatabaseStorage)
 
 async function setupDatabaseStorage() {
-  const isProduction = process.env.MODE === 'production'
+  // const isProduction = process.env.MODE === 'production'
   
-  const storage = new DatabaseStorage(isProduction ? "/app/data/database.sqlite3" : "./data/database.sqlite3") 
+  const storage = new DatabaseStorage() 
   
   app.decorate('storage', storage)  
 
@@ -22,35 +22,35 @@ async function setupDatabaseStorage() {
   })
 }
 
-async function dbConnector(app: FastifyInstance) 
-{
-  const db = new Database('./databases.db', { verbose: console.log });
+// async function dbConnector(app: FastifyInstance) 
+// {
+//   const db = new Database('./databases.db', { verbose: console.log });
 
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      nickname TEXT UNIQUE,
-      email TEXT UNIQUE,
-      password TEXT
-    )
-    `)
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS ratings (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id BIGINT NOT NULL,
-      value INTEGER DEFAULT 1000,
-      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-    )
-  `)
-  app.decorate('sqlite', db)
+//   db.exec(`
+//     CREATE TABLE IF NOT EXISTS users (
+//       id INTEGER PRIMARY KEY AUTOINCREMENT,
+//       nickname TEXT UNIQUE,
+//       email TEXT UNIQUE,
+//       password TEXT
+//     )
+//     `)
+//   db.exec(`
+//     CREATE TABLE IF NOT EXISTS ratings (
+//       id INTEGER PRIMARY KEY AUTOINCREMENT,
+//       user_id BIGINT NOT NULL,
+//       value INTEGER DEFAULT 1000,
+//       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+//     )
+//   `)
+//   app.decorate('sqlite', db)
 
-  app.addHook("onClose", (app, done) => {
-    db.close();
-    done();
-  });
+//   app.addHook("onClose", (app, done) => {
+//     db.close();
+//     done();
+//   });
 
-  console.log("Database users and ratings created successfully");
-}
+//   console.log("Database users and ratings created successfully");
+// }
 
 async function main() 
 {
