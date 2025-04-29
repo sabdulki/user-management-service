@@ -35,6 +35,7 @@ class UserCreateForm {
         try {
           await validateOrReject(form);
         } catch (errors) {
+          // which status code should be and how errors should be treated?
           throw new Error(`Validation failed: ${JSON.stringify(errors)}`);
         }
 
