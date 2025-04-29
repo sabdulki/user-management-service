@@ -14,36 +14,14 @@ interface RegisterBody {
 
 export async function registrationHandler(request: FastifyRequest, reply: FastifyReply) 
 {
-  // use class UserCreateForm instead
   const form = await UserCreateForm.create(request.body) as UserCreateForm;
-  // const form = plainToInstance(UserCreateForm, request.body) as UserCreateForm;
-  // try {
-  //   await validateOrReject(form);
-  // }
-  // catch (errors) {
-  //   return reply.status(400).send(errors);
-  // }
-  // // initialaize nickname, email, password as UserCreateForm fileds?
-  // const { nickname, email, password } = request.body as RegisterBody
 
-  // // call class private method to validate data or validate it automatically n class constructor
-  // if (!nickname || !email || !password) {
-  //   return reply.code(400).send({ error: 'Invalid data' })
-  // }
-
-  // // create class'es private method to encrypt the passwoed and return it or place it in password filed instead of the actual one inside the class
-  // const hashedPassword = bcrypt.hashSync(password, 10)
-  
-  // //form instance of UserCreateForm class
-
-
-  //call it in interface method
   const db = request.server.sqlite
 
   try {
     // const userData = request.server.storage.getUserData();
     const stmt = db.prepare('INSERT INTO users (nickname, email, password) VALUES (?, ?, ?)')
-    const result = stmt.run(form._nickname, form._email, form.password)
+    const result = stmt.run(form.nickname, form.email, form.hashedPassword)
     const user_id = result.lastInsertRowid
     const ratingInsert = db.prepare('INSERT INTO ratings (user_id) VALUES (?)')
     ratingInsert.run(user_id)

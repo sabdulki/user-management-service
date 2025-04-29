@@ -9,24 +9,24 @@ import bcrypt from 'bcryptjs';
 // POST
 class UserCreateForm {
     @IsString()
-    _nickname: string;
+    nickname: string;
   
     @IsEmail()
-    _email: string;
+    email: string;
   
     @IsString()
     @MinLength(8)
-    _password: string;
+    password: string;
 
     private _hashedPassword: string;
 
-    get password(): string {
+    get hashedPassword(): string {
       return this._hashedPassword;
-  }
+    }
     constructor(nick: string, mail: string, pass: string) {
-      this._nickname = nick;
-      this._email = mail;
-      this._password = '';
+      this.nickname = nick;
+      this.email = mail;
+      this.password = '';
       this._hashedPassword = pass;
     }
 
@@ -40,7 +40,7 @@ class UserCreateForm {
 
         try {
           const hashed = await bcrypt.hash(form.password, 10);
-          return new UserCreateForm(form._nickname, form._email, hashed);
+          return new UserCreateForm(form.nickname, form.email, hashed);
         } catch (hashError) {
           throw new Error('Password hashing failed');
         }
