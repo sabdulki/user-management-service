@@ -19,10 +19,13 @@ export default class DatabaseStorage implements IStorage {
             const result = stmt.run(nickname, email, password);
             const userId = Number(result.lastInsertRowid); // Ensure it's a number
             return (userId);
-        } catch (error) {
-            console.error('Error inserting user:', error);
-            throw new Error('Failed to insert user');
-        }
+        } catch (error: any) {
+            if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+              // This means nickname or email already exists (assuming there's a UNIQUE constraint)
+              throw new Error('UserAlreadyExists');
+            }
+            throw new Error('DatabaseFailure');
+          }
     }
     
     insertBasicRatingForUser(userId: number): void {

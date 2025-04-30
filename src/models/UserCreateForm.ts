@@ -35,14 +35,14 @@ class UserCreateForm {
           await validateOrReject(form);
         } catch (errors) {
           // which status code should be and how errors should be treated?
-          throw new Error(`Validation failed: ${JSON.stringify(errors)}`);
+          throw new Error('Invalid data');
         }
 
         try {
           const hashed = await bcrypt.hash(form.password, 10);
           return new UserCreateForm(form.nickname, form.email, hashed);
         } catch (hashError) {
-          throw new Error('Password hashing failed');
+          throw new Error('Operation failed');
         }
     }
 };

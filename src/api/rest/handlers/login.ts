@@ -1,20 +1,16 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { UserLoginForm } from '../../../models/UserLoginForm';
-import bcrypt from 'bcryptjs'
-
-interface LoginBody {
-	nickname: string
-	password: string
-}
   
 export async function loginHandler(request: FastifyRequest, reply: FastifyReply) 
 {
-  const { nickname, password } = request.body as { nickname: string, password: string };
-  const form = new UserLoginForm(nickname, password, request.server.storage);
+  const form = await UserLoginForm.create(request.body) as UserLoginForm;
 
-  const user = await form.authenticate();
-  if (!user) {
-      return reply.code(401).send({ error: 'Invalid credentials' });
+  // const { nickname, password } = request.body as { nickname: string, password: string };
+  // const form = new UserLoginForm(nickname, password, request.server.storage);
+
+  const isValid = await form.authenticate();
+  if (!isValid) {
+      return reply.code(401).send({ error: 'Invalid data' });
   }
 
   // Optionally: generate JWT or session here
