@@ -1,5 +1,6 @@
 import Database, { Database as DatabaseType } from "better-sqlite3";
 import IStorage from '../interfaces/storage'
+import UserCreateForm from '../models/UserCreateForm'
 
 export default class DatabaseStorage implements IStorage {
     private _db: DatabaseType
@@ -13,10 +14,10 @@ export default class DatabaseStorage implements IStorage {
         this._db.close()
     }
     
-    insertUserData(nickname: string, email: string, password: string): number {
+    userRegister(form: UserCreateForm): number {
         try {
             const stmt = this._db.prepare('INSERT INTO users (nickname, email, password) VALUES (?, ?, ?)');
-            const result = stmt.run(nickname, email, password);
+            const result = stmt.run(form.nickname, form.email, form.hashedPassword);
             const userId = Number(result.lastInsertRowid); // Ensure it's a number
             return (userId);
         } catch (error: any) {
@@ -28,8 +29,10 @@ export default class DatabaseStorage implements IStorage {
           }
     }
     
-    insertBasicRatingForUser(userId: number): void {
+    insertBasicRatingForUser(form: UserCreateForm): void {
         try {
+            const user = this.getUserByNickname(form.nickname);
+            const userId = user.id;
             const ratingInsert = this._db.prepare('INSERT INTO ratings (user_id) VALUES (?)')
             ratingInsert.run(userId)
         } catch (error) {

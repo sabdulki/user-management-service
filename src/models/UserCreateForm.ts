@@ -6,7 +6,7 @@ import bcrypt from 'bcryptjs';
 //  in JavaScript/TypeScript, setters are called whenever you assign a value to a property.
 
 // POST
-class UserCreateForm {
+export default class UserCreateForm {
     @IsString()
     nickname: string;
   
@@ -45,8 +45,4 @@ class UserCreateForm {
           throw new Error('Operation failed');
         }
     }
-};
-
-export {
-  UserCreateForm
 };

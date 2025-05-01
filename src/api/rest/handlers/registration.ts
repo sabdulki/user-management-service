@@ -13,7 +13,7 @@ export async function registrationHandler(request: FastifyRequest, reply: Fastif
 
   const storage = request.server.storage;
   try {
-    const userId = storage.insertUserData(form.nickname, form.email, form.hashedPassword);
+    const userId = storage.userRegister(form);
     storage.insertBasicRatingForUser(userId);
 
     // the server generates a JWT containing the user's information (in a claim) and signs it with a secret key.
@@ -30,5 +30,5 @@ export async function registrationHandler(request: FastifyRequest, reply: Fastif
 
   // Fallback error
   return reply.code(400).send({ error: 'Invalid data', detail: err.message });
-}
+  }
 }

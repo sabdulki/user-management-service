@@ -1,8 +1,11 @@
 
+import UserCreateForm from '../models/UserCreateForm'
+
 // only signature of method
 interface IStorage {
-    insertUserData(nickname: string, email:string, password: string) : number;
-    insertBasicRatingForUser(userId: number): void;
+    userRegister(form: UserCreateForm) : number;
+    insertBasicRatingForUser(form: UserCreateForm): void;
+    // inner methods
     getUserByNickname(nickname: string): any;
 };
 
