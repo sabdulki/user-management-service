@@ -13,12 +13,21 @@ export default class DatabaseStorage implements IStorage {
     close() {
         this._db.close()
     }
-    
+
+    // If any statement inside the transaction block throws, better-sqlite3 will rollback automatically.
+    userRegisterTransaction(form:UserCreateForm): void {
+        const transaction = this._db.transaction((form: UserCreateForm) => {
+            this.userRegister(form) 
+        });
+        transaction(form);
+    }
+
     userRegister(form: UserCreateForm): number {
         try {
             const stmt = this._db.prepare('INSERT INTO users (nickname, email, password) VALUES (?, ?, ?)');
             const result = stmt.run(form.nickname, form.email, form.hashedPassword);
-            const userId = Number(result.lastInsertRowid); // Ensure it's a number
+            const userId = Number(result.lastInsertRowid);
+            this._db.prepare('INSERT INTO ratings (user_id) VALUES (?)').run(userId)
             return (userId);
         } catch (error: any) {
             if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
@@ -27,18 +36,6 @@ export default class DatabaseStorage implements IStorage {
             }
             throw new Error('DatabaseFailure');
           }
-    }
-    
-    insertBasicRatingForUser(form: UserCreateForm): void {
-        try {
-            const user = this.getUserByNickname(form.nickname);
-            const userId = user.id;
-            const ratingInsert = this._db.prepare('INSERT INTO ratings (user_id) VALUES (?)')
-            ratingInsert.run(userId)
-        } catch (error) {
-            console.error('Error inserting user rating:', error);
-            throw new Error('Failed to insert user rating');
-        }
     }
 
     getUserByNickname(nickname: string): any {
