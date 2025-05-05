@@ -3,6 +3,7 @@ import { IHandler } from '../../pkg/handler/handler'
 import { pingHandler } from './handlers/ping'
 import { registrationHandler } from './handlers/registration'
 import { loginHandler } from './handlers/login'
+import { verifyToken } from './handlers/testConfig'
 
 const routes: IHandler[] = [
   {
@@ -19,7 +20,13 @@ const routes: IHandler[] = [
     method: 'POST',
     route: '/auth/api/rest/login',
     handler: loginHandler
+  },
+  {
+    method: 'GET',
+    route: '/verify-token',
+    handler: verifyToken
   }
+
 ]
 
 export async function registerRestRoutes(app: FastifyInstance) {

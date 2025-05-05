@@ -15,11 +15,11 @@ export default class DatabaseStorage implements IStorage {
     }
 
     // If any statement inside the transaction block throws, better-sqlite3 will rollback automatically.
-    userRegisterTransaction(form:UserCreateForm): void {
+    userRegisterTransaction(form:UserCreateForm): number {
         const transaction = this._db.transaction((form: UserCreateForm) => {
-            this.userRegister(form) 
+            return this.userRegister(form) 
         });
-        transaction(form);
+        return transaction(form);
     }
 
     userRegister(form: UserCreateForm): number {

@@ -1,21 +1,34 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import UserCreateForm from '../../../models/UserCreateForm';
-
+import Config from '../../../models/Config';
 
 export async function registrationHandler(request: FastifyRequest, reply: FastifyReply) 
 {
   let form: UserCreateForm;
   try {
     form = await UserCreateForm.create(request.body);
-  } catch (error) {
-    return reply.code(400).send('Invalid input data');
+  } catch (error: any) {
+    return reply.code(400).send({ message: 'Invalid input data'});
   }
 
   const storage = request.server.storage;
 
   try {
-    storage.userRegisterTransaction(form);
-    return reply.code(201).send({ message: 'User registered successfully' })
+    let userId: number;
+    userId = storage.userRegisterTransaction(form);
+    const config = Config.getInstance();
+    const tokenPair = config.generateTokenPair({ userId });
+
+    //testing
+    // console.log('Access Token:', tokenPair.accessToken);
+    // console.log('Refresh Token:', tokenPair.refreshToken);
+    // const decoded = config.verifyToken(tokenPair.accessToken);
+    // console.log('Decoded payload:', decoded);
+    return reply.code(201).send({
+      message: 'User registered successfully',
+      accessToken: tokenPair.accessToken,
+      refreshToken: tokenPair.refreshToken
+    })
   } catch (err: any) {
   if (err.message === 'UserAlreadyExists') {
     return reply.code(409).send({ error: 'User already exists' }); // 409 Conflict
