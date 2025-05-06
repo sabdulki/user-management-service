@@ -24,6 +24,7 @@ class UserLoginForm {
     }
 
     async authenticate(): Promise<boolean> {
+        // try 
         const user = app.storage.getUserByNickname(this.nickname) as any;
         if (!user) return false;
 
