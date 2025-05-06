@@ -1,6 +1,7 @@
 import Database, { Database as DatabaseType } from "better-sqlite3";
 import IStorage from '../interfaces/storage'
 import UserCreateForm from '../models/UserCreateForm'
+import UserBaseInfo from "types/UserBaseInfo";
 
 export default class DatabaseStorage implements IStorage {
     private _db: DatabaseType
@@ -38,10 +39,20 @@ export default class DatabaseStorage implements IStorage {
           }
     }
 
-    getUserByNickname(nickname: string): any {
+    getUserByNickname(nickname: string): UserBaseInfo {
         try {
             const user = this._db.prepare('SELECT * FROM users WHERE nickname = ?').get(nickname);
-            return user;
+            return user as UserBaseInfo;
+        } catch (error) {
+            console.error('User not found', error);
+            throw new Error('Failed to get user');
+        }
+    }
+
+    getUserById(id: number) : UserBaseInfo {
+        try {
+            const user = this._db.prepare('SELECT * FROM users WHERE id = ?').get(id);
+            return user as UserBaseInfo;
         } catch (error) {
             console.error('User not found', error);
             throw new Error('Failed to get user');

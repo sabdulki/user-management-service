@@ -3,7 +3,9 @@ import { IHandler } from '../../pkg/handler/handler'
 import { pingHandler } from './handlers/ping'
 import { registrationHandler } from './handlers/registration'
 import { loginHandler } from './handlers/login'
-import { verifyToken } from './handlers/testConfig'
+import { getUserInfo } from './handlers/getUser'
+import { getUserInfoById } from './handlers/getUserById'
+import { refreshTokensPair } from './handlers/refreshToken'
 
 const routes: IHandler[] = [
   {
@@ -23,8 +25,18 @@ const routes: IHandler[] = [
   },
   {
     method: 'GET',
-    route: '/verify-token',
-    handler: verifyToken
+    route: '/user',
+    handler: getUserInfo
+  },
+  {
+    method: 'GET',
+    route: '/user/:userId',
+    handler: getUserInfoById
+  },
+  {
+    method: 'POST',
+    route: '/refresh',
+    handler: refreshTokensPair
   }
 
 ]

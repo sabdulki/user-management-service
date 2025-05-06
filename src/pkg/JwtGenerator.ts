@@ -54,7 +54,11 @@ export default class JwtGenerator {
 	}
   
 	public verifyToken(token: string): JwtPayload {
-	  return jwt.verify(token, this.config.secret + this.config.salt) as JwtPayload;
+		try {
+			return jwt.verify(token, this.config.secret + this.config.salt) as JwtPayload;
+		} catch (error) {
+			throw new Error("verification failed");
+		}
 	}
 };
 
@@ -62,7 +66,7 @@ function getUserPayload(request: FastifyRequest)
 {
 	const token = request.headers.authorization?.replace('Bearer ', '');
 	if (!token) {
-		throw new Error("no token")
+		throw new Error("token is not provided")
 	}
   
 	return JwtGenerator.getInstance().verifyToken(token);
