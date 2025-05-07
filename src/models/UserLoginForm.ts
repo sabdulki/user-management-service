@@ -4,7 +4,7 @@ import { validateOrReject } from 'class-validator';
 import { IsEmail, IsString, MinLength, MaxLength, IsNotEmpty } from 'class-validator';
 import bcrypt from 'bcryptjs';
 import app from '../app'
-import IStorage from 'interfaces/storage';
+import IStorage from 'interfaces/IStorage';
 
 //  in JavaScript/TypeScript, setters are called whenever you assign a value to a property.
 
@@ -24,15 +24,16 @@ class UserLoginForm {
     }
 
     async authenticate(): Promise<boolean> {
-        // try 
-        const user = app.storage.getUserByNickname(this.nickname) as any;
-        if (!user) return false;
-
-        const passwordMatches = await bcrypt.compare(this.rawPassword, user.password);
-        if (!passwordMatches) return false;
-
-        return true;
-    }
+        try {
+          const userPassword = app.storage.getUserPassword(this.nickname) as string;
+          const passwordMatches = await bcrypt.compare(this.rawPassword, userPassword);
+      
+          return passwordMatches; // return true if match, false otherwise
+        } catch (error) {
+          console.error('Authentication failed:', error);
+          return false;
+        }
+    }      
 
     static async create(rawData: unknown): Promise <UserLoginForm> {
         const form = plainToInstance(UserLoginForm, rawData);

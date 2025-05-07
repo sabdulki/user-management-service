@@ -4,6 +4,10 @@ import { registerRestRoutes } from './api/rest/rest'
 import fp from "fastify-plugin";
 import Database from "better-sqlite3";
 import DatabaseStorage from './storage/DatabaseStorage'
+import JwtGenerator from './pkg/JwtGenerator';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = Fastify()
 const registerRoutesPlugin = fp(registerRestRoutes)
@@ -56,6 +60,13 @@ async function main()
 {
   await app.register(dbConnectorPlugin);
   await app.register(registerRoutesPlugin);
+
+  try {
+    JwtGenerator.getInstance();
+  } catch (error : any) {
+    console.log("jwt generation error ");
+    process.exit(1)
+  }
 
   app.listen({ port: 3000 }, (err, address) => {
     if (err) {

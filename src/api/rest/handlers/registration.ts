@@ -20,10 +20,10 @@ export async function registrationHandler(request: FastifyRequest, reply: Fastif
     const tokenPair = instance.generateTokenPair({ userId });
 
     //testing
-    // console.log('Access Token:', tokenPair.accessToken);
-    // console.log('Refresh Token:', tokenPair.refreshToken);
-    // const decoded = config.verifyToken(tokenPair.accessToken);
-    // console.log('Decoded payload:', decoded);
+    console.log('Access Token:', tokenPair.accessToken);
+    console.log('Refresh Token:', tokenPair.refreshToken);
+    const decoded = instance.verifyToken(tokenPair.accessToken);
+    console.log('Decoded payload:', decoded);
     return reply.code(201).send({
       accessToken: tokenPair.accessToken,
       refreshToken: tokenPair.refreshToken

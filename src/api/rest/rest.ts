@@ -6,6 +6,8 @@ import { loginHandler } from './handlers/login'
 import { getUserInfo } from './handlers/getUser'
 import { getUserInfoById } from './handlers/getUserById'
 import { refreshTokensPair } from './handlers/refreshToken'
+import { deleteUser } from './handlers/deleteUserById'
+import { verifyToken } from './handlers/isTokenValid'
 
 const routes: IHandler[] = [
   {
@@ -34,9 +36,19 @@ const routes: IHandler[] = [
     handler: getUserInfoById
   },
   {
+    method: 'GET',
+    route: '/verify-token',
+    handler: verifyToken
+  },
+  {
     method: 'POST',
     route: '/refresh',
     handler: refreshTokensPair
+  },
+  {
+    method: 'DELETE',
+    route: '/user/delete/:userId',
+    handler: deleteUser
   }
 
 ]

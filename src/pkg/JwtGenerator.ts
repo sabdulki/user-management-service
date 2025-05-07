@@ -15,7 +15,7 @@ class JwtGeneratorConfig {
 		const secret = process.env.JWT_SECRET
 		const salt = process.env.JWT_SALT
 		if (!secret || !salt) {
-			throw new Error("JwtGeneratorConfig error : not enoght arguments.")
+			throw new Error("JwtGeneratorConfig error : not enough arguments.")
 		}  
 		this.secret = secret;
 		this.salt = salt;
@@ -42,34 +42,41 @@ export default class JwtGenerator {
 	
 	private generateToken(payload: JwtPayload, expiresIn: string): string {
 	  // Include salt in signature by appending it to the secret
-	  return jwt.sign(payload as jwt.JwtPayload, this.config.secret + this.config.salt, {
-		  expiresIn: expiresIn as jwt.SignOptions['expiresIn'],
-		});
+		try {
+			return jwt.sign(payload as jwt.JwtPayload, this.config.secret + this.config.salt, {
+				expiresIn: expiresIn as jwt.SignOptions['expiresIn'],
+			});
+		} catch (error: any) {
+			throw new Error("JwtGenerationFailure");
+		} 
 	}
   
 	public generateTokenPair(payload: JwtPayload): { accessToken: string; refreshToken: string } {
-	  const accessToken = this.generateToken(payload, this.config.accessExpiresIn);
-	  const refreshToken = this.generateToken(payload, this.config.refreshExpiresIn);
-	  return { accessToken, refreshToken };
+		try {
+			const accessToken = this.generateToken(payload, this.config.accessExpiresIn);
+			const refreshToken = this.generateToken(payload, this.config.refreshExpiresIn);
+			return { accessToken, refreshToken };
+		} catch (error: any) {
+			throw new Error("JwtPairGenerationFailure");
+		}
 	}
   
 	public verifyToken(token: string): JwtPayload {
 		try {
 			return jwt.verify(token, this.config.secret + this.config.salt) as JwtPayload;
 		} catch (error) {
-			throw new Error("verification failed");
+			throw new Error("TokenVerificationFailure");
 		}
 	}
 };
 
-function getUserPayload(request: FastifyRequest)
-{
-	const token = request.headers.authorization?.replace('Bearer ', '');
-	if (!token) {
-		throw new Error("token is not provided")
+function getUserPayload(request: FastifyRequest): JwtPayload {
+	try {
+		const token = request.headers.authorization?.replace('Bearer ', '') as string;
+		return JwtGenerator.getInstance().verifyToken(token);
+	} catch {
+		throw new Error("TokenExtractionFailure")
 	}
-  
-	return JwtGenerator.getInstance().verifyToken(token);
 };
 
 export {

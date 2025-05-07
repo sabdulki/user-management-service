@@ -9,6 +9,7 @@ interface IStorage {
     // inner methods
     getUserByNickname(nickname: string): UserBaseInfo;
     getUserById(id: number) : UserBaseInfo;
+    deleteUserById(userId: number): void;
 };
 
 export default IStorage

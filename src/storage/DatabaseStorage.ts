@@ -1,5 +1,5 @@
 import Database, { Database as DatabaseType } from "better-sqlite3";
-import IStorage from '../interfaces/storage'
+import IStorage from '../interfaces/IStorage'
 import UserCreateForm from '../models/UserCreateForm'
 import UserBaseInfo from "types/UserBaseInfo";
 
@@ -39,24 +39,64 @@ export default class DatabaseStorage implements IStorage {
           }
     }
 
+    getUserPassword(nickname: string): string {
+        try {
+            const object = this._db.prepare('SELECT password FROM users WHERE nickname = ?').get(nickname) as { password: string } | undefined ;
+            if (!object) {
+                throw new Error('User not found');
+            }
+            return object.password;
+        } catch (error) {
+            throw new Error('Failed to get user info');
+        }
+    }
+
     getUserByNickname(nickname: string): UserBaseInfo {
         try {
-            const user = this._db.prepare('SELECT * FROM users WHERE nickname = ?').get(nickname);
-            return user as UserBaseInfo;
+            const user = this._db.prepare('SELECT * FROM users WHERE nickname = ?').get(nickname) as UserBaseInfo;
+            const userId = user.id;
+            return this.getUserById(userId);
         } catch (error) {
-            console.error('User not found', error);
             throw new Error('Failed to get user');
         }
     }
 
-    getUserById(id: number) : UserBaseInfo {
+    getUserById(id: number): UserBaseInfo {
         try {
-            const user = this._db.prepare('SELECT * FROM users WHERE id = ?').get(id);
+            const stmt = this._db.prepare(`
+                SELECT u.id, u.nickname, r.value as rating
+                FROM users u
+                JOIN ratings r ON u.id = r.user_id
+                WHERE u.id = ?
+            `);
+            const user = stmt.get(id);
+    
+            if (!user) {
+                throw new Error('UserNotFound');
+            }
+    
             return user as UserBaseInfo;
-        } catch (error) {
-            console.error('User not found', error);
+        } catch (error: any) {
+            if (error.message === 'UserNotFound') {
+                throw error; // пробрасываем специфическую ошибку выше
+            }
             throw new Error('Failed to get user');
         }
     }
+    
+
+    deleteUserById(userId: number): void {
+        try {
+            const stmt = this._db.prepare('DELETE FROM users WHERE id = ?');
+            const result = stmt.run(userId);
+        
+            if (result.changes === 0) {
+                throw new Error("User not found");
+            }
+        } catch (error) {
+            throw new Error('Failed to delete user');
+        }
+    }
+      
 
 };

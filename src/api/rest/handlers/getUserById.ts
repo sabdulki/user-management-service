@@ -8,8 +8,8 @@ export async function getUserInfoById(request: FastifyRequest, reply: FastifyRep
         const userBaseInfo = request.server.storage.getUserById(userId) as UserBaseInfo;
         return reply.code(201).send (userBaseInfo);
     } catch (error: any) {
-        if (error.message === 'token is not provided') {
-            return reply.code(401).send({ error: 'tokenization failed' }); // 409 Conflict
+        if (error.message === 'TokenExtractionFailure') {
+            return reply.code(401).send({ error: 'TokenFailure' }); // 409 Conflict
         }
         if (error.message === 'Failed to get user') {
             return reply.code(500).send({ error: 'Database error' });

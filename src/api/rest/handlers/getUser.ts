@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
-import { getUserPayload } from 'pkg/JwtGenerator'
+import { getUserPayload } from '../../../pkg/JwtGenerator'
 import UserBaseInfo from 'types/UserBaseInfo';
 
 export async function getUserInfo(request: FastifyRequest, reply: FastifyReply) 
@@ -9,8 +9,8 @@ export async function getUserInfo(request: FastifyRequest, reply: FastifyReply)
         const userBaseInfo = request.server.storage.getUserById(payload.userId) as UserBaseInfo;
         return reply.code(201).send (userBaseInfo);
     } catch (error: any) {
-        if (error.message === 'token is not provided') {
-            return reply.code(401).send({ error: 'tokenization failed' }); // 409 Conflict
+        if (error.message === 'TokenExtractionFailure') {
+            return reply.code(401).send({ error: 'TokenFailure' }); // 409 Conflict
         }
         if (error.message === 'Failed to get user') {
             return reply.code(500).send({ error: 'Database error' });

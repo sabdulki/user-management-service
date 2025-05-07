@@ -1,17 +1,15 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import JwtGenerator from '../../../pkg/JwtGenerator';
 
-export 	 function verifyToken(request: FastifyRequest, reply: FastifyReply)
+export function verifyToken(request: FastifyRequest, reply: FastifyReply)
 {
 	const token = request.headers.authorization?.replace('Bearer ', '');
-  
 	if (!token) {
 	  return reply.code(400).send({ error: 'No token provided' });
 	}
   
-	const instance = JwtGenerator.getInstance();
-  
 	try {
+	  const instance = JwtGenerator.getInstance();
 	  const decoded = instance.verifyToken(token);
 	  return reply.send({ valid: true, decoded });
 	} catch (error: any) {
@@ -21,6 +19,5 @@ export 	 function verifyToken(request: FastifyRequest, reply: FastifyReply)
 		message: error.message
 	  });
 	}
-	// return JSON 	
   };
   
