@@ -5,7 +5,7 @@ import UserBaseInfo from 'types/UserBaseInfo';
 export async function getUserInfo(request: FastifyRequest, reply: FastifyReply) 
 {
     try {
-        const payload = getUserPayload(request);
+        const payload = await getUserPayload(request);
         const userBaseInfo = request.server.storage.getUserById(payload.userId) as UserBaseInfo;
         return reply.code(201).send (userBaseInfo);
     } catch (error: any) {

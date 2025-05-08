@@ -12,9 +12,9 @@ export async function refreshTokensPair(request: FastifyRequest, reply: FastifyR
 	}
 	try {
 		const instance = JwtGenerator.getInstance();
-		const payload = instance.verifyToken(refreshToken);
+		const payload = await instance.verifyToken(refreshToken, "refresh");
 		const userId = payload.userId;
-		const tokenPair = instance.generateTokenPair({userId});
+		const tokenPair = await instance.generateTokenPair({userId});
 		return reply.code(201).send({
 			accessToken: tokenPair.accessToken,
 			refreshToken: tokenPair.refreshToken

@@ -65,7 +65,7 @@ async function main()
   try {
     JwtGenerator.getInstance();
   } catch (error : any) {
-    console.log("jwt generation error ");
+    console.log("jwt generation error ", error);
     process.exit(1)
   }
 

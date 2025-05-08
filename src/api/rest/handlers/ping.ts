@@ -7,7 +7,7 @@ export async function pingHandler(request: FastifyRequest, reply: FastifyReply) 
   //example of getUserPayload()
   // let payload
   // try {
-  //   payload = getUserPayload(request);
+  //   payload = await getUserPayload(request);
   // } catch (error: any) {
   //   return reply.code(401)
   // }

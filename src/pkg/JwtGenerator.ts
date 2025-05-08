@@ -1,5 +1,7 @@
 import { FastifyRequest } from 'fastify';
 import jwt from 'jsonwebtoken';
+import RadishClient from "./client/client"
+import Config from "../config/Config"
 
 interface JwtPayload {
 	userId: number;
@@ -27,10 +29,14 @@ class JwtGeneratorConfig {
 export default class JwtGenerator {
 
 	private static instance: JwtGenerator;
-	private readonly config:JwtGeneratorConfig
+	private readonly config:JwtGeneratorConfig;
+	private radishClient: RadishClient;
 
 	constructor() {
-		this.config = new JwtGeneratorConfig()
+		this.config = new JwtGeneratorConfig();
+		const host = Config.getInstance().getRadishHost();
+		const port = Config.getInstance().getRadishPort();
+		this.radishClient = new RadishClient({ host, port});
 	}
 
 	public static getInstance(): JwtGenerator {
@@ -51,33 +57,47 @@ export default class JwtGenerator {
 		} 
 	}
   
-	public generateTokenPair(payload: JwtPayload): { accessToken: string; refreshToken: string } {
+	public async generateTokenPair(payload: JwtPayload): Promise<{ accessToken: string; refreshToken: string }> {
 		try {
 			const accessToken = this.generateToken(payload, this.config.accessExpiresIn);
 			const refreshToken = this.generateToken(payload, this.config.refreshExpiresIn);
+			const accessResponse = await this.radishClient.set(`access-${accessToken}`, "true");
+			if (accessResponse.status !== 201)
+				throw new Error("JwtPairGenerationFailure");
+			const refreshResponse = await this.radishClient.set(`refresh-${refreshToken}`, "true");
+			if (refreshResponse.status !== 201)
+				throw new Error("JwtPairGenerationFailure");
 			return { accessToken, refreshToken };
 		} catch (error: any) {
 			throw new Error("JwtPairGenerationFailure");
 		}
 	}
   
-	public verifyToken(token: string): JwtPayload {
+	public async verifyToken(token: string, type: string): Promise<JwtPayload> {
 		try {
-			return jwt.verify(token, this.config.secret + this.config.salt) as JwtPayload;
+			const status = await this.radishClient.get(type+"-"+token);
+			if (status.status == 200) {
+				return jwt.verify(token, this.config.secret + this.config.salt) as JwtPayload;
+			}
+			else {
+				throw new Error("TokenVerificationFailure");
+			}
 		} catch (error) {
 			throw new Error("TokenVerificationFailure");
 		}
 	}
 };
 
-function getUserPayload(request: FastifyRequest): JwtPayload {
+async function getUserPayload(request: FastifyRequest): Promise<JwtPayload> {
 	try {
 		const token = request.headers.authorization?.replace('Bearer ', '') as string;
-		return JwtGenerator.getInstance().verifyToken(token);
+		return await JwtGenerator.getInstance().verifyToken(token, "access");
 	} catch {
 		throw new Error("TokenExtractionFailure")
 	}
 };
+
+// async function 
 
 export {
 	getUserPayload

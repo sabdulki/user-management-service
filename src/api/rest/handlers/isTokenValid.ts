@@ -1,7 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import JwtGenerator from '../../../pkg/JwtGenerator';
 
-export function verifyToken(request: FastifyRequest, reply: FastifyReply)
+export async function verifyToken(request: FastifyRequest, reply: FastifyReply)
 {
 	const token = request.headers.authorization?.replace('Bearer ', '');
 	if (!token) {
@@ -10,7 +10,7 @@ export function verifyToken(request: FastifyRequest, reply: FastifyReply)
   
 	try {
 	  const instance = JwtGenerator.getInstance();
-	  const decoded = instance.verifyToken(token);
+	  const decoded = await instance.verifyToken(token, "access");
 	  return reply.send({ valid: true, decoded });
 	} catch (error: any) {
 	  return reply.code(401).send({

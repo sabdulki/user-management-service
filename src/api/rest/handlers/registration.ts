@@ -17,12 +17,12 @@ export async function registrationHandler(request: FastifyRequest, reply: Fastif
     let userId: number;
     userId = storage.userRegisterTransaction(form);
     const instance = JwtGenerator.getInstance();
-    const tokenPair = instance.generateTokenPair({ userId });
+    const tokenPair = await instance.generateTokenPair({ userId });
 
     //testing
     console.log('Access Token:', tokenPair.accessToken);
     console.log('Refresh Token:', tokenPair.refreshToken);
-    const decoded = instance.verifyToken(tokenPair.accessToken);
+    const decoded = await instance.verifyToken(tokenPair.accessToken, "access");
     console.log('Decoded payload:', decoded);
     return reply.code(201).send({
       accessToken: tokenPair.accessToken,
