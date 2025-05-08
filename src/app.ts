@@ -6,6 +6,7 @@ import Database from "better-sqlite3";
 import DatabaseStorage from './storage/DatabaseStorage'
 import JwtGenerator from './pkg/JwtGenerator';
 import dotenv from 'dotenv';
+import Config from './config/Config';
 
 dotenv.config();
 
@@ -68,7 +69,9 @@ async function main()
     process.exit(1)
   }
 
-  app.listen({ port: 3000 }, (err, address) => {
+  const host = Config.getInstance().getHost();
+
+  app.listen({ host, port: 3000 }, (err, address) => {
     if (err) {
       app.log.error(err)
       process.exit(1)

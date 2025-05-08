@@ -1,14 +1,14 @@
 
 
 
-class User {
-    id: number;
-    nickname: string;
-    email: string;
-    password: string;
-    rating: number;
-};
+// class User {
+//     id: number;
+//     nickname: string;
+//     email: string;
+//     password: string;
+//     rating: number;
+// };
 
 
 
-export default User;
+// export default User;
