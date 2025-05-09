@@ -20,8 +20,6 @@ export async function loginHandler(request: FastifyRequest, reply: FastifyReply)
     const userId = user.id;
     
     const tokenPair = await generateJwtTokenPair({ userId });
-    // const instance = JwtGenerator.getInstance();
-    // const tokenPair = await instance.generateTokenPair({ userId });
     return reply.code(200).send({
       accessToken: tokenPair.accessToken,
       refreshToken: tokenPair.refreshToken

@@ -57,7 +57,6 @@ export default class JwtGenerator {
 	}
 	
 	private generateToken(payload: JwtPayload, expiresIn: number): string {
-	  // Include salt in signature by appending it to the secret
 		try {
 			return jwt.sign(payload as jwt.JwtPayload, this.config.secret + this.config.salt, {
 				expiresIn: expiresIn as jwt.SignOptions['expiresIn'],
@@ -73,10 +72,10 @@ export default class JwtGenerator {
 			const refreshToken = this.generateToken(payload, this.config.refreshExpiresIn);
 			const accessResponse = await this.radishClient.set(`access-${accessToken}`, "true");
 			if (accessResponse.status !== 201)
-				throw new Error("JwtPairGenerationFailure");
+				throw new Error("JwtSettingFailure");
 			const refreshResponse = await this.radishClient.set(`refresh-${refreshToken}`, "true");
 			if (refreshResponse.status !== 201)
-				throw new Error("JwtPairGenerationFailure");
+				throw new Error("JwtSettingFailure");
 			return { accessToken, refreshToken };
 		} catch (error: any) {
 			throw new Error("JwtPairGenerationFailure");
@@ -91,28 +90,19 @@ export default class JwtGenerator {
 				return jwt.verify(token, this.config.secret + this.config.salt) as JwtPayload;
 			}
 			else {
-				throw new Error("TokenVerificationFailure");
+				throw new Error("TokenVerificationFailure1");
 			}
 		} catch (error) {
-			throw new Error("TokenVerificationFailure");
+			throw new Error("TokenVerificationFailure2");
 		}
 	}
 };
 
-async function getUserPayload(request: FastifyRequest): Promise<JwtPayload> {
-	try {
-		const token = request.headers.authorization?.replace('Bearer ', '') as string;
-		return await JwtGenerator.getInstance().verifyToken(token, TokenType.Access);
-	} catch {
-		throw new Error("TokenExtractionFailure")
-	}
-};
-
-async function isTokenValid(request: FastifyRequest, type: TokenType)
+async function isTokenValid(request: FastifyRequest, type: TokenType): Promise<JwtPayload>
 {
 	let token: string;
 	try {
-		if (type == TokenType.Access) {
+		if (type === TokenType.Access) {
 			token = request.headers.authorization?.replace('Bearer ', '') as string;
 		} else {
 			const body = request.body as { refreshToken: string };
@@ -123,19 +113,18 @@ async function isTokenValid(request: FastifyRequest, type: TokenType)
 	}
 	
 	try {
-		await JwtGenerator.getInstance().verifyToken(token, type);
+		return await JwtGenerator.getInstance().verifyToken(token, type);
 	} catch (err: any) {
 		throw new Error("TokenIsNotValid");
 	}
 }
+
 async function generateJwtTokenPair(payload: JwtPayload): Promise<{ accessToken: string; refreshToken: string }>
 {
 	return JwtGenerator.getInstance().generateTokenPair(payload);
 }
 
-
 export {
-	getUserPayload,
 	isTokenValid,
 	generateJwtTokenPair
 }

@@ -1,6 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { Storage } from '../../../infrastructure/storage/storage'
-import { getUserPayload } from 'pkg/JwtGenerator'
 
 export async function pingHandler(request: FastifyRequest, reply: FastifyReply) {
 

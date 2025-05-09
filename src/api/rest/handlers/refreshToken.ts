@@ -1,11 +1,9 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
-import { getUserPayload } from '../../../pkg/JwtGenerator'
 import JwtGenerator, {isTokenValid, generateJwtTokenPair, TokenType } from '../../../pkg/JwtGenerator';
 
 export async function refreshTokensPair(request: FastifyRequest, reply: FastifyReply) {
 	try {
-		await isTokenValid(request, TokenType.Refresh);
-		const payload = await getUserPayload(request);
+		const payload = await isTokenValid(request, TokenType.Refresh);
 		const userId = payload.userId;
 		const tokenPair = await generateJwtTokenPair({userId});
 		return reply.code(201).send({
