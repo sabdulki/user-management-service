@@ -72,8 +72,9 @@ async function main()
   }
 
   const host = Config.getInstance().getHost();
+  const port = Config.getInstance().getPort();
 
-  app.listen({ host, port: 3000 }, (err, address) => {
+  app.listen({ host, port }, (err, address) => {
     if (err) {
       app.log.error(err)
       process.exit(1)

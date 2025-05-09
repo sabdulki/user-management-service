@@ -3,7 +3,7 @@ import {isTokenValid,TokenType} from '../../../pkg/JwtGenerator';
 
 export async function deleteUserById(request: FastifyRequest, reply: FastifyReply) {
 	try {
-        await isTokenValid(request, TokenType.Access);
+        await isTokenValid(request);
         const {userId} = request.params as {userId : number}; //распаковка
         request.server.storage.deleteUserById(userId);
 		// close his session and delete all jwt tokens

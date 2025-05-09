@@ -5,7 +5,7 @@ import {isTokenValid, TokenType} from '../../../pkg/JwtGenerator'
 export async function getUserInfoById(request: FastifyRequest, reply: FastifyReply) 
 {
     try {
-        await isTokenValid(request, TokenType.Access);
+        await isTokenValid(request);
         const {userId} = request.params as {userId : number}; //распаковка
         const userBaseInfo = request.server.storage.getUserById(userId) as UserBaseInfo;
         return reply.code(201).send (userBaseInfo);

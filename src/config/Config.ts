@@ -7,6 +7,7 @@ export default class Config {
   private mode: string;
   private readonly radishHost: string;
   private readonly radishPort: number;
+  private readonly port: number;
     // private readonly secret: string;
     // private readonly salt: string;
     // private readonly accessExpiresIn: string;
@@ -16,6 +17,7 @@ export default class Config {
     this.mode = process.env.MODE || "develop";
     this.radishHost = process.env.RADISH_HOST || "localhost";
     this.radishPort = Number(process.env.RADISH_PORT) || 5100;
+    this.port = Number(process.env.PORT) || 5000;
     // if (!this.radishHost || !this.radishPort) {
 		// 	throw new Error("Radish initialization error : not enough arguments.")
 		// }
@@ -45,5 +47,9 @@ export default class Config {
       return "0.0.0.0";
     } 
     return "localhost";
+  }
+
+  public getPort(): number {
+    return this.port;
   }
 };

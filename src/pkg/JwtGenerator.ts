@@ -13,6 +13,12 @@ export enum TokenType {
 	Refresh = 'refresh',
 }
 
+// const ErrNotEnoughArgs = new Error("JwtGeneratorConfig error : not enough arguments.")
+// const err = new Error()
+// if (err === ErrNotEnoughArgs) {
+
+// } 
+
 class JwtGeneratorConfig {
 	public readonly secret: string;
 	public readonly salt: string;
@@ -42,7 +48,7 @@ export default class JwtGenerator {
 	private readonly config:JwtGeneratorConfig;
 	private radishClient: RadishClient;
 
-	constructor() {
+	private constructor() {
 		this.config = new JwtGeneratorConfig();
 		const host = Config.getInstance().getRadishHost();
 		const port = Config.getInstance().getRadishPort();
@@ -98,7 +104,7 @@ export default class JwtGenerator {
 	}
 };
 
-async function isTokenValid(request: FastifyRequest, type: TokenType): Promise<JwtPayload>
+async function isTokenValid(request: FastifyRequest, type: TokenType = TokenType.Access): Promise<JwtPayload>
 {
 	let token: string;
 	try {
