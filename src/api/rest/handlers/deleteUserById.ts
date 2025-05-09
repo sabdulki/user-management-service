@@ -1,12 +1,12 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
-import { getUserPayload } from 'pkg/JwtGenerator'
-import JwtGenerator from '../../../pkg/JwtGenerator';
+import {isTokenValid,TokenType} from '../../../pkg/JwtGenerator';
 
-export async function deleteUser(request: FastifyRequest, reply: FastifyReply) {
+export async function deleteUserById(request: FastifyRequest, reply: FastifyReply) {
 	try {
+        await isTokenValid(request, TokenType.Access);
         const {userId} = request.params as {userId : number}; //распаковка
         request.server.storage.deleteUserById(userId);
-		// close his session and felete all jwt tokens
+		// close his session and delete all jwt tokens
         return reply.code(200).send();
     } catch (error: any) {
         return (reply.code(404).send({ error: 'error'}));

@@ -1,26 +1,21 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { getUserPayload } from '../../../pkg/JwtGenerator'
-import JwtGenerator from '../../../pkg/JwtGenerator';
+import JwtGenerator, {isTokenValid, generateJwtTokenPair, TokenType } from '../../../pkg/JwtGenerator';
 
 export async function refreshTokensPair(request: FastifyRequest, reply: FastifyReply) {
-	let refreshToken;
 	try {
-		const body = request.body as { refreshToken: string };
-		refreshToken = body.refreshToken;
-	} catch (error: any) {
-		return reply.code(400).send({ message: 'Missing refresh token' });
-	}
-	try {
-		const instance = JwtGenerator.getInstance();
-		const payload = await instance.verifyToken(refreshToken, "refresh");
+		await isTokenValid(request, TokenType.Refresh);
+		const payload = await getUserPayload(request);
 		const userId = payload.userId;
-		const tokenPair = await instance.generateTokenPair({userId});
+		const tokenPair = await generateJwtTokenPair({userId});
 		return reply.code(201).send({
 			accessToken: tokenPair.accessToken,
 			refreshToken: tokenPair.refreshToken
 		})
 	} catch (error: any) {
-		if (error.message == "TokenVerificationFailure") {
+		if (error.message === "TokenExtractionFailure")
+			return (reply.code(400).send({message: 'TokenExtractionFailure'}))
+		if (error.message == "TokenVerificationFailure"  || error.message === 'TokenIsNotValid') {
 			return reply.code(401).send( {message: 'TokenVerificationFailure'});
 		} else {
 			return reply.code(500).send( {message: error.message });

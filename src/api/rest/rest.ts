@@ -6,8 +6,9 @@ import { loginHandler } from './handlers/login'
 import { getUserInfo } from './handlers/getUser'
 import { getUserInfoById } from './handlers/getUserById'
 import { refreshTokensPair } from './handlers/refreshToken'
-import { deleteUser } from './handlers/deleteUserById'
-import { verifyToken } from './handlers/isTokenValid'
+import { deleteUserById } from './handlers/deleteUserById'
+// import { verifyToken } from './handlers/isTokenValid'
+import { isTokenValid } from 'pkg/JwtGenerator'
 
 const routes: IHandler[] = [
   {
@@ -35,11 +36,11 @@ const routes: IHandler[] = [
     route: '/user/:userId',
     handler: getUserInfoById
   },
-  {
-    method: 'GET',
-    route: '/verify-token',
-    handler: verifyToken
-  },
+  // {
+  //   method: 'GET',
+  //   route: '/verify-token',
+  //   handler: isTokenValid
+  // },
   {
     method: 'POST',
     route: '/refresh',
@@ -48,7 +49,7 @@ const routes: IHandler[] = [
   {
     method: 'DELETE',
     route: '/user/delete/:userId',
-    handler: deleteUser
+    handler: deleteUserById
   }
 
 ]

@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import UserCreateForm from '../../../models/UserCreateForm';
-import JwtGenerator from '../../../pkg/JwtGenerator';
+import JwtGenerator, {generateJwtTokenPair} from '../../../pkg/JwtGenerator';
 
 export async function registrationHandler(request: FastifyRequest, reply: FastifyReply) 
 {
@@ -14,16 +14,14 @@ export async function registrationHandler(request: FastifyRequest, reply: Fastif
   const storage = request.server.storage;
 
   try {
-    let userId: number;
-    userId = storage.userRegisterTransaction(form);
-    const instance = JwtGenerator.getInstance();
-    const tokenPair = await instance.generateTokenPair({ userId });
+    const userId = storage.userRegisterTransaction(form);
+    const tokenPair = await generateJwtTokenPair({userId});
 
     //testing
-    console.log('Access Token:', tokenPair.accessToken);
-    console.log('Refresh Token:', tokenPair.refreshToken);
-    const decoded = await instance.verifyToken(tokenPair.accessToken, "access");
-    console.log('Decoded payload:', decoded);
+    // console.log('Access Token:', tokenPair.accessToken);
+    // console.log('Refresh Token:', tokenPair.refreshToken);
+    // const decoded = await instance.verifyToken(tokenPair.accessToken, TokenType.Access);
+    // console.log('Decoded payload:', decoded);
     return reply.code(201).send({
       accessToken: tokenPair.accessToken,
       refreshToken: tokenPair.refreshToken

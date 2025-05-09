@@ -8,6 +8,11 @@ interface JwtPayload {
 	userId: number;
 }
 
+export enum TokenType {
+	Access = 'access',
+	Refresh = 'refresh',
+}
+
 class JwtGeneratorConfig {
 	public readonly secret: string;
 	public readonly salt: string;
@@ -78,9 +83,10 @@ export default class JwtGenerator {
 		}
 	}
   
-	public async verifyToken(token: string, type: string): Promise<JwtPayload> {
+	public async verifyToken(token: string, type: TokenType): Promise<JwtPayload> {
 		try {
-			const status = await this.radishClient.get(type+"-"+token);
+			const key = `${type}-${token}`;
+			const status = await this.radishClient.get(key);
 			if (status.status == 200) {
 				return jwt.verify(token, this.config.secret + this.config.salt) as JwtPayload;
 			}
@@ -96,14 +102,40 @@ export default class JwtGenerator {
 async function getUserPayload(request: FastifyRequest): Promise<JwtPayload> {
 	try {
 		const token = request.headers.authorization?.replace('Bearer ', '') as string;
-		return await JwtGenerator.getInstance().verifyToken(token, "access");
+		return await JwtGenerator.getInstance().verifyToken(token, TokenType.Access);
 	} catch {
 		throw new Error("TokenExtractionFailure")
 	}
 };
 
-// async function 
+async function isTokenValid(request: FastifyRequest, type: TokenType)
+{
+	let token: string;
+	try {
+		if (type == TokenType.Access) {
+			token = request.headers.authorization?.replace('Bearer ', '') as string;
+		} else {
+			const body = request.body as { refreshToken: string };
+			token = body.refreshToken;
+		}
+	} catch (err: any) {
+		throw new Error ("TokenExtractionFailure");
+	}
+	
+	try {
+		await JwtGenerator.getInstance().verifyToken(token, type);
+	} catch (err: any) {
+		throw new Error("TokenIsNotValid");
+	}
+}
+async function generateJwtTokenPair(payload: JwtPayload): Promise<{ accessToken: string; refreshToken: string }>
+{
+	return JwtGenerator.getInstance().generateTokenPair(payload);
+}
+
 
 export {
-	getUserPayload
+	getUserPayload,
+	isTokenValid,
+	generateJwtTokenPair
 }
