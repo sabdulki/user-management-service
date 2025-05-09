@@ -2,6 +2,7 @@ import { FastifyRequest } from 'fastify';
 import jwt from 'jsonwebtoken';
 import RadishClient from "./client/client"
 import Config from "../config/Config"
+import { stringToSeconds } from './utils';
 
 interface JwtPayload {
 	userId: number;
@@ -10,8 +11,8 @@ interface JwtPayload {
 class JwtGeneratorConfig {
 	public readonly secret: string;
 	public readonly salt: string;
-	public readonly accessExpiresIn: string;
-	public readonly refreshExpiresIn: string;
+	public readonly accessExpiresIn: number;
+	public readonly refreshExpiresIn: number;
   
 	constructor() {
 		const secret = process.env.JWT_SECRET
@@ -21,8 +22,12 @@ class JwtGeneratorConfig {
 		}  
 		this.secret = secret;
 		this.salt = salt;
-		this.accessExpiresIn = process.env.JWT_ACCESS_EXPIRES_IN || "15m";
-		this.refreshExpiresIn = process.env.JWT_REFRESH_EXPIRES_IN || "90d";
+		try {
+			this.accessExpiresIn = stringToSeconds(process.env.JWT_ACCESS_EXPIRES_IN || '15m');
+			this.refreshExpiresIn = stringToSeconds(process.env.JWT_REFRESH_EXPIRES_IN || '90d');
+		} catch {
+			throw new Error('JwtGeneratorConfig error: invalid expiration format');
+		}
 	}
 };
 
@@ -46,7 +51,7 @@ export default class JwtGenerator {
 		return JwtGenerator.instance;
 	}
 	
-	private generateToken(payload: JwtPayload, expiresIn: string): string {
+	private generateToken(payload: JwtPayload, expiresIn: number): string {
 	  // Include salt in signature by appending it to the secret
 		try {
 			return jwt.sign(payload as jwt.JwtPayload, this.config.secret + this.config.salt, {

@@ -1,12 +1,11 @@
 import Fastify from 'fastify'
-import { FastifyInstance } from 'fastify'
 import { registerRestRoutes } from './api/rest/rest'
 import fp from "fastify-plugin";
-import Database from "better-sqlite3";
 import DatabaseStorage from './storage/DatabaseStorage'
 import JwtGenerator from './pkg/JwtGenerator';
 import dotenv from 'dotenv';
 import Config from './config/Config';
+import cors from '@fastify/cors'
 
 dotenv.config();
 
@@ -61,6 +60,9 @@ async function main()
 {
   await app.register(dbConnectorPlugin);
   await app.register(registerRoutesPlugin);
+  await app.register(cors, {
+    origin: true, // разрешить ВСЕ источники
+  })
 
   try {
     JwtGenerator.getInstance();
