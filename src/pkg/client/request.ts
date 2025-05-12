@@ -24,15 +24,19 @@ export default class RadishRequest {
 				if (err) {
 					return reject(err);
 				}
+                console.log("err in write");
 			});
-
+            
 			conn.once('data', (data) => {
-				resolve(data.toString());
+                resolve(data.toString());
+                console.log("err in data");
 			});
-
+            
 			conn.once('error', (err) => {
-				reject(err);
+                reject(err);
+                console.log("err in error");
 			});
+            console.log("send DONE");
 		});
     }
 

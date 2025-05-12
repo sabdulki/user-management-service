@@ -21,6 +21,7 @@ export default class RequestQueue {
 
             this.queue.push(wrappedTask);
             this.processNext();
+            console.log("add DONE");
         });
     }
 

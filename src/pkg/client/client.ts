@@ -69,7 +69,9 @@ export default class RadishClient {
 
 	async set(key: string, value: string, expire?: number) {
 		const request = RadishRequest.set(key, value, expire);
+		console.log("set is done. going to queue.add() request.send()");
 		const data = await this.queue.add(() => request.send(this.conn));
+		console.log("queue.add() request.send() DONE");
 		return new RadishResponse(data);
 	}
 

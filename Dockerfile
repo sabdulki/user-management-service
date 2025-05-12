@@ -1,7 +1,7 @@
 
 # How to run
 # docker build -t fastify-app .
-# docker run -p 3000:3000 fastify-app
+# docker run -p 5000:5000 fastify-app
 # to stop: docker stop fastify-app
 
 # Базовый образ
@@ -33,7 +33,7 @@ COPY . .
 RUN npm run build
 
 # Пробрасываем порт
-EXPOSE 3000
+EXPOSE 5000
 
 # Команда для запуска (если используешь ts-node)
 CMD ["sh", "./docker-run.sh"]

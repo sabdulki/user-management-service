@@ -76,12 +76,14 @@ export default class JwtGenerator {
 		try {
 			const accessToken = this.generateToken(payload, this.config.accessExpiresIn);
 			const refreshToken = this.generateToken(payload, this.config.refreshExpiresIn);
+			console.log ("is going to set values in generateTokenPair");
 			const accessResponse = await this.radishClient.set(`access-${accessToken}`, "true");
 			if (accessResponse.status !== 201)
 				throw new Error("JwtSettingFailure");
 			const refreshResponse = await this.radishClient.set(`refresh-${refreshToken}`, "true");
 			if (refreshResponse.status !== 201)
 				throw new Error("JwtSettingFailure");
+			console.log ("has set all values in generateTokenPair");
 			return { accessToken, refreshToken };
 		} catch (error: any) {
 			throw new Error("JwtPairGenerationFailure");
