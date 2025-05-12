@@ -6,6 +6,7 @@ import JwtGenerator from './pkg/JwtGenerator';
 import dotenv from 'dotenv';
 import Config from './config/Config';
 import cors from '@fastify/cors'
+import loggerMiddleware from "./pkg/middlewares/loggerMiddleware"
 
 dotenv.config();
 
@@ -19,7 +20,7 @@ async function setupDatabaseStorage() {
   const storage = new DatabaseStorage() 
   
   app.decorate('storage', storage)  
-
+  
   app.addHook('onClose', (app, done) => {
     storage.close()
     done()
@@ -63,6 +64,7 @@ async function main()
   await app.register(cors, {
     origin: true, // разрешить ВСЕ источники
   })
+  app.addHook('onRequest', loggerMiddleware)
 
   try {
     JwtGenerator.getInstance();
