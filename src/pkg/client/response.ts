@@ -4,7 +4,7 @@ export default class RadishResponse {
     private _data: Record<string, any> | undefined;
 
     constructor(input: string) {
-        console.log("going to parse input");
+
         const obj = JSON.parse(input);
 
         const {status, error, data} = obj;
@@ -15,7 +15,6 @@ export default class RadishResponse {
         this._status = status;
         this._error = error;
         this._data = data ? JSON.parse(data) : undefined;
-        console.log("data is parsed. returning a new instance of RadishResponce");
     }
 
     get value() {

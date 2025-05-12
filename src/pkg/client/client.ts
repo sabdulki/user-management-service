@@ -10,55 +10,73 @@ type RadishClientConfig = {
 }
 
 export default class RadishClient {
-	private conn : net.Socket;
+	private conn: net.Socket;
 	private config: RadishClientConfig;
 	isConnected: boolean = false;
-	private queue: RequestQueue	= new RequestQueue(this);
+	private reconnecting: boolean = false;
+	private queue: RequestQueue = new RequestQueue(this);
 
 	constructor(config: RadishClientConfig) {
 		this.config = config;
 		this.conn = this.connect();
 	}
 
-	private connect(){
-		if (this.conn) {
-			this.conn.removeAllListeners();
-			this.conn.destroy();            
-		}
-
+	private connect(): net.Socket {
 		const port = this.config.port;
 		const host = this.config.host;
 
-		this.conn = net.createConnection({ port, host }, () => {
-			this.config.onConnect?.();
+		const socket = net.createConnection({ port, host }, () => {
 			this.isConnected = true;
+			this.reconnecting = false;
+			this.config.onConnect?.();
+			console.log('RadishClient info : connected to server.');
 		});
 
-		this.conn.on('error', (err) => {
-			console.error('Connection error:', err);
+		socket.on('error', (err) => {
+			console.error('RadishClient error : connection establishment failed :', err.message);
+		});
+
+		socket.on('close', () => {
+			if (this.isConnected) {
+				console.error('RadishClient error : connection closed.');
+			}
 			this.isConnected = false;
-			this.reconnect();
+			if (!this.reconnecting) {
+				this.reconnect();
+			}
 		});
 
-		this.conn.on('error', (err) => {
-			console.error('Socket error:', err);
-		});
-		return this.conn
+		this.conn = socket;
+		return socket;
 	}
 
-	private async reconnect() {
-		if (this.isConnected) {
-			return;
-		}
+	private reconnect() {
+		this.reconnecting = true;
+		const attemptReconnect = () => {
+			if (this.isConnected) {
+				this.reconnecting = false;
+				return;
+			}
 
-		setTimeout(() => {
-			console.log(`Reconnect attempt...`);
-			this.connect();
-		}, 1000);
+			console.log('RadishClient info : Attempting to reconnect...');
+			this.conn = this.connect();
+			
+			// Wait 1 second before next attempt
+			setTimeout(() => {
+				if (!this.isConnected) {
+					attemptReconnect();
+				}
+			}, 1000);
+		};
+
+		attemptReconnect();
 	}
-	
+
 	close() {
 		this.conn.end();
+		this.conn.destroy();
+		this.isConnected = false;
+		this.reconnecting = false;
 	}
 
 	async get(key: string) {
@@ -69,9 +87,7 @@ export default class RadishClient {
 
 	async set(key: string, value: string, expire?: number) {
 		const request = RadishRequest.set(key, value, expire);
-		console.log("set is done. going to queue.add() request.send()");
 		const data = await this.queue.add(() => request.send(this.conn));
-		console.log("queue.add() request.send() DONE");
 		return new RadishResponse(data);
 	}
 

@@ -15,8 +15,8 @@ ENV JWT_SECRET=super_secure_secret_key
 ENV JWT_SALT=random_salt_string
 ENV JWT_ACCESS_EXPIRES_IN=15m
 ENV JWT_REFRESH_EXPIRES_IN=90d
-ENV RADISH_HOST=5100
-ENV RADISH_PORT=localhost
+ENV RADISH_HOST=localhost
+ENV RADISH_PORT=5100
 ENV PORT=5000
 
 # Копируем package.json и package-lock.json

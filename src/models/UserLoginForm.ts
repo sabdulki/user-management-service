@@ -15,18 +15,18 @@ class UserLoginForm {
     
     @IsString()
     @MinLength(8)
-    rawPassword:string;
+    password:string;
     // private _password :string;
     constructor(nick: string, pass: string) {
         this.nickname = nick;
         // this._password = pass;
-        this.rawPassword = pass;
+        this.password = pass;
     }
 
     async authenticate(): Promise<boolean> {
         try {
           const userPassword = app.storage.getUserPassword(this.nickname) as string;
-          const passwordMatches = await bcrypt.compare(this.rawPassword, userPassword);
+          const passwordMatches = await bcrypt.compare(this.password, userPassword);
       
           return passwordMatches; // return true if match, false otherwise
         } catch (error) {
@@ -39,7 +39,7 @@ class UserLoginForm {
         const form = plainToInstance(UserLoginForm, rawData);
         try {
           await validateOrReject(form);
-          return new UserLoginForm(form.nickname, form.rawPassword)
+          return new UserLoginForm(form.nickname, form.password)
         } catch (errors) {
           // which status code should be and how errors should be treated?
           throw new Error("Invalid data");
