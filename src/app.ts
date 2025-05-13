@@ -7,6 +7,10 @@ import Config from './config/Config';
 import cors from '@fastify/cors'
 import loggerMiddleware from "./pkg/middlewares/loggerMiddleware"
 import { setUpJwtGenerator } from './pkg/jwt/JwtGenerator';
+import fastifyMultipart from '@fastify/multipart'
+import fastifyStatic from '@fastify/static'
+import path from 'path'
+
 
 dotenv.config();
 
@@ -63,6 +67,15 @@ async function main()
   await app.register(registerRoutesPlugin);
   await app.register(cors, {
     origin: true, // разрешить ВСЕ источники
+  })
+  await app.register(fastifyMultipart, {
+    limits: {
+      fileSize: 2 * 1024 * 1024, // Optional: enforce 2MB at plugin level too
+    }
+  })
+  app.register(fastifyStatic, {
+    root: path.join(__dirname, 'public'),
+    prefix: '/avatars/', // so /avatars/filename.jpg works
   })
   app.addHook('onRequest', loggerMiddleware)
 

@@ -8,7 +8,7 @@ import { getUserInfoById } from './handlers/getUserById'
 import { refreshTokensPair } from './handlers/refreshToken'
 import { deleteUserById } from './handlers/deleteUserById'
 import { isTokenExpired } from './handlers/isTokenExpired'
-import { isTokenValid } from 'pkg/jwt/JwtGenerator'
+import { uploadAvatar } from './handlers/uploadAvatar'
 
 const routes: IHandler[] = [
   {
@@ -45,6 +45,11 @@ const routes: IHandler[] = [
     method: 'POST',
     route: '/auth/api/rest/refresh',
     handler: refreshTokensPair
+  },
+  {
+    method: 'POST',
+    route: '/auth/api/rest/user/avatar',
+    handler: uploadAvatar
   },
   {
     method: 'DELETE',

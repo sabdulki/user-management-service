@@ -9,6 +9,15 @@ export default class DatabaseStorage implements IStorage {
     constructor() {
         //Работает как обычное подключение к SQLite-файлу если файл уже создан
         this._db = new Database('./databases.db');
+        // this was executed on;y ONCE to add avatar_path column ONLY
+        // const columnExists = this._db
+        //     .prepare(`PRAGMA table_info(users)`)
+        //     .all()
+        //     .some(col => col.name === 'avatar_path')
+
+        // if (!columnExists) {
+        //     this._db.exec(`ALTER TABLE users ADD COLUMN avatar_path TEXT;`)
+        // }
     }
 
     close() {
@@ -84,6 +93,14 @@ export default class DatabaseStorage implements IStorage {
         }
     }
     
+    addUserAvatar(userId: number, relativePath: string): void {
+        try {
+            const stmt = this._db.prepare('UPDATE users SET avatar_path = ? WHERE id = ?');
+            stmt.run(relativePath, userId) 
+        } catch (error: any) {
+            throw new Error('Failed to add user avatar');
+        }
+    }
 
     deleteUserById(userId: number): void {
         try {

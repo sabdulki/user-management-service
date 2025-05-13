@@ -9,6 +9,7 @@ interface IStorage {
     // inner methods
     getUserByNickname(nickname: string): UserBaseInfo;
     getUserById(id: number) : UserBaseInfo;
+    addUserAvatar(userId: number, relativePath: string): void;
     deleteUserById(userId: number): void;
 };
 
