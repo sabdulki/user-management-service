@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import UserBaseInfo from 'types/UserBaseInfo';
-import {isTokenValid, TokenType} from '../../../pkg/JwtGenerator'
+import {isTokenValid, TokenType} from '../../../pkg/jwt/JwtGenerator'
 
 export async function getUserInfoById(request: FastifyRequest, reply: FastifyReply) 
 {

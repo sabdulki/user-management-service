@@ -8,7 +8,7 @@ import { getUserInfoById } from './handlers/getUserById'
 import { refreshTokensPair } from './handlers/refreshToken'
 import { deleteUserById } from './handlers/deleteUserById'
 import { isTokenExpired } from './handlers/isTokenExpired'
-import { isTokenValid } from 'pkg/JwtGenerator'
+import { isTokenValid } from 'pkg/jwt/JwtGenerator'
 
 const routes: IHandler[] = [
   {
@@ -28,27 +28,27 @@ const routes: IHandler[] = [
   },
   {
     method: 'GET',
-    route: '/user',
+    route: '/auth/api/rest/user',
     handler: getUserInfo
   },
   {
     method: 'GET',
-    route: '/user/:userId',
+    route: '/auth/api/rest/user/:userId',
     handler: getUserInfoById
   },
   {
     method: 'GET',
-    route: '/isTokenExpired',
+    route: '/auth/api/rest/isTokenExpired',
     handler: isTokenExpired
   },
   {
     method: 'POST',
-    route: '/refresh',
+    route: '/auth/api/rest/refresh',
     handler: refreshTokensPair
   },
   {
     method: 'DELETE',
-    route: '/user/delete/:userId',
+    route: '/auth/api/rest/user/delete/:userId',
     handler: deleteUserById
   }
 

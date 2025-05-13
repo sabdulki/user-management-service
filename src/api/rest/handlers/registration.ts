@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import UserCreateForm from '../../../models/UserCreateForm';
-import JwtGenerator, {generateJwtTokenPair} from '../../../pkg/JwtGenerator';
+import {generateJwtTokenPair} from '../../../pkg/jwt/JwtGenerator';
 
 export async function registrationHandler(request: FastifyRequest, reply: FastifyReply) 
 {
@@ -16,7 +16,9 @@ export async function registrationHandler(request: FastifyRequest, reply: Fastif
   try {
     const userId = storage.userRegisterTransaction(form);
     const tokenPair = await generateJwtTokenPair({userId});
-
+    if (!tokenPair) {
+      return reply.code(500).send();
+    }
     //testing
     // console.log('Access Token:', tokenPair.accessToken);
     // console.log('Refresh Token:', tokenPair.refreshToken);

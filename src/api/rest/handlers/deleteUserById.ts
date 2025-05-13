@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
-import {isTokenValid,TokenType} from '../../../pkg/JwtGenerator';
+import {isTokenValid,TokenType} from '../../../pkg/jwt/JwtGenerator';
 
 export async function deleteUserById(request: FastifyRequest, reply: FastifyReply) {
 	try {

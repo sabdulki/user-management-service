@@ -2,11 +2,11 @@ import Fastify from 'fastify'
 import { registerRestRoutes } from './api/rest/rest'
 import fp from "fastify-plugin";
 import DatabaseStorage from './storage/DatabaseStorage'
-import JwtGenerator from './pkg/JwtGenerator';
 import dotenv from 'dotenv';
 import Config from './config/Config';
 import cors from '@fastify/cors'
 import loggerMiddleware from "./pkg/middlewares/loggerMiddleware"
+import { setUpJwtGenerator } from './pkg/jwt/JwtGenerator';
 
 dotenv.config();
 
@@ -67,9 +67,9 @@ async function main()
   app.addHook('onRequest', loggerMiddleware)
 
   try {
-    JwtGenerator.getInstance();
+    setUpJwtGenerator();
   } catch (error : any) {
-    console.log("jwt generation error ", error);
+    console.log(error);
     process.exit(1)
   }
 

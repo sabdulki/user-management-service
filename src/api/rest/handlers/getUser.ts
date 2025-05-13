@@ -1,11 +1,13 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
-import { isTokenValid, TokenType } from '../../../pkg/JwtGenerator'
+import { isTokenValid, TokenType } from '../../../pkg/jwt/JwtGenerator'
 import UserBaseInfo from 'types/UserBaseInfo';
 
 export async function getUserInfo(request: FastifyRequest, reply: FastifyReply) 
 {
     try {
         const payload = await isTokenValid(request);
+        if (!payload)
+            return reply.code(401).send();
         const userBaseInfo = request.server.storage.getUserById(payload.userId) as UserBaseInfo;
         return reply.code(201).send (userBaseInfo);
     } catch (error: any) {

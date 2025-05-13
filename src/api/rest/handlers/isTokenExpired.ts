@@ -1,12 +1,12 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
-import JwtGenerator, {isTokenValid, TokenType}  from '../../../pkg/JwtGenerator';
-import { access } from 'fs';
+import {isTokenValid}  from '../../../pkg/jwt/JwtGenerator';
 
 export async function isTokenExpired(request: FastifyRequest, reply: FastifyReply)
 {
 	try {
 	  const decoded = await isTokenValid(request);
-	  return reply.send({ valid: true, decoded });
+	  if (!decoded)
+	  	return reply.send({ valid: true, decoded });
 	} catch (error: any) {
 	  return reply.code(401).send({
 		valid: false,

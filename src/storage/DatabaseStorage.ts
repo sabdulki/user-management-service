@@ -8,7 +8,7 @@ export default class DatabaseStorage implements IStorage {
 
     constructor() {
         //Работает как обычное подключение к SQLite-файлу если файл уже создан
-        this._db = new Database('./databases.db', { verbose: console.log });
+        this._db = new Database('./databases.db');
     }
 
     close() {

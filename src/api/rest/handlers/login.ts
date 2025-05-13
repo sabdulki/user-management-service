@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { UserLoginForm } from '../../../models/UserLoginForm';
-import JwtGenerator, {generateJwtTokenPair} from '../../../pkg/JwtGenerator';
+import {generateJwtTokenPair} from '../../../pkg/jwt/JwtGenerator';
   
 export async function loginHandler(request: FastifyRequest, reply: FastifyReply) 
 {
@@ -20,6 +20,9 @@ export async function loginHandler(request: FastifyRequest, reply: FastifyReply)
     const userId = user.id;
     
     const tokenPair = await generateJwtTokenPair({ userId });
+    if (!tokenPair) {
+      return reply.code(500).send();
+    }
     return reply.code(200).send({
       accessToken: tokenPair.accessToken,
       refreshToken: tokenPair.refreshToken
