@@ -8,6 +8,7 @@ interface IStorage {
     userRegister(form: UserCreateForm) : number;
     // inner methods
     getUserByNickname(nickname: string): UserBaseInfo;
+    getUserByEmail(email: string): UserBaseInfo | undefined ;
     getUserById(id: number) : UserBaseInfo;
     addUserAvatar(userId: number, relativePath: string): void;
     getUserAvatar(userId: number): string | undefined;

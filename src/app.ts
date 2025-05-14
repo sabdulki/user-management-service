@@ -10,6 +10,7 @@ import { setUpJwtGenerator } from './pkg/jwt/JwtGenerator';
 import fastifyMultipart from '@fastify/multipart'
 import fastifyStatic from '@fastify/static'
 import path from 'path'
+import fastifyOauth2 from '@fastify/oauth2'
 
 
 dotenv.config();
@@ -73,9 +74,27 @@ async function main()
       fileSize: 2 * 1024 * 1024 // Optional: enforce 2MB at plugin level too
     }
   })
-  app.register(fastifyStatic, {
+  await app.register(fastifyStatic, {
     root: path.join(__dirname, 'public'),
     prefix: '/avatars/', // so /avatars/filename.jpg works
+  })
+
+  const configInstance =  Config.getInstance()
+  const googleClientId = configInstance.getGoogleClientId();
+  const googleClientSecret = configInstance.getGoogleClientSecret();
+  const googleCallbackUrl = configInstance.getGoogleCallbackUrl();
+
+  await app.register(fastifyOauth2, {
+    name: 'googleOAuth2',
+    credentials: {
+      client: {
+        id: googleClientId,
+        secret: googleClientSecret
+      },
+      auth: fastifyOauth2.GOOGLE_CONFIGURATION
+    },
+    startRedirectPath: 'google/login',
+    callbackUri: googleCallbackUrl
   })
   app.addHook('onRequest', loggerMiddleware)
 
@@ -86,8 +105,8 @@ async function main()
     process.exit(1)
   }
 
-  const host = Config.getInstance().getHost();
-  const port = Config.getInstance().getPort();
+  const host = configInstance.getHost();
+  const port = configInstance.getPort();
 
   app.listen({ host, port }, (err, address) => {
     if (err) {

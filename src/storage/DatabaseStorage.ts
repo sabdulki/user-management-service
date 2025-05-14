@@ -70,6 +70,16 @@ export default class DatabaseStorage implements IStorage {
         }
     }
 
+    getUserByEmail(email: string): UserBaseInfo | undefined {
+        try {
+            const user = this._db.prepare('SELECT * FROM users WHERE email = ?').get(email) as UserBaseInfo;
+            const userId = user.id;
+            return this.getUserById(userId);
+        } catch (error) {
+            throw new Error('Failed to get user');
+        }
+    }
+
     getUserById(id: number): UserBaseInfo {
         try {
             const stmt = this._db.prepare(`

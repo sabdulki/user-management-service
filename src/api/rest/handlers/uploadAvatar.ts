@@ -78,5 +78,5 @@ export async function uploadAvatar(request: FastifyRequest, reply: FastifyReply)
 	} catch (error: any) {
 	return reply.code(500).send({ message: 'Failed to record avatar in storage' });
 	}
- 	return reply.code(200).send({ avatarUrl: `/public/${relativePath}` });
+ 	return reply.code(200).send({ avatar: `/public/${relativePath}` });
 }

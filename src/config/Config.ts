@@ -8,23 +8,18 @@ export default class Config {
   private readonly radishHost: string;
   private readonly radishPort: number;
   private readonly port: number;
-    // private readonly secret: string;
-    // private readonly salt: string;
-    // private readonly accessExpiresIn: string;
-    // private readonly refreshExpiresIn: string;
+  private readonly googleClientId: string;
+  private readonly googleClientSecret: string;
+  private readonly googleCallbackUrl: string;
 
   private constructor() {
     this.mode = process.env.MODE || "develop";
     this.radishHost = process.env.RADISH_HOST || "localhost";
     this.radishPort = Number(process.env.RADISH_PORT) || 5100;
     this.port = Number(process.env.PORT) || 5000;
-    // if (!this.radishHost || !this.radishPort) {
-		// 	throw new Error("Radish initialization error : not enough arguments.")
-		// }
-    // this.secret = process.env.JWT_SECRET!;
-    // this.salt = process.env.JWT_SALT!;
-    // this.accessExpiresIn = process.env.JWT_ACCESS_EXPIRES_IN || "15m";
-    // this.refreshExpiresIn = process.env.JWT_REFRESH_EXPIRES_IN || "90d";
+    this.googleClientId = process.env.GOOGLE_CLIENT_ID!;
+    this.googleClientSecret = process.env.GOOGLE_CLIENT_SECRET!;
+    this.googleCallbackUrl = process.env.GOOGLE_CALLBACK_URL!;
   }
 
   public static getInstance(): Config {
@@ -51,5 +46,17 @@ export default class Config {
 
   public getPort(): number {
     return this.port;
+  }
+
+  public getGoogleClientId(): string {
+    return this.googleClientId;
+  }
+
+  public getGoogleClientSecret(): string {
+    return this.googleClientSecret;
+  }
+
+  public getGoogleCallbackUrl(): string {
+    return this.googleCallbackUrl;
   }
 };
