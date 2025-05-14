@@ -10,6 +10,8 @@ interface IStorage {
     getUserByNickname(nickname: string): UserBaseInfo;
     getUserById(id: number) : UserBaseInfo;
     addUserAvatar(userId: number, relativePath: string): void;
+    getUserAvatar(userId: number): string | undefined;
+    deleteUserAvatar(userId: number): void;
     deleteUserById(userId: number): void;
 };
 

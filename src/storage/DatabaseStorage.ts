@@ -102,6 +102,18 @@ export default class DatabaseStorage implements IStorage {
         }
     }
 
+    getUserAvatar(userId: number): string | undefined {
+        const object = this._db.prepare('SELECT avatar_path FROM users WHERE id = ?').get(userId) as { avatar_path: string } | undefined ;
+        if (!object) {
+            return undefined;
+        }
+        return object.avatar_path;
+    }
+
+    deleteUserAvatar(userId: number): void {
+        this._db.prepare('UPDATE users SET avatar_path = NULL WHERE id = ?').run(userId);
+    }
+
     deleteUserById(userId: number): void {
         try {
             const stmt = this._db.prepare('DELETE FROM users WHERE id = ?');
