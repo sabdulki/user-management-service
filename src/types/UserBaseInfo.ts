@@ -1,7 +1,8 @@
 type UserBaseInfo = {
     id: number;
     nickname: string;
-    rating: number
+    rating: number;
+    avatar_path: string;
 };
 
 export default UserBaseInfo

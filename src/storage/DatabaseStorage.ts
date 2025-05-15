@@ -99,7 +99,7 @@ export default class DatabaseStorage implements IStorage {
     getUserById(id: number): UserBaseInfo {
         try {
             const stmt = this._db.prepare(`
-                SELECT u.id, u.nickname, r.value as rating
+                SELECT u.id, u.nickname, u.avatar_path, r.value as rating
                 FROM users u
                 JOIN ratings r ON u.id = r.user_id
                 WHERE u.id = ?
@@ -109,7 +109,6 @@ export default class DatabaseStorage implements IStorage {
             if (!user) {
                 throw new Error('UserNotFound');
             }
-    
             return user as UserBaseInfo;
         } catch (error: any) {
             if (error.message === 'UserNotFound') {

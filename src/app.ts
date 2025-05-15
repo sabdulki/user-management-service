@@ -76,7 +76,7 @@ async function main()
   })
   await app.register(fastifyStatic, {
     root: path.join(__dirname, 'public'),
-    prefix: '/avatars/', // so /avatars/filename.jpg works
+    prefix: '/public/', // so /avatars/filename.jpg works
   })
 
   const configInstance =  Config.getInstance()

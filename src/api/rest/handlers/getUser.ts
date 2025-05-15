@@ -17,6 +17,6 @@ export async function getUserInfo(request: FastifyRequest, reply: FastifyReply)
         if (error.message === 'Failed to get user') {
             return reply.code(500).send({ error: 'Database error' });
         }
-        return (reply.code(400).send({ error: 'error'}));
+        return (reply.code(400).send(error));
     }
 }
