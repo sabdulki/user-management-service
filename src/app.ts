@@ -93,7 +93,7 @@ async function main()
       },
       auth: fastifyOauth2.GOOGLE_CONFIGURATION
     },
-    startRedirectPath: 'google/login',
+    startRedirectPath: '/auth/api/rest/google/login',
     callbackUri: googleCallbackUrl
   })
   app.addHook('onRequest', loggerMiddleware)

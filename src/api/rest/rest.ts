@@ -9,7 +9,7 @@ import { refreshTokensPair } from './handlers/refreshToken'
 import { deleteUserById } from './handlers/deleteUserById'
 import { isTokenExpired } from './handlers/isTokenExpired'
 import { uploadAvatar } from './handlers/uploadAvatar'
-import { googleLoginHandler } from './handlers/googleLogin'
+import { googleLoginCallbackHandler } from './handlers/googleLogin'
 
 const routes: IHandler[] = [
   {
@@ -27,16 +27,16 @@ const routes: IHandler[] = [
     route: '/auth/api/rest/login',
     handler: loginHandler
   },
-  {
-    method: 'GET',
-    route: '/auth/api/rest/google/login',
-    handler: googleLoginHandler
-  },
   // {
   //   method: 'GET',
-  //   route: '/auth/api/rest/google/login/callback',
-  //   handler: googleLoginCallbackHandler
+  //   route: '/auth/api/rest/google/login',
+  //   // handler: googleLoginHandler
   // },
+  {
+    method: 'POST',
+    route: '/auth/api/rest/google/login/callback',
+    handler: googleLoginCallbackHandler
+  },
   {
     method: 'GET',
     route: '/auth/api/rest/user',

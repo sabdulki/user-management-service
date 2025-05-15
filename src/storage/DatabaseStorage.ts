@@ -3,6 +3,11 @@ import IStorage from '../interfaces/IStorage'
 import UserCreateForm from '../models/UserCreateForm'
 import UserBaseInfo from "types/UserBaseInfo";
 
+export enum AuthProvider {
+    LOCAL = 0,
+    GOOGLE = 1
+}
+
 export default class DatabaseStorage implements IStorage {
     private _db: DatabaseType
 
@@ -13,10 +18,10 @@ export default class DatabaseStorage implements IStorage {
         // const columnExists = this._db
         //     .prepare(`PRAGMA table_info(users)`)
         //     .all()
-        //     .some(col => col.name === 'avatar_path')
+        //     .some(col => col.name === 'provider')
 
         // if (!columnExists) {
-        //     this._db.exec(`ALTER TABLE users ADD COLUMN avatar_path TEXT;`)
+            this._db.exec(`ALTER TABLE users ADD COLUMN provider INTEGER DEFAULT 0;`)
         // }
     }
 
@@ -34,8 +39,8 @@ export default class DatabaseStorage implements IStorage {
 
     userRegister(form: UserCreateForm): number {
         try {
-            const stmt = this._db.prepare('INSERT INTO users (nickname, email, password) VALUES (?, ?, ?)');
-            const result = stmt.run(form.nickname, form.email, form.hashedPassword);
+            const stmt = this._db.prepare('INSERT INTO users (nickname, email, password, provider) VALUES (?, ?, ?)');
+            const result = stmt.run(form.nickname, form.email, form.hashedPassword, form.provider);
             const userId = Number(result.lastInsertRowid);
             this._db.prepare('INSERT INTO ratings (user_id) VALUES (?)').run(userId)
             return (userId);
