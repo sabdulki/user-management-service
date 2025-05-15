@@ -94,7 +94,8 @@ async function main()
       auth: fastifyOauth2.GOOGLE_CONFIGURATION
     },
     startRedirectPath: '/auth/api/rest/google/login',
-    callbackUri: googleCallbackUrl
+    callbackUri: googleCallbackUrl,
+    scope: ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile', 'openid']
   })
   app.addHook('onRequest', loggerMiddleware)
 

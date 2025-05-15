@@ -21,7 +21,7 @@ export default class DatabaseStorage implements IStorage {
         //     .some(col => col.name === 'provider')
 
         // if (!columnExists) {
-            this._db.exec(`ALTER TABLE users ADD COLUMN provider INTEGER DEFAULT 0;`)
+            // this._db.exec(`ALTER TABLE users ADD COLUMN provider INTEGER DEFAULT 0;`)
         // }
     }
 
@@ -39,8 +39,15 @@ export default class DatabaseStorage implements IStorage {
 
     userRegister(form: UserCreateForm): number {
         try {
-            const stmt = this._db.prepare('INSERT INTO users (nickname, email, password, provider) VALUES (?, ?, ?)');
-            const result = stmt.run(form.nickname, form.email, form.hashedPassword, form.provider);
+            let result: any;
+            // if (form.provider === AuthProvider.LOCAL) {
+                const stmt = this._db.prepare('INSERT INTO users (nickname, email, password, provider) VALUES (?, ?, ?, ?)');
+                result = stmt.run(form.nickname, form.email, form.hashedPassword, form.provider);
+            // }
+            // else {
+            //     const stmt = this._db.prepare('INSERT INTO users (nickname, email, provider) VALUES (?, ?, ?)');
+            //     result = stmt.run(form.nickname, form.email, form.provider);
+            // }
             const userId = Number(result.lastInsertRowid);
             this._db.prepare('INSERT INTO ratings (user_id) VALUES (?)').run(userId)
             return (userId);
@@ -49,7 +56,9 @@ export default class DatabaseStorage implements IStorage {
               // This means nickname or email already exists (assuming there's a UNIQUE constraint)
               throw new Error('UserAlreadyExists');
             }
+            console.log('DatabaseFailure', error)
             throw new Error('DatabaseFailure');
+            
           }
     }
 
@@ -76,13 +85,15 @@ export default class DatabaseStorage implements IStorage {
     }
 
     getUserByEmail(email: string): UserBaseInfo | undefined {
-        try {
+        // try {
             const user = this._db.prepare('SELECT * FROM users WHERE email = ?').get(email) as UserBaseInfo;
+            if (!user)
+                return undefined;
             const userId = user.id;
             return this.getUserById(userId);
-        } catch (error) {
-            throw new Error('Failed to get user');
-        }
+        // } catch (error) {
+        //     throw new Error('Failed to get user');
+        // }
     }
 
     getUserById(id: number): UserBaseInfo {

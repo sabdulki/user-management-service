@@ -33,7 +33,7 @@ const routes: IHandler[] = [
   //   // handler: googleLoginHandler
   // },
   {
-    method: 'POST',
+    method: 'GET',
     route: '/auth/api/rest/google/login/callback',
     handler: googleLoginCallbackHandler
   },
