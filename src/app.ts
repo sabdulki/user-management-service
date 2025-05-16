@@ -69,16 +69,16 @@ async function main()
   await app.register(cors, {
     origin: true, // разрешить ВСЕ источники
   })
+  await app.register(fastifyStatic, {
+    root: path.join(__dirname, 'public'),
+    prefix: '/auth/public', // so /avatars/filename.jpg works
+  })
   await app.register(fastifyMultipart, {
     limits: {
       fileSize: 2 * 1024 * 1024 // Optional: enforce 2MB at plugin level too
     }
   })
-  await app.register(fastifyStatic, {
-    root: path.join(__dirname, 'public'),
-    prefix: '/public/', // so /avatars/filename.jpg works
-  })
-
+  
   const configInstance =  Config.getInstance()
   const googleClientId = configInstance.getGoogleClientId();
   const googleClientSecret = configInstance.getGoogleClientSecret();
