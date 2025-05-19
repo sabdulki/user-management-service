@@ -5,6 +5,7 @@ import { unlink } from 'fs/promises';
 import { randomUUID } from 'crypto';
 import path from 'path'
 import fs from 'fs'
+import IStorage from 'interfaces/IStorage';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 
@@ -17,7 +18,15 @@ async function deleteFile(path: string): Promise<boolean> {
 	  console.error('Error deleting file:', err);
 	  return false;
 	}
-  }
+}
+
+export async function deleteAvatar(userId: number, userAvatar: string, storage: IStorage) {
+	const userAvatarFullPath = path.join(__dirname, '../../../public', userAvatar);
+
+	const isDeleted = await deleteFile(userAvatarFullPath);
+	if (isDeleted) // delete file if it exists ?????
+		storage.deleteUserAvatar(userId);
+}
 
 export async function uploadAvatar(request: FastifyRequest, reply: FastifyReply) {
  	const payload = await isTokenValid(request);
@@ -25,8 +34,9 @@ export async function uploadAvatar(request: FastifyRequest, reply: FastifyReply)
 		return reply.code(401).send();
 
  	const userId = payload.userId;
-	const storage =  request.server.storage;
+	const storage = request.server.storage;
 	let userAvatar: string | undefined;
+
 	try {
 		userAvatar = storage.getUserAvatar(userId);
 	} catch (err: any) {
@@ -37,7 +47,7 @@ export async function uploadAvatar(request: FastifyRequest, reply: FastifyReply)
  	const parts = request.parts();
 	// 413 will be automatically send if the file is bigger than 2 mb
 
- 	let originalFilename: string | undefined;
+	let originalFilename: string | undefined;
  	let fileStream: NodeJS.ReadableStream | undefined;
 	let relativePath: string | undefined;
  	for await (const part of parts) {
@@ -67,22 +77,19 @@ export async function uploadAvatar(request: FastifyRequest, reply: FastifyReply)
  	    return reply.code(400).send({ message: 'No file provided' });
  	  }
  	}
-
+ 	
 	if (!relativePath) {
 		return reply.code(400).send({ message: 'No file uploaded' });
 	}
  	
 	if (userAvatar) {
-		const userAvatarFullPath = path.join(__dirname, '../../../public', userAvatar);
-
-		const isDeleted = await deleteFile(userAvatarFullPath);
-		if (!isDeleted)
-			storage.deleteUserAvatar(userId);
+		deleteAvatar(userId, userAvatar, storage);
 	}
+
 	try {
 		storage.addUserAvatar(userId, relativePath);
 	} catch (error: any) {
-	return reply.code(500).send({ message: 'Failed to record avatar in storage' });
+		return reply.code(500).send({ message: 'Failed to record avatar in storage' });
 	}
  	return reply.code(200).send({ avatar: `${relativePath}` });
 }
