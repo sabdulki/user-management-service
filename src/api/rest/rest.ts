@@ -9,8 +9,9 @@ import { refreshTokensPair } from './publicHandlers/refreshToken'
 import { removeUser } from './publicHandlers/deleteUser'
 import { isTokenExpired } from './publicHandlers/isTokenExpired'
 import { uploadAvatar } from './publicHandlers/uploadAvatar'
-import { googleLoginCallbackHandler } from './publicHandlers/googleLogin'
+import { googleLoginCallbackHandler } from './publicHandlers/googleLoginCallback'
 import { updateRating } from './privateHandlers/updateRating'
+import { googleLoginRedirector } from './publicHandlers/googleLogin'
 
 const routes: IHandler[] = [
   {
@@ -33,11 +34,11 @@ const routes: IHandler[] = [
   //   route: '/auth/api/rest/verify_otp',
   //   handler: verifyOtp
   // },
-  // {
-  //   method: 'GET',
-  //   route: '/auth/api/rest/google/login',
-  //   // handler: googleLoginHandler
-  // },
+  {
+    method: 'GET',
+    route: '/auth/api/rest/google/login',
+    handler: googleLoginRedirector
+  },
   {
     method: 'GET',
     route: '/auth/api/rest/google/login/callback',

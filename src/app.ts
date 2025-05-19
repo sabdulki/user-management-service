@@ -93,10 +93,13 @@ async function main()
       },
       auth: fastifyOauth2.GOOGLE_CONFIGURATION
     },
-    startRedirectPath: '/auth/api/rest/google/login',
+    // startRedirectPath: '/auth/api/rest/google/login',
     callbackUri: googleCallbackUrl,
     scope: ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile', 'openid']
-  })
+  });
+  // await app.register(require('@fastify/cookie'), {
+  //   secret: googleClientSecret, // нужен для signed cookies
+  // });
   app.addHook('onRequest', loggerMiddleware)
 
   try {
