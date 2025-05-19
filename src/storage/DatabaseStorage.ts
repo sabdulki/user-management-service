@@ -152,7 +152,11 @@ export default class DatabaseStorage implements IStorage {
     }
 
     deleteUserAvatar(userId: number): void {
-        this._db.prepare('UPDATE users SET avatar = NULL WHERE id = ?').run(userId);
+        try {
+            this._db.prepare('UPDATE users SET avatar = NULL WHERE id = ?').run(userId);
+        } catch (err:any) {
+            console.log(err);
+        }
     }
 
     setUserUnavalible(userId: number): void {
