@@ -8,7 +8,7 @@ export async function pingHandler(request: FastifyRequest, reply: FastifyReply) 
   // try {
   //   payload = await getUserPayload(request);
   // } catch (error: any) {
-  //   return reply.code(401)
+  //   return reply.code(401).send()
   // }
 
   const storage = new Storage()

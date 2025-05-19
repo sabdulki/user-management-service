@@ -9,7 +9,7 @@ export async function removeUser(request: FastifyRequest, reply: FastifyReply) {
         return reply.code(404).send();
     const userId = payload.userId;
     if (!request.server.storage.isUserAvailable(userId))
-        return reply.code(404);
+        return reply.code(404).send();
     try {
         request.server.storage.setUserUnavalible(userId);
         if (!deleteJwtTokenPair(request))

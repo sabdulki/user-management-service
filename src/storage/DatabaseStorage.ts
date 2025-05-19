@@ -70,9 +70,11 @@ export default class DatabaseStorage implements IStorage {
         }
     }
 
-    getUserByNickname(nickname: string): UserBaseInfo {
+    getUserByNickname(nickname: string): UserBaseInfo | undefined {
         try {
             const user = this._db.prepare('SELECT * FROM users WHERE nickname = ?').get(nickname) as UserBaseInfo;
+            if (!user)
+                return undefined;
             const userId = user.id;
             return this.getUserById(userId);
         } catch (error) {
@@ -131,6 +133,18 @@ export default class DatabaseStorage implements IStorage {
             stmt.run(newRating, user.id);
         } catch (error: any) {
             throw new Error('Failed to update user rating');
+        }
+    }
+
+    updateNicknmae(userId: number, nickname: string): void {
+        const user = this.getUserByNickname(nickname);
+        if (user)
+            throw new Error('Nicknmae is already taken');
+        try {
+            const stmt = this._db.prepare('UPDATE users SET nickname = ? WHERE id = ?');
+            stmt.run(nickname, userId);
+        } catch (error: any) {
+            throw new Error('Failed to update user nickname');
         }
     }
 

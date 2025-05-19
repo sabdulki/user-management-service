@@ -12,6 +12,7 @@ import { uploadAvatar } from './publicHandlers/uploadAvatar'
 import { googleLoginCallbackHandler } from './publicHandlers/googleLoginCallback'
 import { updateRating } from './privateHandlers/updateRating'
 import { googleLoginRedirector } from './publicHandlers/googleLogin'
+import { updateUserNickname } from './publicHandlers/updateNickname'
 
 const routes: IHandler[] = [
   {
@@ -65,6 +66,11 @@ const routes: IHandler[] = [
     handler: uploadAvatar
   },
   {
+    method: 'PATCH',
+    route: '/auth/api/rest/user/nickname',
+    handler: updateUserNickname
+  },
+  {
     method: 'DELETE',
     route: '/auth/api/rest/user',
     handler: removeUser
@@ -91,3 +97,5 @@ export async function registerRestRoutes(app: FastifyInstance) {
     })
   }
 }
+
+
