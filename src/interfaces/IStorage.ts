@@ -14,6 +14,8 @@ interface IStorage {
     getUserAvatar(userId: number): string | undefined;
     deleteUserAvatar(userId: number): void;
     setUserUnavalible(userId: number): void;
+    updateRating(userId: number, newRating: number): void;
+    updateRatingTransaction(ratings: { id: number; rating: number }[]): void;
 };
 
 export default IStorage

@@ -14,7 +14,7 @@ export default class DatabaseStorage implements IStorage {
     constructor() {
         //Работает как обычное подключение к SQLite-файлу если файл уже создан
         this._db = new Database('./databases.db');
-        // this was executed on;y ONCE to add avatar_path column ONLY
+        // this was executed on;y ONCE to add avatar column ONLY
         // const columnExists = this._db
         //     .prepare(`PRAGMA table_info(users)`)
         //     .all()
@@ -22,6 +22,8 @@ export default class DatabaseStorage implements IStorage {
 
         // if (!columnExists) {
             // this._db.exec(`ALTER TABLE users ADD COLUMN removed_at INTEGER DEFAULT null;`)
+            // this._db.exec(`ALTER TABLE users RENAME COLUMN avatar_path TO avatar;`)
+
         // }
     }
 
@@ -40,14 +42,8 @@ export default class DatabaseStorage implements IStorage {
     userRegister(form: UserCreateForm): number {
         try {
             let result: any;
-            // if (form.provider === AuthProvider.LOCAL) {
-                const stmt = this._db.prepare('INSERT INTO users (nickname, email, password, provider) VALUES (?, ?, ?, ?)');
-                result = stmt.run(form.nickname, form.email, form.hashedPassword, form.provider);
-            // }
-            // else {
-            //     const stmt = this._db.prepare('INSERT INTO users (nickname, email, provider) VALUES (?, ?, ?)');
-            //     result = stmt.run(form.nickname, form.email, form.provider);
-            // }
+            const stmt = this._db.prepare('INSERT INTO users (nickname, email, password, provider) VALUES (?, ?, ?, ?)');
+            result = stmt.run(form.nickname, form.email, form.hashedPassword, form.provider);
             const userId = Number(result.lastInsertRowid);
             this._db.prepare('INSERT INTO ratings (user_id) VALUES (?)').run(userId)
             return (userId);
@@ -99,7 +95,7 @@ export default class DatabaseStorage implements IStorage {
     getUserById(id: number): UserBaseInfo {
         try {
             const stmt = this._db.prepare(`
-                SELECT u.id, u.nickname, u.avatar_path, u.removed_at, r.value as rating
+                SELECT u.id, u.nickname, u.avatar, u.removed_at, r.value as rating
                 FROM users u
                 JOIN ratings r ON u.id = r.user_id
                 WHERE u.id = ?
@@ -118,9 +114,29 @@ export default class DatabaseStorage implements IStorage {
         }
     }
     
+    updateRatingTransaction(ratings: { id: number; rating: number }[]): void {
+        const transaction = this._db.transaction((ratings: { id: number; rating: number }[]) => {
+            for (const { id, rating } of ratings) {
+                this.updateRating(id, rating);
+            }
+        });
+    
+        transaction(ratings); 
+    }
+
+    updateRating(userId: number, newRating: number): void {
+        try {
+            const user = this.getUserById(userId) as UserBaseInfo;
+            const stmt = this._db.prepare('UPDATE ratings SET value = ? WHERE user_id = ?');
+            stmt.run(newRating, user.id);
+        } catch (error: any) {
+            throw new Error('Failed to update user rating');
+        }
+    }
+
     addUserAvatar(userId: number, relativePath: string): void {
         try {
-            const stmt = this._db.prepare('UPDATE users SET avatar_path = ? WHERE id = ?');
+            const stmt = this._db.prepare('UPDATE users SET avatar = ? WHERE id = ?');
             stmt.run(relativePath, userId) 
         } catch (error: any) {
             throw new Error('Failed to add user avatar');
@@ -128,15 +144,15 @@ export default class DatabaseStorage implements IStorage {
     }
 
     getUserAvatar(userId: number): string | undefined {
-        const object = this._db.prepare('SELECT avatar_path FROM users WHERE id = ?').get(userId) as { avatar_path: string } | undefined ;
+        const object = this._db.prepare('SELECT avatar FROM users WHERE id = ?').get(userId) as { avatar: string } | undefined ;
         if (!object) {
             throw new Error('UserNotFound');;
         }
-        return object.avatar_path;
+        return object.avatar;
     }
 
     deleteUserAvatar(userId: number): void {
-        this._db.prepare('UPDATE users SET avatar_path = NULL WHERE id = ?').run(userId);
+        this._db.prepare('UPDATE users SET avatar = NULL WHERE id = ?').run(userId);
     }
 
     setUserUnavalible(userId: number): void {

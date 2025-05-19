@@ -24,7 +24,7 @@ export async function deleteAvatar(userId: number, userAvatar: string, storage: 
 	const userAvatarFullPath = path.join(__dirname, '../../../public', userAvatar);
 
 	const isDeleted = await deleteFile(userAvatarFullPath);
-	if (isDeleted) // delete file if it exists ?????
+	if (!isDeleted) // delete file if it exists ?????
 		storage.deleteUserAvatar(userId);
 }
 

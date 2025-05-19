@@ -1,15 +1,16 @@
 import { FastifyInstance } from 'fastify'
 import { IHandler } from '../../pkg/handler/handler'
-import { pingHandler } from './handlers/ping'
-import { registrationHandler } from './handlers/registration'
-import { loginHandler } from './handlers/login'
-import { getUserInfo } from './handlers/getUser'
-import { getUserInfoById } from './handlers/getUserById'
-import { refreshTokensPair } from './handlers/refreshToken'
-import { removeUser } from './handlers/deleteUser'
-import { isTokenExpired } from './handlers/isTokenExpired'
-import { uploadAvatar } from './handlers/uploadAvatar'
-import { googleLoginCallbackHandler } from './handlers/googleLogin'
+import { pingHandler } from './publicHandlers/ping'
+import { registrationHandler } from './publicHandlers/registration'
+import { loginHandler } from './publicHandlers/login'
+import { getUserInfo } from './publicHandlers/getUser'
+import { getUserInfoById } from './privateHandlers/getUserById'
+import { refreshTokensPair } from './publicHandlers/refreshToken'
+import { removeUser } from './publicHandlers/deleteUser'
+import { isTokenExpired } from './publicHandlers/isTokenExpired'
+import { uploadAvatar } from './publicHandlers/uploadAvatar'
+import { googleLoginCallbackHandler } from './publicHandlers/googleLogin'
+import { updateRating } from './privateHandlers/updateRating'
 
 const routes: IHandler[] = [
   {
@@ -47,11 +48,6 @@ const routes: IHandler[] = [
     route: '/auth/api/rest/user',
     handler: getUserInfo
   },
-  {
-    method: 'GET',
-    route: '/auth/api/rest/user/:userId',
-    handler: getUserInfoById
-  },
   // {
   //   method: 'GET',
   //   route: '/auth/api/rest/isTokenExpired', has to be snake case!!!!
@@ -71,8 +67,18 @@ const routes: IHandler[] = [
     method: 'DELETE',
     route: '/auth/api/rest/user',
     handler: removeUser
+  },
+  // internal
+  {
+    method: 'GET',
+    route: '/auth/internal/user/:id',
+    handler: getUserInfoById
+  },
+  {
+    method: 'POST',
+    route: '/auth/internal/rating/update',
+    handler: updateRating
   }
-
 ]
 
 export async function registerRestRoutes(app: FastifyInstance) {
