@@ -13,7 +13,7 @@ interface IStorage {
     addUserAvatar(userId: number, relativePath: string): void;
     getUserAvatar(userId: number): string | undefined;
     deleteUserAvatar(userId: number): void;
-    deleteUserById(userId: number): void;
+    setUserUnavalible(userId: number): void;
 };
 
 export default IStorage

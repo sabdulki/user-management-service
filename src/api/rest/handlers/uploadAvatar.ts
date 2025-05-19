@@ -21,12 +21,18 @@ async function deleteFile(path: string): Promise<boolean> {
 
 export async function uploadAvatar(request: FastifyRequest, reply: FastifyReply) {
  	const payload = await isTokenValid(request);
- 	if (!payload) return reply.code(401).send();
+ 	if (!payload) 
+		return reply.code(401).send();
 
  	const userId = payload.userId;
 	const storage =  request.server.storage;
 	let userAvatar: string | undefined;
-	userAvatar = storage.getUserAvatar(userId);
+	try {
+		userAvatar = storage.getUserAvatar(userId);
+	} catch (err: any) {
+		console.log(err);
+		return reply.code(401).send();
+	}
 
  	const parts = request.parts();
 	// 413 will be automatically send if the file is bigger than 2 mb
@@ -78,5 +84,5 @@ export async function uploadAvatar(request: FastifyRequest, reply: FastifyReply)
 	} catch (error: any) {
 	return reply.code(500).send({ message: 'Failed to record avatar in storage' });
 	}
- 	return reply.code(200).send({ avatar: `/public/${relativePath}` });
+ 	return reply.code(200).send({ avatar: `${relativePath}` });
 }

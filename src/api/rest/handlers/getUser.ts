@@ -6,8 +6,10 @@ export async function getUserInfo(request: FastifyRequest, reply: FastifyReply)
 {
     try {
         const payload = await isTokenValid(request);
-        if (!payload)
-            return reply.code(401).send();
+        if (!payload || !payload.userId)
+            return reply.code(401);
+        if (!request.server.storage.isUserAvailable(payload.userId))
+            return reply.code(404);
         const userBaseInfo = request.server.storage.getUserById(payload.userId) as UserBaseInfo;
         return reply.code(201).send (userBaseInfo);
     } catch (error: any) {

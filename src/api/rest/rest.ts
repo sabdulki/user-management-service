@@ -6,7 +6,7 @@ import { loginHandler } from './handlers/login'
 import { getUserInfo } from './handlers/getUser'
 import { getUserInfoById } from './handlers/getUserById'
 import { refreshTokensPair } from './handlers/refreshToken'
-import { deleteUserById } from './handlers/deleteUserById'
+import { removeUser } from './handlers/deleteUser'
 import { isTokenExpired } from './handlers/isTokenExpired'
 import { uploadAvatar } from './handlers/uploadAvatar'
 import { googleLoginCallbackHandler } from './handlers/googleLogin'
@@ -28,6 +28,11 @@ const routes: IHandler[] = [
     handler: loginHandler
   },
   // {
+  //   method: 'POST',
+  //   route: '/auth/api/rest/verify_otp',
+  //   handler: verifyOtp
+  // },
+  // {
   //   method: 'GET',
   //   route: '/auth/api/rest/google/login',
   //   // handler: googleLoginHandler
@@ -47,11 +52,11 @@ const routes: IHandler[] = [
     route: '/auth/api/rest/user/:userId',
     handler: getUserInfoById
   },
-  {
-    method: 'GET',
-    route: '/auth/api/rest/isTokenExpired',
-    handler: isTokenExpired
-  },
+  // {
+  //   method: 'GET',
+  //   route: '/auth/api/rest/isTokenExpired', has to be snake case!!!!
+  //   handler: isTokenExpired
+  // },
   {
     method: 'POST',
     route: '/auth/api/rest/refresh',
@@ -64,8 +69,8 @@ const routes: IHandler[] = [
   },
   {
     method: 'DELETE',
-    route: '/auth/api/rest/user/delete/:userId',
-    handler: deleteUserById
+    route: '/auth/api/rest/user',
+    handler: removeUser
   }
 
 ]

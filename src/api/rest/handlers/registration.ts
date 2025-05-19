@@ -10,7 +10,8 @@ export async function registrationHandler(request: FastifyRequest, reply: Fastif
   } catch (error: any) {
     return reply.code(400).send({ message: 'Invalid input data'});
   }
-
+  // temporarily save these f=valus into cash in redis, 
+  // only ofter confirming otp sabe to db
   const storage = request.server.storage;
 
   try {

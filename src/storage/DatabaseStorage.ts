@@ -21,7 +21,7 @@ export default class DatabaseStorage implements IStorage {
         //     .some(col => col.name === 'provider')
 
         // if (!columnExists) {
-            // this._db.exec(`ALTER TABLE users ADD COLUMN provider INTEGER DEFAULT 0;`)
+            // this._db.exec(`ALTER TABLE users ADD COLUMN removed_at INTEGER DEFAULT null;`)
         // }
     }
 
@@ -99,7 +99,7 @@ export default class DatabaseStorage implements IStorage {
     getUserById(id: number): UserBaseInfo {
         try {
             const stmt = this._db.prepare(`
-                SELECT u.id, u.nickname, u.avatar_path, r.value as rating
+                SELECT u.id, u.nickname, u.avatar_path, u.removed_at, r.value as rating
                 FROM users u
                 JOIN ratings r ON u.id = r.user_id
                 WHERE u.id = ?
@@ -130,7 +130,7 @@ export default class DatabaseStorage implements IStorage {
     getUserAvatar(userId: number): string | undefined {
         const object = this._db.prepare('SELECT avatar_path FROM users WHERE id = ?').get(userId) as { avatar_path: string } | undefined ;
         if (!object) {
-            return undefined;
+            throw new Error('UserNotFound');;
         }
         return object.avatar_path;
     }
@@ -139,10 +139,12 @@ export default class DatabaseStorage implements IStorage {
         this._db.prepare('UPDATE users SET avatar_path = NULL WHERE id = ?').run(userId);
     }
 
-    deleteUserById(userId: number): void {
+    setUserUnavalible(userId: number): void {
         try {
-            const stmt = this._db.prepare('DELETE FROM users WHERE id = ?');
-            const result = stmt.run(userId);
+            // const stmt = this._db.prepare('DELETE FROM users WHERE id = ?');
+            const removed_at = Date.now();
+            const stmt = this._db.prepare('UPDATE users SET removed_at = ? WHERE id = ?');
+            const result = stmt.run(removed_at, userId);
         
             if (result.changes === 0) {
                 throw new Error("User not found");
@@ -151,6 +153,11 @@ export default class DatabaseStorage implements IStorage {
             throw new Error('Failed to delete user');
         }
     }
+    
+    isUserAvailable(userId: number): boolean {
+        // Оператор !! преобразует значение в логическое: true, если объект существует, и false, если нет.
+        const user = this.getUserById(userId);
+        return !!user && user.removed_at === null;
+    }
       
-
 };

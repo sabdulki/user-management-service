@@ -2,7 +2,8 @@ type UserBaseInfo = {
     id: number;
     nickname: string;
     rating: number;
-    avatar_path: string;
+    avatar: string | null;
+    removed_at: number | null;
 };
 
 export default UserBaseInfo

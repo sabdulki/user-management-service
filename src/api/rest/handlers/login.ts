@@ -11,10 +11,17 @@ export async function loginHandler(request: FastifyRequest, reply: FastifyReply)
   } catch (error: any) {
     return reply.code(400).send({ message: 'Invalid input data'});
   }
+
+  const user = request.server.storage.getUserByNickname(form.nickname);
+    const userId = user.id;
+  if (!request.server.storage.isUserAvailable(userId))
+    return reply.code(404).send();
+
   isValid = await form.authenticate();
   if (!isValid) {
     return reply.code(401).send({ error: 'Authentication failed' });
   }
+  // generate uuid and otp and send otp to ess, whait for response. 
   try {
     const user = request.server.storage.getUserByNickname(form.nickname);
     const userId = user.id;
