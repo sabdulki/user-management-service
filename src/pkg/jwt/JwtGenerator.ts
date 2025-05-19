@@ -21,7 +21,12 @@ interface TokenPair {
 
 export enum TokenType {
 	Access = 'access',
-	Refresh = 'refresh',
+	Refresh = 'refresh'
+}
+
+export enum TokensToDelete {
+	All = 0,
+	RefreshOnly = 1
 }
 
 class JwtGenerator {
@@ -88,20 +93,31 @@ class JwtGenerator {
 	}
 };
 
-async function deleteJwtTokenPair(request: FastifyRequest): Promise<boolean> {
-
-	const accessToken = await getTokenFromRequest(request, TokenType.Access);
-	const refreshToken = await getTokenFromRequest(request, TokenType.Refresh);
-	if (!accessToken || !refreshToken) {
-		throw JwtExtractionError;
+async function deleteJwtToken(request: FastifyRequest, type: TokenType): Promise<boolean> {
+	const token = await getTokenFromRequest(request, type);
+	if (!token) {
+		console.log(`${type} token extraction from request failed`);
+		return false;
 	}
 	try {
 		const insatnce = JwtGenerator.getInstance();
-		insatnce.deleteToken(`access-${accessToken}`);
-		insatnce.deleteToken(`refresh-${refreshToken}`);
+		insatnce.deleteToken(`${type}-${token}`);
 	} catch (err: any) {
 		console.log(err);
 		return false;
+	}
+	return true;
+}
+
+async function deleteJwtTokenPair(request: FastifyRequest, tokens: TokensToDelete = TokensToDelete.All): Promise<boolean> {
+
+	if (!deleteJwtToken(request, TokenType.Refresh))
+		return false;
+
+	if (tokens === TokensToDelete.All)
+	{
+		if (!deleteJwtToken(request, TokenType.Access))
+			return false;
 	}
 	return true;
 }
@@ -124,7 +140,7 @@ async function isTokenValid(request: FastifyRequest, type: TokenType = TokenType
 	let token: string | undefined;
 	token = await getTokenFromRequest(request, type);
 	if (!token) {
-		console.log(`${type} token excraction failed`);
+		console.log(`${type} token extraction from request failed`);
 		return undefined;
 	}
 	try {

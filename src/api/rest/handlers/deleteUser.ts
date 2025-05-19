@@ -10,7 +10,8 @@ export async function removeUser(request: FastifyRequest, reply: FastifyReply) {
         return reply.code(404);
     try {
         request.server.storage.setUserUnavalible(payload.userId);
-        deleteJwtTokenPair(request);
+        if (!deleteJwtTokenPair(request))
+            return reply.code(404).send();
         return reply.code(200).send();
     } catch (error: any) {
         return reply.code(404).send({ error });

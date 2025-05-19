@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
-import {isTokenValid, generateJwtTokenPair, TokenType } from '../../../pkg/jwt/JwtGenerator';
+import {isTokenValid, generateJwtTokenPair, TokenType, deleteJwtTokenPair, TokensToDelete } from '../../../pkg/jwt/JwtGenerator';
 
 export async function refreshTokensPair(request: FastifyRequest, reply: FastifyReply) 
 {
@@ -9,6 +9,13 @@ export async function refreshTokensPair(request: FastifyRequest, reply: FastifyR
 	const userId = payload.userId;
 	if (!request.server.storage.isUserAvailable(userId))
 		return reply.code(404).send();
+	try {
+		if (!deleteJwtTokenPair(request, TokensToDelete.RefreshOnly))
+			return reply.code(500).send();
+	} catch (err: any) {
+		console.log (err);
+		return reply.code(500).send();
+	}
 	const tokenPair = await generateJwtTokenPair({userId});
 	if (!tokenPair)
 		return reply.code(500).send();
