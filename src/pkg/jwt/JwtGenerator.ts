@@ -135,10 +135,15 @@ async function getTokenFromRequest(request: FastifyRequest, type: TokenType): Pr
 }
 
 //return undefined if error was caught, in handler reply 401
-async function isTokenValid(request: FastifyRequest, type: TokenType = TokenType.Access): Promise<JwtPayload | undefined>
+async function isTokenValid(request: FastifyRequest | string, type: TokenType = TokenType.Access): Promise<JwtPayload | undefined>
 {
-	let token: string | undefined;
-	token = await getTokenFromRequest(request, type);
+	let token: string | undefined
+	if (typeof request === 'string') {
+		token = request
+	} else {
+		token = await getTokenFromRequest(request, type);
+	}
+
 	if (!token) {
 		console.log(`${type} token extraction from request failed`);
 		return undefined;
