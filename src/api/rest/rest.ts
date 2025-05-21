@@ -14,6 +14,7 @@ import { updateRating } from './privateHandlers/updateRating'
 import { googleLoginRedirector } from './publicHandlers/googleLogin'
 import { updateUserNickname } from './publicHandlers/updateNickname'
 import { updateUserPassword } from './publicHandlers/updatePassword'
+import { verifyOtp } from './publicHandlers/verifyOtp'
 // import { verifyOtp } from './publicHandlers/verifyOtp'
 
 const routes: IHandler[] = [
@@ -60,11 +61,11 @@ const routes: IHandler[] = [
     route: '/auth/api/rest/user/avatar',
     handler: uploadAvatar
   },
-  // {
-  //   method: 'POST',
-  //   route: '/auth/api/rest/verify_otp',
-  //   handler: verifyOtp
-  // },
+  {
+    method: 'POST',
+    route: '/auth/api/rest/verify_otp',
+    handler: verifyOtp
+  },
   
   // {
   //   method: 'GET',

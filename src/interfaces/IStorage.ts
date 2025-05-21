@@ -17,6 +17,7 @@ interface IStorage {
     getUserById(id: number) : UserBaseInfo;
     getUserAvatar(userId: number): string | undefined;
     getUserPassword(identifier: { nickname?: string; id?: number }): string;
+    getEmailById(userId: number): string | undefined;
 
     // update
     updateNicknmae(userId: number, nickname: string): void;

@@ -114,10 +114,10 @@ export default class DatabaseStorage implements IStorage {
     getUserById(id: number): UserBaseInfo {
         try {
             const stmt = this._db.prepare(`
-                SELECT u.id, u.nickname, u.avatar, u.removed_at, r.value as rating
+                SELECT u.id, u.nickname, u.avatar, r.value as rating
                 FROM users u
                 JOIN ratings r ON u.id = r.user_id
-                WHERE u.id = ?
+                WHERE u.id = ? AND u.removed_at IS NULL
             `);
             const user = stmt.get(id);
     
@@ -133,6 +133,13 @@ export default class DatabaseStorage implements IStorage {
         }
     }
     
+    getEmailById(userId: number): string | undefined {
+        const result = this._db.prepare('SELECT email FROM users WHERE id = ?').get(userId) as { email: string } | undefined;
+        if (!result || !result.email)
+            return undefined;
+        return result.email;
+    }
+
     updateRatingTransaction(ratings: { id: number; rating: number }[]): void {
         const transaction = this._db.transaction((ratings: { id: number; rating: number }[]) => {
             for (const { id, rating } of ratings) {

@@ -1,9 +1,9 @@
 // if otp is correct it sends access and refresh tokens. 
 
-import Config from 'config/Config';
+import Config from '../../../config/Config';
 import { FastifyRequest, FastifyReply } from 'fastify'
-import RadishClient from 'pkg/client/client';
-import { generateJwtTokenPair, isTokenValid } from 'pkg/jwt/JwtGenerator';
+import RadishClient from '../../../pkg/client/client';
+import { generateJwtTokenPair, isTokenValid } from '../../../pkg/jwt/JwtGenerator';
 
 export class OtpManager {
     private static instance: OtpManager;
@@ -12,26 +12,41 @@ export class OtpManager {
         const host = Config.getInstance().getRadishHost();
         const port = Config.getInstance().getRadishPort();
         this.radishClient = new RadishClient({ host, port});
+        // setTimeout( async () => {
+        //     const response = await this.radishClient.set("example", "example");
+        //     console.log(response);
+        // }, 0);
+        
     }
 
     public static getInstance(): OtpManager {
 		if (!OtpManager.instance) {
 			OtpManager.instance = new OtpManager();
 		}
+        console.log(" successfully created OtpManager ")
 		return OtpManager.instance;
 	}
-}
 
+    public async checkOtpMatch(uuid: string, userOtp: string): Promise<number>{
+        const response = await this.radishClient.get(`uuid-${uuid}`);
+        if (response.status !== 200)
+            return 500;
+        const radishOtp = response?.value;
+        if (radishOtp !== userOtp)
+            return 403;
+        return 200;
+    }
 
-async function checkOtpMatch(uuid: string, userOtp: string): Promise<number>{
-    const radishClient = new RadishClient({ host, port}); // создавать новый инстанс Радиша????
-    const response = await radishClient.get(`uuid-${uuid}`);
-    if (response.status !== 200)
-        return 500;
-    const radishOtp = response?.value;
-    if (radishOtp !== userOtp)
-        return 403;
-    return 200;
+    public async saveUuidInRadish(uuid: string, otp: string, expireTime: number) : Promise<number> {
+        console.log("in saveUuidInRadish")
+        
+        const response = await this.radishClient.set(`uuid-${uuid}`, `${otp}`, expireTime);
+        if (response.status !== 201){
+            console.log("radishClient set failed")
+            return 500;
+        }
+        return 200;
+      }
 }
 
 export async function verifyOtp (request: FastifyRequest, reply: FastifyReply) {
@@ -44,7 +59,9 @@ export async function verifyOtp (request: FastifyRequest, reply: FastifyReply) {
     const userOtp = body.otp;
     if (!uuid || !userOtp)
         return reply.code(400).send(); // bad request
-    const matchStatus = await checkOtpMatch(uuid, userOtp);
+
+    const OtpManagerInstance = OtpManager.getInstance();
+    const matchStatus = await OtpManagerInstance.checkOtpMatch(uuid, userOtp);
     if (matchStatus !== 200)
         return reply.code(400).send(); // internal server error or forbiden
 
