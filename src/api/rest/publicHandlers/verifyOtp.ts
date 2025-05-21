@@ -27,20 +27,40 @@ export class OtpManager {
 		return OtpManager.instance;
 	}
 
-    public async checkOtpMatch(uuid: string, userOtp: string): Promise<number>{
+    public async checkOtpMatch(uuid: string, userOtp: string): Promise<{userId: number | undefined, status: number}>{
         const response = await this.radishClient.get(`uuid-${uuid}`);
-        if (response.status !== 200)
-            return 500;
-        const radishOtp = response?.value;
-        if (radishOtp !== userOtp)
-            return 403;
-        return 200;
+        let userId = undefined;
+        let status;
+        if (response.status !== 200) {
+            status = 500;
+            return {userId, status};
+        }
+        console.log("response?.value: ", response?.value);
+        const obj = JSON.parse(response?.value);
+        if (!obj.otp || ! obj.userId) {
+            status = 500;
+            return {userId, status};
+        }
+        userId = obj.userId;
+        const radishOtp = obj.otp;
+        if (radishOtp !== userOtp) {
+            status = 403;
+            return {userId, status};
+        }
+        status = 200;
+        const radishResponse = await this.radishClient.delete(`uuid-${uuid}`);
+        if (radishResponse.status !== 200) {
+            status = 403;
+            return {userId, status};
+        }
+
+        return {userId, status};
     }
 
-    public async saveUuidInRadish(uuid: string, otp: string, expireTime: number) : Promise<number> {
+    public async saveUuidInRadish(userId: number, uuid: string, otp: string, expireTime: number) : Promise<number> {
         console.log("in saveUuidInRadish")
         
-        const response = await this.radishClient.set(`uuid-${uuid}`, `${otp}`, expireTime);
+        const response = await this.radishClient.set(`uuid-${uuid}`, JSON.stringify({otp, userId}), expireTime);
         if (response.status !== 201){
             console.log("radishClient set failed")
             return 500;
@@ -50,21 +70,20 @@ export class OtpManager {
 }
 
 export async function verifyOtp (request: FastifyRequest, reply: FastifyReply) {
-    const payload = await isTokenValid(request);
-    if (!payload || !payload.userId)
-        return reply.code(401).send();
-    const userId = payload.userId;
-    const body = request.body as { uuid: string, otp: string }
+    // const payload = await isTokenValid(request);
+    // if (!payload || !payload.userId)
+    //     return reply.code(401).send();
+    const body = request.body as { uuid: string, otp: string}
     const uuid = body.uuid;
     const userOtp = body.otp;
     if (!uuid || !userOtp)
         return reply.code(400).send(); // bad request
 
     const OtpManagerInstance = OtpManager.getInstance();
-    const matchStatus = await OtpManagerInstance.checkOtpMatch(uuid, userOtp);
-    if (matchStatus !== 200)
+    const obj = await OtpManagerInstance.checkOtpMatch(uuid, userOtp);
+    if (obj.status !== 200 || !obj.userId)
         return reply.code(400).send(); // internal server error or forbiden
-
+    const userId = obj.userId;
     try {
         const tokenPair = await generateJwtTokenPair({ userId });
         if (!tokenPair) {
@@ -83,5 +102,6 @@ export async function verifyOtp (request: FastifyRequest, reply: FastifyReply) {
         }
         return reply.code(400).send({ error: 'Invalid data', detail: err.message });
     }
+    return reply.code(400).send(); 
     
 }

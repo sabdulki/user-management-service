@@ -43,7 +43,7 @@ async function sendOtpToEmail(otp: string, userEmail: string) : Promise<number> 
   // return data.status;
 }
 
-async function otpLogic(userEmail: string) :  Promise<string | undefined> { // change name of function to more meaningful
+async function otpLogic(userId: number, userEmail: string) :  Promise<string | undefined> { // change name of function to more meaningful
   const OtpManagerInstance = OtpManager.getInstance();
   const otp = generateOtp();
   const uuid = generateUuid();
@@ -55,8 +55,8 @@ async function otpLogic(userEmail: string) :  Promise<string | undefined> { // c
   if (sendStatus !== 202) // sending to email failed
     return undefined;
   console.log("after sendOtpToEmail");
-  const expireTime = 120; // 2 minutes
-  const saveStatus = await OtpManagerInstance.saveUuidInRadish(uuid, otp, expireTime);
+  const expireTime = 300; // 2 minutes
+  const saveStatus = await OtpManagerInstance.saveUuidInRadish(userId, uuid, otp, expireTime);
   if (saveStatus !== 200) {// saving in redis failed
     console.log("saveUuidInRadish failed");
     return undefined;
@@ -90,7 +90,7 @@ export async function loginHandler(request: FastifyRequest, reply: FastifyReply)
   }
   // generate uuid and otp and send otp to ess, whait for response. 
   const userEmail = request.server.storage.getEmailById(userId);
-  const uuid = await otpLogic(userEmail);
+  const uuid = await otpLogic(userId, userEmail);
   console.log("after otpLogic");
   if (!uuid) // generation/saving in redis/sending to email failed
     return reply.code(400).send();
