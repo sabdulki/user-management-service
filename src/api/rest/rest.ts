@@ -14,6 +14,7 @@ import { updateRating } from './privateHandlers/updateRating'
 import { googleLoginRedirector } from './publicHandlers/googleLogin'
 import { updateUserNickname } from './publicHandlers/updateNickname'
 import { updateUserPassword } from './publicHandlers/updatePassword'
+// import { verifyOtp } from './publicHandlers/verifyOtp'
 
 const routes: IHandler[] = [
   //        PUBLIC
