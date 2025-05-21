@@ -25,7 +25,7 @@ class UserLoginForm {
 
     async authenticate(): Promise<boolean> {
         try {
-          const userPassword = app.storage.getUserPassword(this.nickname) as string;
+          const userPassword = app.storage.getUserPassword({nickname: this.nickname}) as string;
           const passwordMatches = await bcrypt.compare(this.password, userPassword);
       
           return passwordMatches; // return true if match, false otherwise

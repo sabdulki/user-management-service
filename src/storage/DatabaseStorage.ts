@@ -2,6 +2,7 @@ import Database, { Database as DatabaseType } from "better-sqlite3";
 import IStorage from '../interfaces/IStorage'
 import UserCreateForm from '../models/UserCreateForm'
 import UserBaseInfo from "types/UserBaseInfo";
+import bcrypt from "bcryptjs";
 
 export enum AuthProvider {
     LOCAL = 0,
@@ -58,13 +59,29 @@ export default class DatabaseStorage implements IStorage {
           }
     }
 
-    getUserPassword(nickname: string): string {
+    getUserPassword(identifier: { nickname?: string; id?: number }): string {
         try {
-            const object = this._db.prepare('SELECT password FROM users WHERE nickname = ?').get(nickname) as { password: string } | undefined ;
-            if (!object) {
+            let query = '';
+            let param: string | number;
+    
+            if (identifier.nickname) {
+                query = 'SELECT password FROM users WHERE nickname = ?';
+                param = identifier.nickname;
+            } else if (identifier.id !== undefined) {
+                query = 'SELECT password FROM users WHERE id = ?';
+                param = identifier.id;
+            } else {
+                throw new Error('Must provide either nickname or id');
+            }
+    
+            const result = this._db.prepare(query).get(param) as { password: string } | undefined;
+    
+            if (!result) {
                 throw new Error('User not found');
             }
-            return object.password;
+    
+            return result.password;
+    
         } catch (error) {
             throw new Error('Failed to get user info');
         }
@@ -145,6 +162,30 @@ export default class DatabaseStorage implements IStorage {
             stmt.run(nickname, userId);
         } catch (error: any) {
             throw new Error('Failed to update user nickname');
+        }
+    }
+
+    async updatePassword(userId: number, oldPassword: string, newPassword: string) {
+        // get user, check if it's password is the same as old password
+        // if true, hash new pass and update db
+        // if false, throw error "Password is not correct", 403
+        let currentPassword: string;
+        try {
+            currentPassword = this.getUserPassword({ id: userId });
+        } catch (err: any) {
+            throw new Error('Failed to get password');
+        }
+
+        const passwordMatches = await bcrypt.compare(oldPassword, currentPassword);
+        if (!passwordMatches)
+            throw new Error('Password is not correct');
+
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+        try {
+            const stmt = this._db.prepare('UPDATE users SET password = ? WHERE id = ?');
+            stmt.run(hashedNewPassword, userId);
+        } catch (error: any) {
+            throw new Error('Failed to update user password');
         }
     }
 

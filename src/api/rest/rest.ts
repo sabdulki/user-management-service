@@ -13,28 +13,16 @@ import { googleLoginCallbackHandler } from './publicHandlers/googleLoginCallback
 import { updateRating } from './privateHandlers/updateRating'
 import { googleLoginRedirector } from './publicHandlers/googleLogin'
 import { updateUserNickname } from './publicHandlers/updateNickname'
+import { updateUserPassword } from './publicHandlers/updatePassword'
 
 const routes: IHandler[] = [
+  //        PUBLIC
+  //         GET
   {
     method: 'GET',
     route: '/ping',
     handler: pingHandler
   },
-  {
-    method: 'POST',
-    route: '/auth/api/rest/registration',
-    handler: registrationHandler
-  },
-  {
-    method: 'POST',
-    route: '/auth/api/rest/login',
-    handler: loginHandler
-  },
-  // {
-  //   method: 'POST',
-  //   route: '/auth/api/rest/verify_otp',
-  //   handler: verifyOtp
-  // },
   {
     method: 'GET',
     route: '/auth/api/rest/google/login',
@@ -50,11 +38,17 @@ const routes: IHandler[] = [
     route: '/auth/api/rest/user',
     handler: getUserInfo
   },
-  // {
-  //   method: 'GET',
-  //   route: '/auth/api/rest/isTokenExpired', has to be snake case!!!!
-  //   handler: isTokenExpired
-  // },
+  //      POST
+  {
+    method: 'POST',
+    route: '/auth/api/rest/registration',
+    handler: registrationHandler
+  },
+  {
+    method: 'POST',
+    route: '/auth/api/rest/login',
+    handler: loginHandler
+  },
   {
     method: 'POST',
     route: '/auth/api/rest/refresh',
@@ -65,16 +59,38 @@ const routes: IHandler[] = [
     route: '/auth/api/rest/user/avatar',
     handler: uploadAvatar
   },
+  // {
+  //   method: 'POST',
+  //   route: '/auth/api/rest/verify_otp',
+  //   handler: verifyOtp
+  // },
+  
+  // {
+  //   method: 'GET',
+  //   route: '/auth/api/rest/isTokenExpired', has to be snake case!!!!
+  //   handler: isTokenExpired
+  // },
+  
+  //        PATCH
   {
     method: 'PATCH',
     route: '/auth/api/rest/user/nickname',
     handler: updateUserNickname
   },
   {
+    method: 'PATCH',
+    route: '/auth/api/rest/user/password',
+    handler: updateUserPassword
+  },
+
+  // DELETE
+  {
     method: 'DELETE',
     route: '/auth/api/rest/user',
     handler: removeUser
   },
+
+  
   // internal
   {
     method: 'GET',

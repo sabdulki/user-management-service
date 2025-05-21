@@ -6,17 +6,25 @@ import UserCreateForm from '../models/UserCreateForm'
 interface IStorage {
     userRegisterTransaction(form: UserCreateForm): number;
     userRegister(form: UserCreateForm) : number;
-    // inner methods
+
+    // setters
+    setUserUnavalible(userId: number): void;
+    addUserAvatar(userId: number, relativePath: string): void;
+
+    //getters
     getUserByNickname(nickname: string): UserBaseInfo | undefined;
     getUserByEmail(email: string): UserBaseInfo | undefined ;
     getUserById(id: number) : UserBaseInfo;
-    addUserAvatar(userId: number, relativePath: string): void;
     getUserAvatar(userId: number): string | undefined;
-    deleteUserAvatar(userId: number): void;
+    getUserPassword(identifier: { nickname?: string; id?: number }): string;
+
+    // update
     updateNicknmae(userId: number, nickname: string): void;
-    setUserUnavalible(userId: number): void;
     updateRating(userId: number, newRating: number): void;
     updateRatingTransaction(ratings: { id: number; rating: number }[]): void;
+
+    //delete
+    deleteUserAvatar(userId: number): void;
 };
 
 export default IStorage
