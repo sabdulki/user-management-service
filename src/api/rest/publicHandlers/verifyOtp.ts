@@ -102,6 +102,4 @@ export async function verifyOtp (request: FastifyRequest, reply: FastifyReply) {
         }
         return reply.code(400).send({ error: 'Invalid data', detail: err.message });
     }
-    return reply.code(400).send(); 
-    
 }

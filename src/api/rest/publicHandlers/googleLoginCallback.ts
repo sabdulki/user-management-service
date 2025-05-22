@@ -60,10 +60,7 @@ export async function googleLoginCallbackHandler(request: FastifyRequest, reply:
       return reply.code(500).send();
     }
 
-    // Option 1: return JWT as JSON
-    // return reply.send({ token: jwt })
-
-    // Option 2: redirect to frontend with token as query param
+    // return 200 if just logged in (did not create new data)
     return reply.code(201).send({
         accessToken: tokenPair.accessToken,
         refreshToken: tokenPair.refreshToken

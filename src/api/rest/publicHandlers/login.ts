@@ -22,7 +22,9 @@ async function sendOtpToEmail(otp: string, userEmail: string) : Promise<number> 
     template: 'otp', // if your backend expects this
     data: {"code": otp}
   }
-  console.log ("bodyContent: ", bodyContent);
+
+  // console.log ("bodyContent: ", bodyContent);
+
   const response = await fetch('http://localhost:5200/ess/api/rest/email/send', {
     method: 'POST',
     headers: {
@@ -43,7 +45,7 @@ async function sendOtpToEmail(otp: string, userEmail: string) : Promise<number> 
   // return data.status;
 }
 
-async function otpLogic(userId: number, userEmail: string) :  Promise<string | undefined> { // change name of function to more meaningful
+export async function otpLogic(userId: number, userEmail: string) :  Promise<string | undefined> { // change name of function to more meaningful
   const OtpManagerInstance = OtpManager.getInstance();
   const otp = generateOtp();
   const uuid = generateUuid();
