@@ -11,7 +11,7 @@ import { isTokenExpired } from './publicHandlers/isTokenExpired'
 import { uploadAvatar } from './publicHandlers/uploadAvatar'
 import { googleLoginCallbackHandler } from './publicHandlers/googleLoginCallback'
 import { updateRating } from './privateHandlers/updateRating'
-import { googleLoginRedirector } from './publicHandlers/googleLogin'
+import { googleLoginExchange } from './publicHandlers/googleLogin'
 import { updateUserNickname } from './publicHandlers/updateNickname'
 import { updateUserPassword } from './publicHandlers/updatePassword'
 import { verifyOtp } from './publicHandlers/verifyOtp'
@@ -26,15 +26,15 @@ const routes: IHandler[] = [
     handler: pingHandler
   },
   {
-    method: 'GET',
+    method: 'POST',
     route: '/auth/api/rest/google/login',
-    handler: googleLoginRedirector
+    handler: googleLoginExchange
   },
-  {
-    method: 'GET',
-    route: '/auth/api/rest/google/login/callback',
-    handler: googleLoginCallbackHandler
-  },
+  // {
+  //   method: 'GET',
+  //   route: '/auth/api/rest/google/login/callback',
+  //   handler: googleLoginCallbackHandler
+  // },
   {
     method: 'GET',
     route: '/auth/api/rest/user',
