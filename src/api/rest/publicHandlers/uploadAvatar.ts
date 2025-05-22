@@ -84,7 +84,7 @@ export async function uploadAvatar(request: FastifyRequest, reply: FastifyReply)
 		return reply.code(400).send({ message: 'No file uploaded' });
 	}
  	
-	if (userAvatar) {
+	if (userAvatar && !userAvatar.includes("https://lh3.googleusercontent.com/")) {
 		deleteAvatar(userId, userAvatar, storage);
 	}
 

@@ -6,8 +6,8 @@ export async function getUserInfoById(request: FastifyRequest, reply: FastifyRep
 {
     try {
         const {userId} = request.params as {userId : number}; //распаковка
-        if (!request.server.storage.isUserAvailable(userId))
-            return reply.code(404).send();
+        // if (!request.server.storage.isUserAvailable(userId))
+        //     return reply.code(404).send();
         const userBaseInfo = request.server.storage.getUserById(userId) as UserBaseInfo;
         return reply.code(201).send (userBaseInfo);
     } catch (error: any) {
