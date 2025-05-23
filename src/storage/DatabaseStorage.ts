@@ -43,6 +43,7 @@ export default class DatabaseStorage implements IStorage {
     userRegister(form: UserCreateForm): number {
         try {
             let result: any;
+            console.log("form.hashedPassword: ", form.hashedPassword);
             const stmt = this._db.prepare('INSERT INTO users (nickname, email, password, provider) VALUES (?, ?, ?, ?)');
             result = stmt.run(form.nickname, form.email, form.hashedPassword, form.provider);
             const userId = Number(result.lastInsertRowid);
@@ -208,7 +209,7 @@ export default class DatabaseStorage implements IStorage {
     getUserAvatar(userId: number): string | undefined {
         const object = this._db.prepare('SELECT avatar FROM users WHERE id = ?').get(userId) as { avatar: string } | undefined ;
         if (!object) {
-            throw new Error('UserNotFound');;
+            throw new Error('UserNotFound');
         }
         return object.avatar;
     }
@@ -221,9 +222,18 @@ export default class DatabaseStorage implements IStorage {
         }
     }
 
+    deleteUser(userId: number): void {
+        try {
+            this._db.prepare('DELETE FROM users WHERE id = ?').run(userId);
+        } catch (err:any) {
+            console.log(err);
+            throw new Error('Failed to delete user');
+        }
+    }
+
+
     setUserUnavalible(userId: number): void {
         try {
-            // const stmt = this._db.prepare('DELETE FROM users WHERE id = ?');
             const removed_at = Date.now();
             const stmt = this._db.prepare('UPDATE users SET removed_at = ? WHERE id = ?');
             const result = stmt.run(removed_at, userId);

@@ -2,6 +2,37 @@ import { FastifyRequest, FastifyReply } from 'fastify'
 import UserCreateForm from '../../../models/UserCreateForm';
 import {generateJwtTokenPair} from '../../../pkg/jwt/JwtGenerator';
 import {otpLogic} from './login';
+import app from '../../../app';
+
+
+export async function saveRegisteredUser(form: UserCreateForm): Promise<{userId: number | undefined, status: number}>{
+	let userId = undefined;
+	let status: number;
+	const storage = app.storage;
+	console.log("form before registering: ", form);
+	console.log("hashed before registering: ", form.hashedPassword);
+	try {
+	  userId = storage.userRegisterTransaction(form);
+	} catch (err: any) {
+	    if (err.message === 'UserAlreadyExists') {
+			console.log('User already exists');
+			status = 409;
+			return {userId, status};
+	    }
+	    if (err.message === 'DatabaseFailure') {
+			console.log('DatabaseFailure');
+			status = 500;
+			return {userId, status};
+	    }
+	    else {
+			console.log(`Invalid data: ${err}`);
+			status = 400;
+			return {userId, status};
+	    }
+	}
+	status = 201;
+	return {userId, status};
+}
 
 export async function registrationHandler(request: FastifyRequest, reply: FastifyReply) 
 {
@@ -11,8 +42,14 @@ export async function registrationHandler(request: FastifyRequest, reply: Fastif
   } catch (error: any) {
     return reply.code(400).send({ message: 'Invalid input data'});
   }
-  // temporarily save these f=valus into cash in redis, 
-  // only ofter confirming otp sabe to db
+
+  const uuid = await otpLogic({ form }, form.email);
+  console.log("after otpLogic");
+  if (!uuid) // generation/saving in redis/sending to email failed
+    return reply.code(400).send();
+  return reply.code(200).send({"key": uuid});
+  // temporarily save these values into cash in redis, 
+  // only after confirming otp save to db
   const storage = request.server.storage;
   let userId: number;
   try {
@@ -30,11 +67,7 @@ export async function registrationHandler(request: FastifyRequest, reply: Fastif
   }
 
   const userEmail = storage.getEmailById(userId);
-  const uuid = await otpLogic(userId, userEmail);
-  console.log("after otpLogic");
-  if (!uuid) // generation/saving in redis/sending to email failed
-    return reply.code(400).send();
-  return reply.code(200).send({"key": uuid});
+ 
 
   // const tokenPair = await generateJwtTokenPair({userId});
   // if (!tokenPair) {

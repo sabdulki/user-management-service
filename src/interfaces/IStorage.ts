@@ -26,6 +26,7 @@ interface IStorage {
 
     //delete
     deleteUserAvatar(userId: number): void;
+    deleteUser(userId: number): void;
 };
 
 export default IStorage

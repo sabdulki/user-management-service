@@ -4,6 +4,11 @@ import Config from '../../../config/Config';
 import { FastifyRequest, FastifyReply } from 'fastify'
 import RadishClient from '../../../pkg/client/client';
 import { generateJwtTokenPair, isTokenValid } from '../../../pkg/jwt/JwtGenerator';
+import UserCreateForm from '../../../models/UserCreateForm';
+import RadishResponse from 'pkg/client/response';
+import { saveRegisteredUser } from './registration';
+import { plainToInstance } from 'class-transformer';
+
 
 export class OtpManager {
     private static instance: OtpManager;
@@ -30,23 +35,55 @@ export class OtpManager {
     public async checkOtpMatch(uuid: string, userOtp: string): Promise<{userId: number | undefined, status: number}>{
         const response = await this.radishClient.get(`uuid-${uuid}`);
         let userId = undefined;
-        let status;
+        let form: UserCreateForm | undefined = undefined;
+        let status: number;
         if (response.status !== 200) {
             status = 500;
             return {userId, status};
         }
         console.log("response?.value: ", response?.value);
         const obj = JSON.parse(response?.value);
-        if (!obj.otp || ! obj.userId) {
+        if (!obj.otp) {
             status = 500;
+            console.log("otp is not provided in cash");
             return {userId, status};
         }
-        userId = obj.userId;
+        if (obj.form) {
+            // form = plainToInstance(UserCreateForm, obj.form); // восстанавливаем класс
+            form = obj.form;
+            console.log("form from obj.form: ", form);
+        }
+        // if (obj.form) {
+        //     const isArray = Array.isArray(obj.form);
+        //     console.log("form is array?", isArray);
+            
+        //     form = isArray
+        //         ? plainToInstance(UserCreateForm, obj.form[0]) // извлеки первый, если вдруг массив
+        //         : plainToInstance(UserCreateForm, obj.form);
+        // }
+        else if (obj.userId)
+            userId = obj.userId;
+        else {
+            status = 400;
+            console.log("neither userId nor form is provided in cash");
+            return {userId, status};
+        }
+        
         const radishOtp = obj.otp;
         if (radishOtp !== userOtp) {
             status = 403;
             return {userId, status};
         }
+        if (form) {
+            console.log("fomr in otp match: ", form);
+            const obj = await saveRegisteredUser(form);
+            if (obj.status !== 201 || !obj.userId) {
+                status = obj.status;
+                return {userId, status};
+            }
+            userId = obj.userId;
+        }
+
         status = 200;
         const radishResponse = await this.radishClient.delete(`uuid-${uuid}`);
         if (radishResponse.status !== 200) {
@@ -57,16 +94,29 @@ export class OtpManager {
         return {userId, status};
     }
 
-    public async saveUuidInRadish(userId: number, uuid: string, otp: string, expireTime: number) : Promise<number> {
+    public async saveUuidInRadish(identifier: { userId?: number; form?: UserCreateForm }, uuid: string, otp: string, expireTime: number) : Promise<number> {
         console.log("in saveUuidInRadish")
-        
-        const response = await this.radishClient.set(`uuid-${uuid}`, JSON.stringify({otp, userId}), expireTime);
+        let response: RadishResponse;
+        if (identifier.userId) {
+            const userId = identifier.userId;
+            response = await this.radishClient.set(`uuid-${uuid}`, JSON.stringify({otp, userId}), expireTime);
+        }
+        else if (identifier.form) {
+            const form = identifier.form;
+            response = await this.radishClient.set(`uuid-${uuid}`, JSON.stringify({otp, form}), expireTime);
+        }
+        else {
+            console.log("Neither userId nor form provided");
+            return 400; // or throw an error
+        }
+
         if (response.status !== 201){
             console.log("radishClient set failed")
             return 500;
         }
+
         return 200;
-      }
+    }
 }
 
 export async function verifyOtp (request: FastifyRequest, reply: FastifyReply) {

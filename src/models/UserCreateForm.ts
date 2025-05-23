@@ -23,16 +23,13 @@ export default class UserCreateForm {
     @MinLength(8)
     password: string;
 
-    private _hashedPassword: string;
+    public readonly hashedPassword: string;
 
-    get hashedPassword(): string {
-      return this._hashedPassword;
-    }
     constructor(nick: string, mail: string, pass: string, provider: AuthProvider = AuthProvider.LOCAL) {
       this.nickname = nick;
       this.email = mail;
       this.password = '';
-      this._hashedPassword = pass;
+      this.hashedPassword = pass;
       this.provider = provider;
     }
 

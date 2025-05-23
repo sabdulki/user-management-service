@@ -6,7 +6,7 @@ import { loginHandler } from './publicHandlers/login'
 import { getUserInfo } from './publicHandlers/getUser'
 import { getUserInfoById } from './privateHandlers/getUserById'
 import { refreshTokensPair } from './publicHandlers/refreshToken'
-import { removeUser } from './publicHandlers/deleteUser'
+import { setUserRemoved } from './publicHandlers/setUserRemoved'
 import { isTokenExpired } from './publicHandlers/isTokenExpired'
 import { uploadAvatar } from './publicHandlers/uploadAvatar'
 import { googleLoginCallbackHandler } from './publicHandlers/googleLoginCallback'
@@ -15,6 +15,7 @@ import { googleLoginExchange } from './publicHandlers/googleLogin'
 import { updateUserNickname } from './publicHandlers/updateNickname'
 import { updateUserPassword } from './publicHandlers/updatePassword'
 import { verifyOtp } from './publicHandlers/verifyOtp'
+import { deleteUser } from './publicHandlers/deleteUser'
 // import { verifyOtp } from './publicHandlers/verifyOtp'
 
 const routes: IHandler[] = [
@@ -89,7 +90,12 @@ const routes: IHandler[] = [
   {
     method: 'DELETE',
     route: '/auth/api/rest/user',
-    handler: removeUser
+    handler: setUserRemoved
+  },
+  {
+    method: 'DELETE',
+    route: '/auth/api/rest/user/:userId',
+    handler: deleteUser
   },
 
   
