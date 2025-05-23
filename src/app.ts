@@ -41,7 +41,9 @@ async function setupDatabaseStorage() {
 //       id INTEGER PRIMARY KEY AUTOINCREMENT,
 //       nickname TEXT UNIQUE,
 //       email TEXT UNIQUE,
-//       password TEXT
+//       password TEXT,
+//       avatar TEXT,
+//       removed_at INTEGER DEFAULT null
 //     )
 //     `)
 //   db.exec(`
