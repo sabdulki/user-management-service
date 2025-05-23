@@ -6,7 +6,7 @@ import { deleteAvatar } from './uploadAvatar';
 export async function setUserRemoved(request: FastifyRequest, reply: FastifyReply) {
     const payload = await isTokenValid(request) as JwtPayload;
     if (!payload || !payload.userId)
-        return reply.code(404).send();
+        return reply.code(404).send({error: "invalid jwt tokens"});
     const userId = payload.userId;
     if (!request.server.storage.isUserAvailable(userId))
         return reply.code(404).send();

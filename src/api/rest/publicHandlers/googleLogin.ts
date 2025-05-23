@@ -28,7 +28,7 @@ export async function googleLoginExchange(request: FastifyRequest, reply: Fastif
     const codeVerifier = body.codeVerifier;
     const redirectUri = body.redirectUri;
     if (!code || !codeVerifier || !redirectUri)
-        return reply.code(400).send(); // bad request
+        return reply.code(400).send({ error: 'bad request' });
     const configInstance = Config.getInstance();
 
     let userInfoRes;

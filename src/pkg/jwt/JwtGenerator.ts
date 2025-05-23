@@ -87,8 +87,12 @@ class JwtGenerator {
 	}
 
 	public async deleteToken(token: string) {
-		const status = await this.radishClient.delete(token);
-		if (status.status != 200) {
+
+		const getResponse = await this.radishClient.get(token);
+		if (getResponse.status !== 200) // means token was deleted before or doesnt exists
+			return;
+		const deleteResponse = await this.radishClient.delete(token);
+		if (deleteResponse.status !== 200) {
 			throw JwtCachError;
 		}
 	}

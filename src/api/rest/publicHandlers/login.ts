@@ -88,7 +88,9 @@ export async function loginHandler(request: FastifyRequest, reply: FastifyReply)
   } catch (err: any) {
     return reply.code(401).send({message: `${err}, getUserByNickname `});
   }
-
+  if (!user) {
+    return reply.code(404).send({message: "User not found"});
+  }
   const userId = user.id;
   isValid = await form.authenticate();
   if (!isValid) {

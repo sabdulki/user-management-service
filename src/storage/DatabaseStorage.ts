@@ -245,8 +245,11 @@ export default class DatabaseStorage implements IStorage {
     
     isUserAvailable(userId: number): boolean {
         // Оператор !! преобразует значение в логическое: true, если объект существует, и false, если нет.
-        const user = this.getUserById(userId);
-        return !!user && user.removed_at === null;
+        const stmt = this._db.prepare(`
+            SELECT 1 FROM users WHERE id = ? AND removed_at IS NULL
+        `);
+        const result = stmt.get(userId);
+        return !!result; // true, если пользователь найден и не удалён
     }
       
 };

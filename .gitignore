@@ -1,3 +1,9 @@
+# Игнорировать все файлы в папке public/avatars
+/public/avatars/*
+
+# Но НЕ игнорировать default.png
+!/public/avatars/default.png
+
 node_modules
 instruction.txt
 .env
