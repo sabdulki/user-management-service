@@ -69,6 +69,7 @@ async function main()
   await app.register(registerRoutesPlugin);
   await app.register(cors, {
     origin: true, // разрешить ВСЕ источники
+    methods: ['GET', 'POST', 'PUT',' PATCH', 'DELETE', 'OPTIONS']
   });
 
   // Берёт root — /path/to/project/public (твой ../public из __dirname)

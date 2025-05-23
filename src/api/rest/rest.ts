@@ -9,14 +9,12 @@ import { refreshTokensPair } from './publicHandlers/refreshToken'
 import { setUserRemoved } from './publicHandlers/setUserRemoved'
 import { isTokenExpired } from './publicHandlers/isTokenExpired'
 import { uploadAvatar } from './publicHandlers/uploadAvatar'
-import { googleLoginCallbackHandler } from './publicHandlers/googleLoginCallback'
 import { updateRating } from './privateHandlers/updateRating'
 import { googleLoginExchange } from './publicHandlers/googleLogin'
 import { updateUserNickname } from './publicHandlers/updateNickname'
 import { updateUserPassword } from './publicHandlers/updatePassword'
 import { verifyOtp } from './publicHandlers/verifyOtp'
 import { deleteUser } from './publicHandlers/deleteUser'
-// import { verifyOtp } from './publicHandlers/verifyOtp'
 
 const routes: IHandler[] = [
   //        PUBLIC
@@ -31,11 +29,6 @@ const routes: IHandler[] = [
     route: '/auth/api/rest/google/login',
     handler: googleLoginExchange
   },
-  // {
-  //   method: 'GET',
-  //   route: '/auth/api/rest/google/login/callback',
-  //   handler: googleLoginCallbackHandler
-  // },
   {
     method: 'GET',
     route: '/auth/api/rest/user',
