@@ -43,7 +43,6 @@ export default class DatabaseStorage implements IStorage {
     userRegister(form: UserCreateForm): number {
         try {
             let result: any;
-            console.log("form.hashedPassword: ", form.hashedPassword);
             const stmt = this._db.prepare('INSERT INTO users (nickname, email, password, provider) VALUES (?, ?, ?, ?)');
             result = stmt.run(form.nickname, form.email, form.hashedPassword, form.provider);
             const userId = Number(result.lastInsertRowid);

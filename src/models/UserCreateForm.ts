@@ -36,12 +36,10 @@ export default class UserCreateForm {
     static async create(rawData: unknown): Promise <UserCreateForm> {
       const data = rawData as { [key: string]: any };
       const form = plainToInstance(UserCreateForm, data);
-      console.log("form: ", form);
       try {
         await validateOrReject(form);
       } catch (errors) {
         // which status code should be and how errors should be treated?
-        console.log("validateOrReject failed");
         throw new Error('Invalid data');
       }
 
@@ -55,7 +53,6 @@ export default class UserCreateForm {
         const provider: AuthProvider = data.provider ?? AuthProvider.LOCAL;
         return new UserCreateForm(form.nickname, form.email, hashed, provider);
       } catch (hashError) {
-        console.log("constructor failed");
         throw new Error('Operation failed');
       }
     }

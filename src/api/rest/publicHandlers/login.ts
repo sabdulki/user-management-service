@@ -16,15 +16,13 @@ function generateUuid() : string {
   return randomUUID();
 }
 
-async function sendOtpToEmail(otp: string, userEmail: string) : Promise<number> { // change name of function to more meaningful
+async function sendOtpToEmail(otp: string, userEmail: string) : Promise<number> {
   
   const bodyContent = {
     email: userEmail,
-    template: 'otp', // if your backend expects this
+    template: 'otp',
     data: {"code": otp}
   }
-
-  // console.log ("bodyContent: ", bodyContent);
 
   const response = await fetch('http://localhost:5200/ess/api/rest/email/send', {
     method: 'POST',
@@ -35,15 +33,11 @@ async function sendOtpToEmail(otp: string, userEmail: string) : Promise<number> 
   });
 
   const data = await response.json() as { error?: string; status?: number; };
-  // console.log("data: ", data);
   if (response.status !== 202) {
     return 400;
   }
-  return response.status;
 
-  //  if (!data.status)
-  //   return 400; //error
-  // return data.status;
+  return response.status;
 }
 
 export async function otpLogic(identifier: { userId?: number; form?: UserCreateForm }, userEmail: string) :  Promise<string | undefined> { // change name of function to more meaningful
@@ -54,15 +48,10 @@ export async function otpLogic(identifier: { userId?: number; form?: UserCreateF
   const expireTime = 300; // 5 minutes
   if (!otp || !uuid)
     return undefined;
-  console.log("generated otp and uuid: ");
 
   const sendStatus = await sendOtpToEmail(otp, userEmail);
-  console.log("sendStatus: ", sendStatus);
-
-  if (sendStatus !== 202) // sending to email failed
+  if (sendStatus !== 202)
     return undefined;
-  console.log("after sendOtpToEmail");
-  
 
   let saveStatus;
   if (identifier.userId) {
@@ -93,50 +82,23 @@ export async function loginHandler(request: FastifyRequest, reply: FastifyReply)
   } catch (error: any) {
     return reply.code(400).send({ message: 'Invalid input data'});
   }
-  console.log("form: ", form);
   let user;
   try {
     user = request.server.storage.getUserByNickname(form.nickname) as UserBaseInfo;
   } catch (err: any) {
     return reply.code(401).send({message: `${err}, getUserByNickname `});
   }
-  // if (!request.server.storage.isUserAvailable(userId))
-  //   return reply.code(404).send();
-  const userId = user.id;
 
+  const userId = user.id;
   isValid = await form.authenticate();
   if (!isValid) {
     return reply.code(401).send({ error: 'Authentication failed' });
   }
-  // generate uuid and otp and send otp to ess, whait for response. 
   const userEmail = request.server.storage.getEmailById(userId);
   const uuid = await otpLogic({userId}, userEmail);
-  console.log("after otpLogic");
   if (!uuid) // generation/saving in redis/sending to email failed
     return reply.code(400).send();
   return reply.code(200).send({"key": uuid});
-  
-  // try {
-  //   const user = request.server.storage.getUserByNickname(form.nickname);
-  //   const userId = user.id;
-    
-  //   const tokenPair = await generateJwtTokenPair({ userId });
-  //   if (!tokenPair) {
-  //     return reply.code(500).send();
-  //   }
-  //   return reply.code(200).send({
-  //     accessToken: tokenPair.accessToken,
-  //     refreshToken: tokenPair.refreshToken
-  //   })
-  // } catch (err: any) {
-  //   if (err.message === 'Failed to get user') {
-  //     return reply.code(409).send({ error: 'User already exists' }); // 409 Conflict
-  //   }
-  //   if (err.message === 'DatabaseFailure') {
-  //     return reply.code(500).send({ error: 'Database error' });
-  //   }
-  //   return reply.code(400).send({ error: 'Invalid data', detail: err.message });
-  // }
 }
 
 

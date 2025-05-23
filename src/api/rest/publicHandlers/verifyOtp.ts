@@ -1,5 +1,3 @@
-// if otp is correct it sends access and refresh tokens. 
-
 import Config from '../../../config/Config';
 import { FastifyRequest, FastifyReply } from 'fastify'
 import RadishClient from '../../../pkg/client/client';
@@ -7,8 +5,6 @@ import { generateJwtTokenPair, isTokenValid } from '../../../pkg/jwt/JwtGenerato
 import UserCreateForm from '../../../models/UserCreateForm';
 import RadishResponse from 'pkg/client/response';
 import { saveRegisteredUser } from './registration';
-import { plainToInstance } from 'class-transformer';
-
 
 export class OtpManager {
     private static instance: OtpManager;
@@ -17,18 +13,12 @@ export class OtpManager {
         const host = Config.getInstance().getRadishHost();
         const port = Config.getInstance().getRadishPort();
         this.radishClient = new RadishClient({ host, port});
-        // setTimeout( async () => {
-        //     const response = await this.radishClient.set("example", "example");
-        //     console.log(response);
-        // }, 0);
-        
     }
 
     public static getInstance(): OtpManager {
 		if (!OtpManager.instance) {
 			OtpManager.instance = new OtpManager();
 		}
-        console.log(" successfully created OtpManager ")
 		return OtpManager.instance;
 	}
 
@@ -41,7 +31,6 @@ export class OtpManager {
             status = 500;
             return {userId, status};
         }
-        console.log("response?.value: ", response?.value);
         const obj = JSON.parse(response?.value);
         if (!obj.otp) {
             status = 500;
@@ -49,18 +38,9 @@ export class OtpManager {
             return {userId, status};
         }
         if (obj.form) {
-            // form = plainToInstance(UserCreateForm, obj.form); // восстанавливаем класс
             form = obj.form;
             console.log("form from obj.form: ", form);
         }
-        // if (obj.form) {
-        //     const isArray = Array.isArray(obj.form);
-        //     console.log("form is array?", isArray);
-            
-        //     form = isArray
-        //         ? plainToInstance(UserCreateForm, obj.form[0]) // извлеки первый, если вдруг массив
-        //         : plainToInstance(UserCreateForm, obj.form);
-        // }
         else if (obj.userId)
             userId = obj.userId;
         else {
@@ -75,7 +55,6 @@ export class OtpManager {
             return {userId, status};
         }
         if (form) {
-            console.log("fomr in otp match: ", form);
             const obj = await saveRegisteredUser(form);
             if (obj.status !== 201 || !obj.userId) {
                 status = obj.status;
@@ -95,7 +74,6 @@ export class OtpManager {
     }
 
     public async saveUuidInRadish(identifier: { userId?: number; form?: UserCreateForm }, uuid: string, otp: string, expireTime: number) : Promise<number> {
-        console.log("in saveUuidInRadish")
         let response: RadishResponse;
         if (identifier.userId) {
             const userId = identifier.userId;
@@ -120,9 +98,6 @@ export class OtpManager {
 }
 
 export async function verifyOtp (request: FastifyRequest, reply: FastifyReply) {
-    // const payload = await isTokenValid(request);
-    // if (!payload || !payload.userId)
-    //     return reply.code(401).send();
     const body = request.body as { uuid: string, otp: string}
     const uuid = body.uuid;
     const userOtp = body.otp;
@@ -145,7 +120,7 @@ export async function verifyOtp (request: FastifyRequest, reply: FastifyReply) {
         })
     } catch (err: any) {
         if (err.message === 'Failed to get user') {
-          return reply.code(409).send({ error: 'User already exists' }); // 409 Conflict
+          return reply.code(409).send({ error: 'User already exists' });
         }
         if (err.message === 'DatabaseFailure') {
           return reply.code(500).send({ error: 'Database error' });

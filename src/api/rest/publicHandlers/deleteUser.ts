@@ -8,7 +8,6 @@ export async function deleteUser(request: FastifyRequest, reply: FastifyReply)
 {
     try {
         const {userId} = request.params as {userId : number}; //распаковка
-        console.log(`going to delte user no ${userId}`);
         request.server.storage.deleteUser(userId);
         return reply.code(200).send();
     } catch (error: any) {

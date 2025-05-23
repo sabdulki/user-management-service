@@ -75,9 +75,7 @@ class JwtGenerator {
 		
 		const key = `${type}-${token}`;
 		const status = await this.radishClient.get(key);
-		console.log("status.data: ", status.data);
 		const value = status?.value;
-		console.log("value: ", value);
 		if (status.status != 200) {
 			throw JwtCachError;
 		}
@@ -154,7 +152,7 @@ async function isTokenValid(request: FastifyRequest | string, type: TokenType = 
 	try {
 		return await JwtGenerator.getInstance().verifyToken(token, type);
 	} catch (err: any) {
-		console.log(err);
+		// console.log(err);
 		return undefined;
 	}
 }
@@ -165,7 +163,7 @@ async function generateJwtTokenPair(payload: JwtPayload): Promise<TokenPair | un
 	try {
 		return JwtGenerator.getInstance().generateTokenPair(payload);
 	} catch (err: any) {
-		console.log(err);
+		// console.log(err);
 		return undefined;
 	}
 }

@@ -1,16 +1,9 @@
-
-// http://localhost:5000/auth/api/rest/google/login
-
 import { FastifyRequest, FastifyReply } from 'fastify'
 import app from 'fastify'
 import UserCreateForm from '../../../models/UserCreateForm';
 import { AuthProvider } from '../../../storage/DatabaseStorage';
 import {generateJwtTokenPair} from '../../../pkg/jwt/JwtGenerator';
 import Config from '../../../config/Config';
-
-// const redirectUrl = await request.server.googleOAuth2.generateAuthorizationUri(request, reply);
-// // console.log("Redirecting to:", redirectUrl);
-// return reply.redirect(redirectUrl);
 
 type GoogleUser = {
     id: string
@@ -38,13 +31,7 @@ export async function googleLoginExchange(request: FastifyRequest, reply: Fastif
         return reply.code(400).send(); // bad request
     const configInstance = Config.getInstance();
 
-    console.log("code: ", code)
-    console.log("codeVerifier: ", codeVerifier)
-    console.log("redirectUri: ", redirectUri)
-    console.log("getGoogleClientId: ", configInstance.getGoogleClientId())
-    console.log("getGoogleClientSecret: ", configInstance.getGoogleClientSecret())
     let userInfoRes;
-
     try {
         // Exchange code + verifier for access token
         const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
@@ -61,10 +48,8 @@ export async function googleLoginExchange(request: FastifyRequest, reply: Fastif
         });
 
         const token = await tokenRes.json() as GoogleTokenResponse;
-        console.log(token);
 
         if (!token || !token.access_token) {
-          console.error('Token exchange failed:', token);
           return reply.status(400).send({ error: 'Token exchange failed' });
         }
         
@@ -73,14 +58,12 @@ export async function googleLoginExchange(request: FastifyRequest, reply: Fastif
                 Authorization: `Bearer ${token.access_token}`
             }
         })
-    } catch (err:any) {
-        console.log(err);
+    } catch (err: any) {
         return reply.code(500).send(); // or another code
     }
 
     const googleUser = await userInfoRes.json() as GoogleUser;
     const email = googleUser.email;
-    console.log("email: ", googleUser.email, " nickname: ", googleUser.given_name);
 
     // Check if user exists in DB
     const storage = request.server.storage;
@@ -104,7 +87,6 @@ export async function googleLoginExchange(request: FastifyRequest, reply: Fastif
             userId = storage.userRegisterTransaction(form);
             storage.addUserAvatar(userId, googleUser.picture);
         } catch (err: any) {
-            console.log(err);
             return reply.code(500).send({message: "internal server error"});
         }
     }
@@ -114,7 +96,6 @@ export async function googleLoginExchange(request: FastifyRequest, reply: Fastif
       userId = user.id;
     const tokenPair = await generateJwtTokenPair( {userId} );
     if (!tokenPair) {
-        console.log("token paits failed");
       return reply.code(500).send();
     }
 
