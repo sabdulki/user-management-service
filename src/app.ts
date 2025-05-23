@@ -1,17 +1,16 @@
-import Fastify from 'fastify'
-import { registerRestRoutes } from './api/rest/rest'
-import fp from "fastify-plugin";
-import DatabaseStorage from './storage/DatabaseStorage'
 import dotenv from 'dotenv';
-import Config from './config/Config';
+import Fastify from 'fastify'
+import fp from "fastify-plugin";
 import cors from '@fastify/cors'
+import fastifyOauth2 from '@fastify/oauth2'
+import fastifyStatic from '@fastify/static'
+import fastifyMultipart from '@fastify/multipart'
+import { registerRestRoutes } from './api/rest/rest'
+import DatabaseStorage from './storage/DatabaseStorage'
 import loggerMiddleware from "./pkg/middlewares/loggerMiddleware"
 import { setUpJwtGenerator } from './pkg/jwt/JwtGenerator';
-import fastifyMultipart from '@fastify/multipart'
-import fastifyStatic from '@fastify/static'
-import path from 'path'
-import fastifyOauth2 from '@fastify/oauth2'
-
+import Config from './config/Config';
+import path, {dirname} from 'path'
 
 dotenv.config();
 
@@ -70,16 +69,19 @@ async function main()
   await app.register(registerRoutesPlugin);
   await app.register(cors, {
     origin: true, // разрешить ВСЕ источники
-  })
+  });
+
+  // Берёт root — /path/to/project/public (твой ../public из __dirname)
+  // Склеивает root и путь после префикса
   await app.register(fastifyStatic, {
-    root: path.join(__dirname, 'public'),
-    prefix: '/auth/public', // so /avatars/filename.jpg works
-  })
+    root: path.join(__dirname, '../public'), // ROOT
+    prefix: '/auth/public/', // ALWAYS END WITH '/'
+  });
   await app.register(fastifyMultipart, {
     limits: {
       fileSize: 2 * 1024 * 1024 // Optional: enforce 2MB at plugin level too
     }
-  })
+  });
   
   const configInstance =  Config.getInstance()
   const googleClientId = configInstance.getGoogleClientId();
@@ -99,9 +101,6 @@ async function main()
     callbackUri: googleCallbackUrl,
     scope: ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile', 'openid']
   });
-  // await app.register(require('@fastify/cookie'), {
-  //   secret: googleClientSecret, // нужен для signed cookies
-  // });
   app.addHook('onRequest', loggerMiddleware)
 
   try {
