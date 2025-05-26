@@ -21,13 +21,15 @@ async function deleteFile(path: string): Promise<boolean> {
 }
 
 export async function deleteAvatar(userId: number, userAvatar: string, storage: IStorage) {
-	const userAvatarFullPath = path.join(__dirname, '../../../../public', userAvatar);
-
-	const isDeleted = await deleteFile(userAvatarFullPath);
-	if (!isDeleted) { // delete file if it exists ????? {
-		console.log("Failed to delete file");
-		storage.deleteUserAvatar(userId);
+	if (!userAvatar.includes("https://lh3.googleusercontent.com/")) {
+		const userAvatarFullPath = path.join(__dirname, '../../../../public', userAvatar);
+		console.log("userAvatarFullPath: ", userAvatarFullPath)
+		const isDeleted = await deleteFile(userAvatarFullPath);
+		if (!isDeleted) { // delete file if it exists ????? {
+			console.log("Failed to delete file");
+		}
 	}
+	storage.deleteUserAvatar(userId);
 }
 
 export async function uploadAvatar(request: FastifyRequest, reply: FastifyReply) {

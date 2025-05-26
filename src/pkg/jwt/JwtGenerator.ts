@@ -156,7 +156,7 @@ async function isTokenValid(request: FastifyRequest | string, type: TokenType = 
 	try {
 		return await JwtGenerator.getInstance().verifyToken(token, type);
 	} catch (err: any) {
-		// console.log(err);
+		console.log(err);
 		return undefined;
 	}
 }

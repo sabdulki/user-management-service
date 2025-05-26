@@ -39,7 +39,6 @@ export class OtpManager {
         }
         if (obj.form) {
             form = obj.form;
-            console.log("form from obj.form: ", form);
         }
         else if (obj.userId)
             userId = obj.userId;
