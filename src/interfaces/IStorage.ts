@@ -10,6 +10,7 @@ interface IStorage {
     // setters
     setUserUnavalible(userId: number): void;
     addUserAvatar(userId: number, relativePath: string): void;
+    setUserPassword(userId: number, newPassword: string):Promise<void> ;
 
     //getters
     getUserByNickname(nickname: string): UserBaseInfo | undefined;
@@ -21,6 +22,7 @@ interface IStorage {
 
     // update
     updateNicknmae(userId: number, nickname: string): void;
+    updatePassword(userId: number, oldPassword: string, newPassword: string): Promise<void>;
     updateRating(userId: number, newRating: number): void;
     updateRatingTransaction(ratings: { id: number; rating: number }[]): void;
 

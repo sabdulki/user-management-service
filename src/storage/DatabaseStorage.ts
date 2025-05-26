@@ -170,7 +170,25 @@ export default class DatabaseStorage implements IStorage {
         }
     }
 
-    async updatePassword(userId: number, oldPassword: string, newPassword: string) {
+    getUserProvider(userId: number): number {
+        const object = this._db.prepare('SELECT provider FROM users WHERE id = ?').get(userId) as { provider: number } | undefined ;
+        if (!object) {
+            throw new Error('UserNotFound');
+        }
+        return object.provider;
+    }
+
+    async setUserPassword(userId: number, newPassword: string): Promise<void> {
+        try {
+            const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+            const stmt = this._db.prepare('UPDATE users SET password = ? WHERE id = ?');
+            stmt.run(hashedNewPassword, userId);
+        } catch (error: any) {
+            throw new Error('Failed to set user password');
+        }
+    }
+
+    async updatePassword(userId: number, oldPassword: string, newPassword: string): Promise<void> {
         // get user, check if it's password is the same as old password
         // if true, hash new pass and update db
         // if false, throw error "Password is not correct", 403
