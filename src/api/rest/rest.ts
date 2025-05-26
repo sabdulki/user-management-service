@@ -34,6 +34,11 @@ const routes: IHandler[] = [
     route: '/auth/api/rest/user',
     handler: getUserInfo
   },
+  {
+    method: 'GET',
+    route: '/auth/api/rest/rating/leader',
+    handler: getRatingLeaders
+  },
   //      POST
   {
     method: 'POST',

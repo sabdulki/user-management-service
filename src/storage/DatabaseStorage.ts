@@ -178,6 +178,23 @@ export default class DatabaseStorage implements IStorage {
         return object.provider;
     }
 
+    getRatingLeadres(): Array<{ username: string, score: number }> | undefined {
+        try {
+            const stmt = this._db.prepare(`
+                SELECT u.username, r.score
+                FROM ratings r
+                JOIN users u ON u.id = r.user_id
+                ORDER BY r.score DESC
+                LIMIT 5
+            `);
+            const topPlayers = stmt.all() as { username: string, score: number }[];;
+            return topPlayers;
+        } catch (err: any) {
+            return undefined;
+            // throw new Error ("Failed to get leaders");
+        }
+    }
+
     async setUserPassword(userId: number, newPassword: string): Promise<void> {
         try {
             const hashedNewPassword = await bcrypt.hash(newPassword, 10);
