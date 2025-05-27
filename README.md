@@ -28,6 +28,8 @@ REDISH_PORT=5100
 GOOGLE_CLIENT_ID=<client_id provided by Google>
 GOOGLE_CLIENT_SECRET=<client_secret provided by Google>
 GOOGLE_CALLBACK_URL=http://localhost:5000/auth/api/rest/google/login/callback
+ESS_HOST=localhost
+ESS_PORT=5200
 ```
 Navigate to the redish service folder, install its dependencies, and start it:
 ```bash

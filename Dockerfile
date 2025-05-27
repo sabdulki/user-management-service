@@ -1,8 +1,8 @@
 
 # How to run
-# docker build -t fastify-app .
-# docker run -p 5000:5000 fastify-app
-# to stop: docker stop fastify-app
+# docker build -t ums .
+# docker run -p 5000:5000 ums
+# to stop: docker stop ums
 
 # Базовый образ
 FROM node:22
@@ -18,6 +18,12 @@ ENV JWT_REFRESH_EXPIRES_IN=90d
 ENV RADISH_HOST=localhost
 ENV RADISH_PORT=5100
 ENV PORT=5000
+ENV GOOGLE_CLIENT_ID=google_client_id
+ENV GOOGLE_CLIENT_SECRET=google_client_secret
+ENV GOOGLE_CALLBACK_URL=http://localhost:5000/auth/api/rest/google/login/callback
+ENV ESS_HOST=localhost
+ENV ESS_PORT=5200
+# add alć new env
 
 # Копируем package.json и package-lock.json
 COPY package*.json ./

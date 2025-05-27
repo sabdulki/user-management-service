@@ -3,6 +3,7 @@ import IStorage from '../interfaces/IStorage'
 import UserCreateForm from '../models/UserCreateForm'
 import UserBaseInfo from "types/UserBaseInfo";
 import bcrypt from "bcryptjs";
+import { syncMigrations } from "./migrate";
 
 export enum AuthProvider {
     LOCAL = 0,
@@ -14,7 +15,8 @@ export default class DatabaseStorage implements IStorage {
 
     constructor() {
         //Работает как обычное подключение к SQLite-файлу если файл уже создан
-        this._db = new Database('./databases.db');
+        this._db = new Database('./db/database.db');
+        syncMigrations(this._db, './db/migrations');
         // this was executed on;y ONCE to add avatar column ONLY
         // const columnExists = this._db
         //     .prepare(`PRAGMA table_info(users)`)

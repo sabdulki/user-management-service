@@ -4,6 +4,7 @@ import { randomInt, randomUUID } from 'crypto';
 import UserBaseInfo from 'types/UserBaseInfo';
 import { OtpManager } from './verifyOtp';
 import UserCreateForm from '../../../models/UserCreateForm';
+import Config from '../../../config/Config';
 
 function generateOtp() : string {
   return randomInt(100000, 999999).toString(); // 6-значный код
@@ -21,7 +22,12 @@ async function sendOtpToEmail(otp: string, userEmail: string) : Promise<number> 
     data: {"code": otp}
   }
 
-  const response = await fetch('http://localhost:5200/ess/api/rest/email/send', {
+  const emailSenderServiceHost = Config.getInstance().getEssHost();
+  const emailSenderServicePort = Config.getInstance().getEssPort();
+  const emailSenderServiceAddress = `${emailSenderServiceHost}:${emailSenderServicePort}`;
+  const url = 'http://' + emailSenderServiceAddress + '/ess/api/rest/email/send';
+
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
