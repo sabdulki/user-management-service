@@ -80,8 +80,12 @@ export default class RadishClient {
 	}
 
 	async get(key: string) {
+		
+		console.log("the key is: ", key);
 		const request = RadishRequest.get(key);
+		console.log("got string!");
 		const data = await this.queue.add(() => request.send(this.conn));
+		console.log("added in queue!");
 		return new RadishResponse(data);
 	}
 

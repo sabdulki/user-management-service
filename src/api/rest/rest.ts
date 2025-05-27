@@ -15,6 +15,7 @@ import { updateUserNickname } from './publicHandlers/updateNickname'
 import { updateUserPassword } from './publicHandlers/updatePassword'
 import { verifyOtp } from './publicHandlers/verifyOtp'
 import { deleteUser } from './publicHandlers/deleteUser'
+import { getRatingLeaders } from './publicHandlers/getRatingLeaders'
 
 const routes: IHandler[] = [
   //        PUBLIC
@@ -23,11 +24,6 @@ const routes: IHandler[] = [
     method: 'GET',
     route: '/ping',
     handler: pingHandler
-  },
-  {
-    method: 'POST',
-    route: '/auth/api/rest/google/login',
-    handler: googleLoginExchange
   },
   {
     method: 'GET',
@@ -40,6 +36,11 @@ const routes: IHandler[] = [
     handler: getRatingLeaders
   },
   //      POST
+  {
+    method: 'POST',
+    route: '/auth/api/rest/google/login',
+    handler: googleLoginExchange
+  },
   {
     method: 'POST',
     route: '/auth/api/rest/registration',

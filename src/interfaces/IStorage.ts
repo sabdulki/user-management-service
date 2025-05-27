@@ -1,6 +1,7 @@
 
 import UserBaseInfo from 'types/UserBaseInfo';
 import UserCreateForm from '../models/UserCreateForm'
+import RadishResponse from 'pkg/client/response';
 
 // only signature of method
 interface IStorage {
@@ -19,7 +20,7 @@ interface IStorage {
     getUserAvatar(userId: number): string | undefined;
     getUserPassword(identifier: { nickname?: string; id?: number }): string;
     getEmailById(userId: number): string | undefined;
-    getRatingLeadres(): Array<{ username: string, score: number }> | undefined;
+    getRatingLeadres(): Array<{ nickname: string, score: number }> | undefined;
 
     // update
     updateNicknmae(userId: number, nickname: string): void;

@@ -11,24 +11,39 @@ import loggerMiddleware from "./pkg/middlewares/loggerMiddleware"
 import { setUpJwtGenerator } from './pkg/jwt/JwtGenerator';
 import Config from './config/Config';
 import path, {dirname} from 'path'
+import RadishClient from './pkg/client/client';
 
 dotenv.config();
 
 const app = Fastify()
 const registerRoutesPlugin = fp(registerRestRoutes)
-const dbConnectorPlugin = fp(setupDatabaseStorage)
+const dbConnectorPlugin = fp(setupStorage)
 
-async function setupDatabaseStorage() {
-  // const isProduction = process.env.MODE === 'production'
-  
+async function declareDataBase() {
   const storage = new DatabaseStorage() 
-  
   app.decorate('storage', storage)  
-  
   app.addHook('onClose', (app, done) => {
     storage.close()
     done()
   })
+}
+
+async function declareCache() {
+  const host = Config.getInstance().getRadishHost();
+  const port = Config.getInstance().getRadishPort();
+  const cache = new RadishClient({host, port}) 
+  app.decorate('cache', cache)  
+  app.addHook('onClose', (app, done) => {
+    cache.close()
+    done()
+  })
+}
+
+// do th radish as these one
+async function setupStorage() {
+  // const isProduction = process.env.MODE === 'production'
+  await declareDataBase();
+  await declareCache()
 }
 
 // async function dbConnector(app: FastifyInstance) 
@@ -110,7 +125,11 @@ async function main()
     console.log(error);
     process.exit(1)
   }
-
+  // create radish client here
+  // app.addHook('onClose', (app, done) => {
+  //    storage.close()
+  //    done()
+  // })
   const host = configInstance.getHost();
   const port = configInstance.getPort();
 

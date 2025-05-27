@@ -178,18 +178,19 @@ export default class DatabaseStorage implements IStorage {
         return object.provider;
     }
 
-    getRatingLeadres(): Array<{ username: string, score: number }> | undefined {
+    getRatingLeadres(): Array<{ nickname: string, score: number }> | undefined {
         try {
             const stmt = this._db.prepare(`
-                SELECT u.username, r.score
+                SELECT u.nickname, r.value
                 FROM ratings r
                 JOIN users u ON u.id = r.user_id
-                ORDER BY r.score DESC
+                ORDER BY r.value DESC
                 LIMIT 5
             `);
-            const topPlayers = stmt.all() as { username: string, score: number }[];;
+            const topPlayers = stmt.all() as { nickname: string, score: number }[];;
             return topPlayers;
         } catch (err: any) {
+            console.log("error in db in getRatingLeadres", err);
             return undefined;
             // throw new Error ("Failed to get leaders");
         }

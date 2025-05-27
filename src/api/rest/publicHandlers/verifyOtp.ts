@@ -5,14 +5,13 @@ import { generateJwtTokenPair, isTokenValid } from '../../../pkg/jwt/JwtGenerato
 import UserCreateForm from '../../../models/UserCreateForm';
 import RadishResponse from 'pkg/client/response';
 import { saveRegisteredUser } from './registration';
+import app from '../../../app';
 
 export class OtpManager {
     private static instance: OtpManager;
     private radishClient: RadishClient;
     private constructor() {
-        const host = Config.getInstance().getRadishHost();
-        const port = Config.getInstance().getRadishPort();
-        this.radishClient = new RadishClient({ host, port});
+        this.radishClient = app.cache;
     }
 
     public static getInstance(): OtpManager {

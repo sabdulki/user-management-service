@@ -1,9 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { UserLoginForm } from '../../../models/UserLoginForm';
-import {generateJwtTokenPair} from '../../../pkg/jwt/JwtGenerator';
 import { randomInt, randomUUID } from 'crypto';
-import Config from '../../../config/Config';
-import RadishClient from '../../../pkg/client/client';
 import UserBaseInfo from 'types/UserBaseInfo';
 import { OtpManager } from './verifyOtp';
 import UserCreateForm from '../../../models/UserCreateForm';

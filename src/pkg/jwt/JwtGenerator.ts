@@ -4,6 +4,7 @@ import RadishClient from "../client/client"
 import Config from "../../config/Config"
 import { JwtGeneratorConfig } from "./JwtGeneratorConfig"
 import { JwtSignError, JwtCachError, JwtTokenVerificationError, JwtExtractionError } from './jwtErrors';
+import app from '../../app'; 
 
 function setUpJwtGenerator(): void {
 	JwtGenerator.getInstance();
@@ -39,7 +40,7 @@ class JwtGenerator {
 		this.config = new JwtGeneratorConfig();
 		const host = Config.getInstance().getRadishHost();
 		const port = Config.getInstance().getRadishPort();
-		this.radishClient = new RadishClient({ host, port});
+		this.radishClient = app.cache;
 	}
 
 	public static getInstance(): JwtGenerator {
