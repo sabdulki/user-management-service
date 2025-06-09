@@ -4,6 +4,7 @@ import UserCreateForm from '../models/UserCreateForm'
 import UserBaseInfo from "types/UserBaseInfo";
 import bcrypt from "bcryptjs";
 import { syncMigrations } from "./migrate";
+import { InvitationListForm } from "../api/rest/publicHandlers/getInvitations";
 
 export enum AuthProvider {
     LOCAL = 0,
@@ -392,7 +393,7 @@ export default class DatabaseStorage implements IStorage {
         }
     }
     
-    deleteFriend(userId: number, userToDelete: number) {
+    deleteFriend(userId: number, userToDelete: number): void {
         const [userA, userB] = [userId, userToDelete].sort((a, b) => a - b);
         try {
             const stmt = this._db.prepare(
@@ -411,6 +412,39 @@ export default class DatabaseStorage implements IStorage {
                 throw new Error('DatabaseFailure');
             }
         }
+    }
+
+    getInvitationsList(userId: number): InvitationListForm[] | undefined{
+        let invitations: InvitationListForm[] | undefined;
+        try {
+            const stmt = this._db.prepare(`
+                SELECT 
+                  i.id AS recordId,
+                  CASE 
+                    WHEN i.sender_id = ? THEN i.sender_id
+                    ELSE i.receiver_id
+                  END AS senderId,
+                  CASE 
+                    WHEN i.sender_id = ? THEN u.nickname  
+                    ELSE u.nickname
+                  END AS nickname
+                FROM invitations i
+                JOIN users u 
+                  ON u.id = CASE 
+                              WHEN i.sender_id = ? THEN i.receiver_id
+                              ELSE i.sender_id
+                            END
+                WHERE i.sender_id = ? OR i.receiver_id = ?
+              `);
+              
+            const rows = stmt.all(userId, userId, userId, userId, userId);
+            invitations = rows as InvitationListForm[];
+            console.log(invitations);
+            return invitations;
+        } catch (err:any) {
+            throw new Error('DatabaseFailure');
+        }
+
     }
 
 };

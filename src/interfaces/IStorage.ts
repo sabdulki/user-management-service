@@ -3,6 +3,7 @@ import UserBaseInfo from 'types/UserBaseInfo';
 import UserCreateForm from '../models/UserCreateForm'
 import RadishResponse from 'pkg/client/response';
 import { InvitationStatus } from 'storage/DatabaseStorage';
+import { InvitationListForm } from '../api/rest/publicHandlers/getInvitations';
 
 // only signature of method
 interface IStorage {
@@ -26,6 +27,7 @@ interface IStorage {
     getUserPassword(identifier: { nickname?: string; id?: number }): string;
     getEmailById(userId: number): string | undefined;
     getRatingLeadres(): Array<{ nickname: string, score: number }> | undefined;
+    getInvitationsList(userId: number): InvitationListForm[] | undefined;
 
     // update
     updateNicknmae(userId: number, nickname: string): void;
@@ -39,6 +41,7 @@ interface IStorage {
     //delete
     deleteUserAvatar(userId: number): void;
     deleteUser(userId: number): void;
+    deleteFriend(userId: number, userToDelete: number): void;
 };
 
 export default IStorage

@@ -21,6 +21,7 @@ import { acceptInvitation } from './publicHandlers/acceptInvitation'
 import { rejectInvitation } from './publicHandlers/rejectInvitation'
 import { getFriends } from './publicHandlers/getFriends'
 import { deleteFriend } from './publicHandlers/deleteFriend'
+import { getInvitations } from './publicHandlers/getInvitations'
 
 const routes: IHandler[] = [
   //        PUBLIC
@@ -36,6 +37,9 @@ const routes: IHandler[] = [
   },
   {
     method: 'GET', route: '/auth/api/rest/friends', handler: getFriends
+  },
+  {
+    method: 'GET', route: '/auth/api/rest//friends/invite', handler: getInvitations
   },
   // POST
   {
