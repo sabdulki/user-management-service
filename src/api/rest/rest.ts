@@ -17,6 +17,7 @@ import { verifyOtp } from './publicHandlers/verifyOtp'
 import { deleteUser } from './publicHandlers/deleteUser'
 import { getRatingLeaders } from './publicHandlers/getRatingLeaders'
 import { inviteFriend } from './publicHandlers/inviteFriend'
+import { acceptInvitation } from './publicHandlers/acceptInvitation'
 
 const routes: IHandler[] = [
   //        PUBLIC

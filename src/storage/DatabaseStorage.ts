@@ -10,6 +10,11 @@ export enum AuthProvider {
     GOOGLE = 1
 }
 
+export enum InvitationStatus {
+    ACCEPT = 0,
+    REJECT = 1
+}
+
 export default class DatabaseStorage implements IStorage {
     private _db: DatabaseType
 
@@ -291,7 +296,7 @@ export default class DatabaseStorage implements IStorage {
     }
     
 
-    createInvitation(senderId: number, recieverId: number) {
+    createInvitation(senderId: number, recieverId: number): void {
         try {
             const stmt = this._db.prepare('INSERT INTO invitations (sender_id, receiver_id) VALUES (?, ?)');
             stmt.run(senderId, recieverId);
@@ -307,4 +312,52 @@ export default class DatabaseStorage implements IStorage {
             }
         }
     }
+
+    acceptInvitation(recordId: number, invitedUserId: number):void {
+        const object = this._db.prepare(
+            'SELECT status FROM invitations WHERE id = ?'
+        ).get(recordId) as { status: number } | undefined ;
+        if (!object)
+            throw new Error('DatabaseFailure');
+        if (object.status !== null)
+            throw new Error('Invitation already exists');
+        try {
+            this._db.prepare(
+                'UPDATE invitations SET status = ? WHERE id = ? AND receiver_id = ?'
+            ).run(InvitationStatus.ACCEPT, recordId, invitedUserId);
+        } catch (err:any) {
+            throw new Error('DatabaseFailure');
+        }
+    }
+
+    addFriends(firstUser:number, secondUser: number):void {
+        try {
+            this._db.prepare(
+                'INSERT INTO friends (user_1_id, user_2_id) VALUES (?, ?)'
+            ).run(firstUser, secondUser);
+        } catch (error: any) {
+            console.log(error);
+            if (error.code === 'SQLITE_CONSTRAINT_FOREIGNKEY') {
+              throw new Error('User not found');
+            } else if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+              throw new Error('Record already exists');
+            } else {
+              console.error('Other database error:', error.message);
+              throw new Error('DatabaseFailure');
+            }
+        }
+    }
+
+    getSender(recordId: number): number {
+        const object = this._db.prepare(
+            'SELECT sender_id FROM invitations WHERE id = ?'
+        ).get(recordId) as { senderId: number } | undefined ;
+        if (!object)
+            throw new Error('DatabaseFailure');
+        if (!object.senderId)
+            throw new Error('User not found');
+
+        return object.senderId;
+    }
+
 };
