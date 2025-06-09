@@ -18,6 +18,7 @@ import { deleteUser } from './publicHandlers/deleteUser'
 import { getRatingLeaders } from './publicHandlers/getRatingLeaders'
 import { inviteFriend } from './publicHandlers/inviteFriend'
 import { acceptInvitation } from './publicHandlers/acceptInvitation'
+import { rejectInvitation } from './publicHandlers/rejectInvitation'
 
 const routes: IHandler[] = [
   //        PUBLIC
@@ -63,6 +64,9 @@ const routes: IHandler[] = [
   },
   {
     method: 'PATCH', route: '/auth/api/rest/friends/invite/:invitationId/accept', handler: acceptInvitation
+  },
+  {
+    method: 'PATCH', route: '/auth/api/rest/friends/invite/:invitationId/reject', handler: rejectInvitation
   },
 
   // DELETE

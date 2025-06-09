@@ -313,7 +313,7 @@ export default class DatabaseStorage implements IStorage {
         }
     }
 
-    acceptInvitation(recordId: number, invitedUserId: number):void {
+    changeInvitationStatus(recordId: number, invitedUserId: number, status: InvitationStatus):void {
         const object = this._db.prepare(
             'SELECT status FROM invitations WHERE id = ?'
         ).get(recordId) as { status: number } | undefined ;
@@ -324,7 +324,7 @@ export default class DatabaseStorage implements IStorage {
         try {
             this._db.prepare(
                 'UPDATE invitations SET status = ? WHERE id = ? AND receiver_id = ?'
-            ).run(InvitationStatus.ACCEPT, recordId, invitedUserId);
+            ).run(status, recordId, invitedUserId);
         } catch (err:any) {
             throw new Error('DatabaseFailure');
         }

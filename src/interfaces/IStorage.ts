@@ -2,6 +2,7 @@
 import UserBaseInfo from 'types/UserBaseInfo';
 import UserCreateForm from '../models/UserCreateForm'
 import RadishResponse from 'pkg/client/response';
+import { InvitationStatus } from 'storage/DatabaseStorage';
 
 // only signature of method
 interface IStorage {
@@ -31,7 +32,7 @@ interface IStorage {
     updatePassword(userId: number, oldPassword: string, newPassword: string): Promise<void>;
     updateRating(userId: number, newRating: number): void;
     updateRatingTransaction(ratings: { id: number; rating: number }[]): void;
-    acceptInvitation(recordId: number, invitedUserId: number):void;
+    changeInvitationStatus(recordId: number, invitedUserId: number, status: InvitationStatus):void;
     getSender(recordId: number): number;
 
 

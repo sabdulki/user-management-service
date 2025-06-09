@@ -3,8 +3,7 @@ import {isTokenValid}  from '../../../pkg/jwt/JwtGenerator';
 import UserBaseInfo from 'types/UserBaseInfo';
 import {InvitationStatus }from '../../../storage/DatabaseStorage';
 
-
-export async function acceptInvitation (request: FastifyRequest, reply: FastifyReply) {
+export async function rejectInvitation(request: FastifyRequest, reply: FastifyReply) {
     const payload = await isTokenValid(request);
     if (!payload || !payload.userId)
         return reply.code(401).send();
@@ -19,7 +18,7 @@ export async function acceptInvitation (request: FastifyRequest, reply: FastifyR
     const storage = request.server.storage;
 
     try {
-        storage.acceptInvitation(recordId, invitedUserId, InvitationStatus.REJECT);
+        storage.changeInvitationStatus(recordId, invitedUserId, InvitationStatus.REJECT);
     } catch ( error: any) {
         if (error.message === 'User not found') {
             return reply.code(400).send();
@@ -29,20 +28,5 @@ export async function acceptInvitation (request: FastifyRequest, reply: FastifyR
             return reply.code(500).send();
         }
     }
-    let senderId;
-    try {
-        senderId = storage.getSender(recordId);
-        storage.addFriends(senderId, invitedUserId);
-    } catch ( error: any) {
-        if (error.message === 'User not found') {
-            return reply.code(400).send();
-        } else if (error.message === 'Record already exists') {
-            return reply.code(409).send();
-        } else {
-            return reply.code(500).send();
-        }
-    }
-
-    const userBaseInfo = request.server.storage.getUserById(senderId) as UserBaseInfo;
-    return reply.code(200).send (userBaseInfo);    
+    return reply.code(200).send();    
 }
