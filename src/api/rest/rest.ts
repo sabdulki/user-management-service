@@ -20,6 +20,7 @@ import { inviteFriend } from './publicHandlers/inviteFriend'
 import { acceptInvitation } from './publicHandlers/acceptInvitation'
 import { rejectInvitation } from './publicHandlers/rejectInvitation'
 import { getFriends } from './publicHandlers/getFriends'
+import { deleteFriend } from './publicHandlers/deleteFriend'
 
 const routes: IHandler[] = [
   //        PUBLIC
@@ -79,6 +80,9 @@ const routes: IHandler[] = [
   },
   {
     method: 'DELETE', route: '/auth/api/rest/user/:userId', handler: deleteUser
+  },
+  {
+    method: 'DELETE', route: '/auth/api/rest/friends/:userId', handler: deleteFriend
   },
 
   

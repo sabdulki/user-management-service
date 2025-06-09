@@ -331,10 +331,11 @@ export default class DatabaseStorage implements IStorage {
     }
 
     addFriends(firstUser:number, secondUser: number):void {
+        const [userA, userB] = [firstUser, secondUser].sort((a, b) => a - b);
         try {
             this._db.prepare(
-                'INSERT INTO friends (user_1_id, user_2_id) VALUES (?, ?)'
-            ).run(firstUser, secondUser);
+                'INSERT INTO friends (user_a, user_b) VALUES (?, ?)'
+            ).run(userA, userB);
         } catch (error: any) {
             console.log(error);
             if (error.code === 'SQLITE_CONSTRAINT_FOREIGNKEY') {
@@ -375,11 +376,11 @@ export default class DatabaseStorage implements IStorage {
                 WHERE u.id IN (
                     SELECT
                     CASE
-                        WHEN user_1_id = ? THEN user_2_id
-                        ELSE user_1_id
+                        WHEN user_a = ? THEN user_b
+                        ELSE user_a
                     END
                     FROM friends
-                    WHERE user_1_id = ? OR user_2_id = ?
+                    WHERE user_a = ? OR user_b = ?
                 )
             `);
             const rows = stmt.all(issuerId, issuerId, issuerId);
@@ -391,5 +392,25 @@ export default class DatabaseStorage implements IStorage {
         }
     }
     
+    deleteFriend(userId: number, userToDelete: number) {
+        const [userA, userB] = [userId, userToDelete].sort((a, b) => a - b);
+        try {
+            const stmt = this._db.prepare(
+                'DELETE FROM friends WHERE user_a = ? AND user_b = ?'
+        );
+        const result = stmt.run(userA, userB);
+      
+        if (result.changes === 0) {
+          throw new Error('No such friendship exists');
+          }
+        } catch (error: any) {
+            if (error.code === 'SQLITE_CONSTRAINT_FOREIGNKEY') {
+                throw new Error('User not found');
+            } else {
+                console.error('Failed to remove friend:', error.message);
+                throw new Error('DatabaseFailure');
+            }
+        }
+    }
 
 };
