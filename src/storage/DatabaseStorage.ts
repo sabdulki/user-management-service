@@ -289,5 +289,22 @@ export default class DatabaseStorage implements IStorage {
         const result = stmt.get(userId);
         return !!result; // true, если пользователь найден и не удалён
     }
-      
+    
+
+    createInvitation(senderId: number, recieverId: number) {
+        try {
+            const stmt = this._db.prepare('INSERT INTO invitations (sender_id, receiver_id) VALUES (?, ?)');
+            stmt.run(senderId, recieverId);
+        } catch (error:any) {
+            console.log(error);
+            if (error.code === 'SQLITE_CONSTRAINT_FOREIGNKEY') {
+              throw new Error('User not found');
+            } else if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+              throw new Error('Invitation already exists');
+            } else {
+              console.error('Other database error:', error.message);
+              throw new Error('DatabaseFailure');
+            }
+        }
+    }
 };

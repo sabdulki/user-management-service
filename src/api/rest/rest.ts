@@ -16,98 +16,69 @@ import { updateUserPassword } from './publicHandlers/updatePassword'
 import { verifyOtp } from './publicHandlers/verifyOtp'
 import { deleteUser } from './publicHandlers/deleteUser'
 import { getRatingLeaders } from './publicHandlers/getRatingLeaders'
+import { inviteFriend } from './publicHandlers/inviteFriend'
 
 const routes: IHandler[] = [
   //        PUBLIC
-  //         GET
+  // GET
   {
-    method: 'GET',
-    route: '/ping',
-    handler: pingHandler
+    method: 'GET', route: '/ping', handler: pingHandler
   },
   {
-    method: 'GET',
-    route: '/auth/api/rest/user',
-    handler: getUserInfo
+    method: 'GET', route: '/auth/api/rest/user', handler: getUserInfo
   },
   {
-    method: 'GET',
-    route: '/auth/api/rest/rating/leader',
-    handler: getRatingLeaders
+    method: 'GET', route: '/auth/api/rest/rating/leader', handler: getRatingLeaders
   },
-  //      POST
+  // POST
   {
-    method: 'POST',
-    route: '/auth/api/rest/google/login',
-    handler: googleLoginExchange
+    method: 'POST', route: '/auth/api/rest/google/login', handler: googleLoginExchange
   },
   {
-    method: 'POST',
-    route: '/auth/api/rest/registration',
-    handler: registrationHandler
+    method: 'POST', route: '/auth/api/rest/registration', handler: registrationHandler
   },
   {
-    method: 'POST',
-    route: '/auth/api/rest/login',
-    handler: loginHandler
+    method: 'POST', route: '/auth/api/rest/login', handler: loginHandler
   },
   {
-    method: 'POST',
-    route: '/auth/api/rest/refresh',
-    handler: refreshTokensPair
+    method: 'POST', route: '/auth/api/rest/refresh', handler: refreshTokensPair
   },
   {
-    method: 'POST',
-    route: '/auth/api/rest/user/avatar',
-    handler: uploadAvatar
+    method: 'POST', route: '/auth/api/rest/user/avatar', handler: uploadAvatar
   },
   {
-    method: 'POST',
-    route: '/auth/api/rest/verify_otp',
-    handler: verifyOtp
+    method: 'POST', route: '/auth/api/rest/verify_otp', handler: verifyOtp
+  },
+  {
+    method: 'POST', route: '/auth/api/rest/friends/invite', handler: inviteFriend
   },
   
-  // {
-  //   method: 'GET',
-  //   route: '/auth/api/rest/isTokenExpired', has to be snake case!!!!
-  //   handler: isTokenExpired
-  // },
-  
-  //        PATCH
+  // PATCH
   {
-    method: 'PATCH',
-    route: '/auth/api/rest/user/nickname',
-    handler: updateUserNickname
+    method: 'PATCH', route: '/auth/api/rest/user/nickname', handler: updateUserNickname
   },
   {
-    method: 'PATCH',
-    route: '/auth/api/rest/user/password',
-    handler: updateUserPassword
+    method: 'PATCH', route: '/auth/api/rest/user/password', handler: updateUserPassword
+  },
+  {
+    method: 'PATCH', route: '/auth/api/rest/friends/invite/:invitationId/accept', handler: acceptInvitation
   },
 
   // DELETE
   {
-    method: 'DELETE',
-    route: '/auth/api/rest/user',
-    handler: setUserRemoved
+    method: 'DELETE', route: '/auth/api/rest/user', handler: setUserRemoved
   },
   {
-    method: 'DELETE',
-    route: '/auth/api/rest/user/:userId',
-    handler: deleteUser
+    method: 'DELETE', route: '/auth/api/rest/user/:userId', handler: deleteUser
   },
 
   
   // internal
   {
-    method: 'GET',
-    route: '/auth/internal/user/:id',
-    handler: getUserInfoById
+    method: 'GET', route: '/auth/internal/user/:id', handler: getUserInfoById
   },
   {
-    method: 'POST',
-    route: '/auth/internal/rating/update',
-    handler: updateRating
+    method: 'POST', route: '/auth/internal/rating/update', handler: updateRating
   }
 ]
 
