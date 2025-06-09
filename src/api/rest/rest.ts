@@ -19,6 +19,7 @@ import { getRatingLeaders } from './publicHandlers/getRatingLeaders'
 import { inviteFriend } from './publicHandlers/inviteFriend'
 import { acceptInvitation } from './publicHandlers/acceptInvitation'
 import { rejectInvitation } from './publicHandlers/rejectInvitation'
+import { getFriends } from './publicHandlers/getFriends'
 
 const routes: IHandler[] = [
   //        PUBLIC
@@ -31,6 +32,9 @@ const routes: IHandler[] = [
   },
   {
     method: 'GET', route: '/auth/api/rest/rating/leader', handler: getRatingLeaders
+  },
+  {
+    method: 'GET', route: '/auth/api/rest/friends', handler: getFriends
   },
   // POST
   {

@@ -1,6 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import {isTokenValid}  from '../../../pkg/jwt/JwtGenerator';
-import UserBaseInfo from 'types/UserBaseInfo';
 import {InvitationStatus }from '../../../storage/DatabaseStorage';
 
 export async function rejectInvitation(request: FastifyRequest, reply: FastifyReply) {

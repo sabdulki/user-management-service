@@ -360,4 +360,36 @@ export default class DatabaseStorage implements IStorage {
         return object.senderId;
     }
 
+    getFriendsList(issuerId: number): undefined | UserBaseInfo[] {
+        let friends: UserBaseInfo[] | undefined;
+        try {
+            const stmt = this._db.prepare(`
+                SELECT
+                    u.id,
+                    u.nickname,
+                    u.avatar,
+                    u.removed_at,
+                    r.value AS rating
+                FROM users u
+                JOIN ratings r ON u.id = r.user_id
+                WHERE u.id IN (
+                    SELECT
+                    CASE
+                        WHEN user_1_id = ? THEN user_2_id
+                        ELSE user_1_id
+                    END
+                    FROM friends
+                    WHERE user_1_id = ? OR user_2_id = ?
+                )
+            `);
+            const rows = stmt.all(issuerId, issuerId, issuerId);
+            friends = rows as UserBaseInfo[];
+            console.log(friends);
+            return friends;
+        } catch (err:any) {
+            throw new Error('DatabaseFailure');
+        }
+    }
+    
+
 };

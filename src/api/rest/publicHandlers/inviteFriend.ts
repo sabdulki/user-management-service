@@ -10,7 +10,13 @@ export async function inviteFriend (request: FastifyRequest, reply: FastifyReply
 
     const storage = request.server.storage;
 
-    const recieverId = storage.getUserByNickname(recieverNickname);
+    let recieverId;
+    try {
+        recieverId = storage.getUserByNickname(recieverNickname);
+    } catch (err: any) {
+        return reply.code(404).send();
+    }
+
     try {
         storage.createInvitation(payload.userId, recieverId);
     } catch ( error: any) {
