@@ -22,6 +22,7 @@ import { rejectInvitation } from './publicHandlers/rejectInvitation'
 import { getFriends } from './publicHandlers/getFriends'
 import { deleteFriend } from './publicHandlers/deleteFriend'
 import { getInvitations } from './publicHandlers/getInvitations'
+import { getUserById } from './publicHandlers/getUserById'
 
 const routes: IHandler[] = [
   //        PUBLIC
@@ -33,13 +34,16 @@ const routes: IHandler[] = [
     method: 'GET', route: '/auth/api/rest/user', handler: getUserInfo
   },
   {
+    method: 'GET', route: '/auth/api/rest/user/:userId', handler: getUserById
+  },
+  {
     method: 'GET', route: '/auth/api/rest/rating/leader', handler: getRatingLeaders
   },
   {
     method: 'GET', route: '/auth/api/rest/friends', handler: getFriends
   },
   {
-    method: 'GET', route: '/auth/api/rest//friends/invite', handler: getInvitations
+    method: 'GET', route: '/auth/api/rest/friends/invite', handler: getInvitations
   },
   // POST
   {

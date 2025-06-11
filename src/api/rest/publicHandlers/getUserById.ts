@@ -1,10 +1,14 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import UserBaseInfo from 'types/UserBaseInfo';
+import {isTokenValid}  from '../../../pkg/jwt/JwtGenerator';
 
-export async function getUserInfoById(request: FastifyRequest, reply: FastifyReply) 
+export async function getUserById(request: FastifyRequest, reply: FastifyReply) 
 {
+    const payload = await isTokenValid(request);
+    if (!payload || !payload.userId)
+        return reply.code(401).send();
     try {
-        const userIdRaw = (request.params as any).id;
+        const userIdRaw = (request.params as any).userId;
         const userId = parseInt(userIdRaw, 10);
         if (isNaN(userId)) {
           return reply.code(400).send({ error: 'Invalid user ID' });
