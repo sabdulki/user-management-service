@@ -1,4 +1,4 @@
-import { isTokenValid } from '../../../pkg/jwt/JwtGenerator'
+import { isTokenValid } from '../../../../pkg/jwt/JwtGenerator'
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { pipeline } from 'stream/promises';
 import { unlink } from 'fs/promises';

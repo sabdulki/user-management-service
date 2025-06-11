@@ -1,7 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
-import {isTokenValid, TokenType, getTokenFromRequest, deleteJwtTokenPair} from '../../../pkg/jwt/JwtGenerator';
-import { JwtPayload } from 'jsonwebtoken';
-import { deleteAvatar } from './uploadAvatar';
+import {isTokenValid, TokenType, getTokenFromRequest, deleteJwtTokenPair} from '../../../../pkg/jwt/JwtGenerator';
 
 
 export async function deleteUser(request: FastifyRequest, reply: FastifyReply) 

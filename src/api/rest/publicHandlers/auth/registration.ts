@@ -1,8 +1,8 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
-import UserCreateForm from '../../../models/UserCreateForm';
-import {generateJwtTokenPair} from '../../../pkg/jwt/JwtGenerator';
+import UserCreateForm from '../../../../models/UserCreateForm';
+import {generateJwtTokenPair} from '../../../../pkg/jwt/JwtGenerator';
 import {otpLogic} from './login';
-import app from '../../../app';
+import app from '../../../../app';
 
 
 export async function saveRegisteredUser(form: UserCreateForm): Promise<{userId: number | undefined, status: number}>{

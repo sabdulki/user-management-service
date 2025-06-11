@@ -1,10 +1,10 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
-import { UserLoginForm } from '../../../models/UserLoginForm';
+import { UserLoginForm } from '../../../../models/UserLoginForm';
 import { randomInt, randomUUID } from 'crypto';
 import UserBaseInfo from 'types/UserBaseInfo';
 import { OtpManager } from './verifyOtp';
-import UserCreateForm from '../../../models/UserCreateForm';
-import Config from '../../../config/Config';
+import UserCreateForm from '../../../../models/UserCreateForm';
+import Config from '../../../../config/Config';
 
 function generateOtp() : string {
   return randomInt(100000, 999999).toString(); // 6-значный код

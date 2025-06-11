@@ -1,35 +1,30 @@
 import { FastifyInstance } from 'fastify'
 import { IHandler } from '../../pkg/handler/handler'
-import { pingHandler } from './publicHandlers/ping'
-import { registrationHandler } from './publicHandlers/registration'
-import { loginHandler } from './publicHandlers/login'
-import { getUserInfo } from './publicHandlers/getUser'
+import { registrationHandler } from './publicHandlers/auth/registration'
+import { loginHandler } from './publicHandlers/auth/login'
+import { getUserInfo } from './publicHandlers/get/getUser'
 import { getUserInfoById } from './privateHandlers/getUserById'
 import { refreshTokensPair } from './publicHandlers/refreshToken'
-import { setUserRemoved } from './publicHandlers/setUserRemoved'
-import { isTokenExpired } from './publicHandlers/isTokenExpired'
-import { uploadAvatar } from './publicHandlers/uploadAvatar'
+import { setUserRemoved } from './publicHandlers/delete/setUserRemoved'
+import { uploadAvatar } from './publicHandlers/update/uploadAvatar'
 import { updateRating } from './privateHandlers/updateRating'
-import { googleLoginExchange } from './publicHandlers/googleLogin'
-import { updateUserNickname } from './publicHandlers/updateNickname'
-import { updateUserPassword } from './publicHandlers/updatePassword'
-import { verifyOtp } from './publicHandlers/verifyOtp'
-import { deleteUser } from './publicHandlers/deleteUser'
-import { getRatingLeaders } from './publicHandlers/getRatingLeaders'
-import { inviteFriend } from './publicHandlers/inviteFriend'
-import { acceptInvitation } from './publicHandlers/acceptInvitation'
-import { rejectInvitation } from './publicHandlers/rejectInvitation'
-import { getFriends } from './publicHandlers/getFriends'
-import { deleteFriend } from './publicHandlers/deleteFriend'
-import { getInvitations } from './publicHandlers/getInvitations'
-import { getUserById } from './publicHandlers/getUserById'
+import { googleLoginExchange } from './publicHandlers/auth/googleLogin'
+import { updateUserNickname } from './publicHandlers/update/updateNickname'
+import { updateUserPassword } from './publicHandlers/update/updatePassword'
+import { verifyOtp } from './publicHandlers/auth/verifyOtp'
+import { deleteUser } from './publicHandlers/delete/deleteUser'
+import { getRatingLeaders } from './publicHandlers/get/getRatingLeaders'
+import { inviteFriend } from './publicHandlers/friends/inviteFriend'
+import { acceptInvitation } from './publicHandlers/friends/acceptInvitation'
+import { rejectInvitation } from './publicHandlers/friends/rejectInvitation'
+import { getFriends } from './publicHandlers/friends/getFriends'
+import { deleteFriend } from './publicHandlers/friends/deleteFriend'
+import { getInvitations } from './publicHandlers/friends/getInvitations'
+import { getUserById } from './publicHandlers/get/getUserById'
 
 const routes: IHandler[] = [
   //        PUBLIC
   // GET
-  {
-    method: 'GET', route: '/ping', handler: pingHandler
-  },
   {
     method: 'GET', route: '/auth/api/rest/user', handler: getUserInfo
   },

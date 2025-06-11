@@ -1,7 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
-import {isTokenValid, TokenType, getTokenFromRequest, deleteJwtTokenPair} from '../../../pkg/jwt/JwtGenerator';
+import {isTokenValid, TokenType, getTokenFromRequest, deleteJwtTokenPair} from '../../../../pkg/jwt/JwtGenerator';
 import { JwtPayload } from 'jsonwebtoken';
-import { deleteAvatar } from './uploadAvatar';
+import { deleteAvatar } from './../update/uploadAvatar';
 
 export async function setUserRemoved(request: FastifyRequest, reply: FastifyReply) {
     const payload = await isTokenValid(request) as JwtPayload;

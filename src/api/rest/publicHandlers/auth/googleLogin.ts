@@ -1,9 +1,9 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import app from 'fastify'
-import UserCreateForm from '../../../models/UserCreateForm';
-import { AuthProvider } from '../../../storage/DatabaseStorage';
-import {generateJwtTokenPair} from '../../../pkg/jwt/JwtGenerator';
-import Config from '../../../config/Config';
+import UserCreateForm from '../../../../models/UserCreateForm';
+import { AuthProvider } from '../../../../storage/DatabaseStorage';
+import {generateJwtTokenPair} from '../../../../pkg/jwt/JwtGenerator';
+import Config from '../../../../config/Config';
 
 type GoogleUser = {
     id: string

@@ -1,11 +1,11 @@
-import Config from '../../../config/Config';
+import Config from '../../../../config/Config';
 import { FastifyRequest, FastifyReply } from 'fastify'
-import RadishClient from '../../../pkg/client/client';
-import { generateJwtTokenPair, isTokenValid } from '../../../pkg/jwt/JwtGenerator';
-import UserCreateForm from '../../../models/UserCreateForm';
+import RadishClient from '../../../../pkg/client/client';
+import { generateJwtTokenPair, isTokenValid } from '../../../../pkg/jwt/JwtGenerator';
+import UserCreateForm from '../../../../models/UserCreateForm';
 import RadishResponse from 'pkg/client/response';
 import { saveRegisteredUser } from './registration';
-import app from '../../../app';
+import app from '../../../../app';
 
 export class OtpManager {
     private static instance: OtpManager;

@@ -4,7 +4,7 @@ import UserCreateForm from '../models/UserCreateForm'
 import UserBaseInfo from "types/UserBaseInfo";
 import bcrypt from "bcryptjs";
 import { syncMigrations } from "./migrate";
-import { InvitationListForm } from "../api/rest/publicHandlers/getInvitations";
+import { InvitationListForm } from "../api/rest/publicHandlers/friends/getInvitations";
 
 export enum AuthProvider {
     LOCAL = 0,

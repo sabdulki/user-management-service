@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
-import {isTokenValid}  from '../../../pkg/jwt/JwtGenerator';
+import {isTokenValid}  from '../../../../pkg/jwt/JwtGenerator';
 
 export async function inviteFriend (request: FastifyRequest, reply: FastifyReply) {
     const payload = await isTokenValid(request);
