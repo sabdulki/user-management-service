@@ -2,22 +2,27 @@ import { FastifyRequest, FastifyReply } from 'fastify'
 import {isTokenValid}  from '../../../../pkg/jwt/JwtGenerator';
 
 export async function inviteFriend (request: FastifyRequest, reply: FastifyReply) {
+    console.log(request);
     const payload = await isTokenValid(request);
-    if (!payload || !payload.userId)
+    if (!payload || !payload.userId){
         return reply.code(401).send();
-    const body = request.body as {recieverNickname: string}
-    const recieverNickname = body.recieverNickname;
+    }
+    
+    const body = request.body as {nickname: string}
+    const recieverNickname = body.nickname;
 
     const storage = request.server.storage;
 
     let recieverId;
     try {
-        recieverId = storage.getUserByNickname(recieverNickname);
+        const user = storage.getUserByNickname(recieverNickname);
+        recieverId = user.id
     } catch (err: any) {
         return reply.code(404).send();
     }
 
     try {
+        console.log("payload.userId: ", payload.userId, "recieverId, ", recieverId);
         storage.createInvitation(payload.userId, recieverId);
     } catch ( error: any) {
         if (error.message === 'User not found') {

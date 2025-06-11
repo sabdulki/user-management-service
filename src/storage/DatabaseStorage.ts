@@ -297,10 +297,10 @@ export default class DatabaseStorage implements IStorage {
     }
     
 
-    createInvitation(senderId: number, recieverId: number): void {
+    createInvitation(senderId: number, receiverId: number): void {
         try {
             const stmt = this._db.prepare('INSERT INTO invitations (sender_id, receiver_id) VALUES (?, ?)');
-            stmt.run(senderId, recieverId);
+            stmt.run(senderId, receiverId);
         } catch (error:any) {
             console.log(error);
             if (error.code === 'SQLITE_CONSTRAINT_FOREIGNKEY') {

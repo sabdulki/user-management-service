@@ -3,7 +3,7 @@ import UserBaseInfo from 'types/UserBaseInfo';
 import UserCreateForm from '../models/UserCreateForm'
 import RadishResponse from 'pkg/client/response';
 import { InvitationStatus } from 'storage/DatabaseStorage';
-import { InvitationListForm } from '../api/rest/publicHandlers/getInvitations';
+import { InvitationListForm } from '../api/rest/publicHandlers/friends/getInvitations';
 
 // only signature of method
 interface IStorage {
@@ -14,7 +14,7 @@ interface IStorage {
     setUserUnavalible(userId: number): void;
     addUserAvatar(userId: number, relativePath: string): void;
     setUserPassword(userId: number, newPassword: string):Promise<void> ;
-    createInvitation(senderId: number, recieverId: number): void;
+    createInvitation(senderId: number, receiverId: number): void;
     addFriends(firstUser:number, secondUser: number):void;
 
 

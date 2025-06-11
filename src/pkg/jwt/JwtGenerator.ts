@@ -78,6 +78,7 @@ class JwtGenerator {
 		const status = await this.radishClient.get(key);
 		const value = status?.value;
 		if (status.status != 200) {
+			console.log(status);
 			throw JwtCachError;
 		}
 		try {

@@ -5,9 +5,12 @@ import {InvitationStatus }from '../../../../storage/DatabaseStorage';
 
 
 export async function acceptInvitation (request: FastifyRequest, reply: FastifyReply) {
+
     const payload = await isTokenValid(request);
-    if (!payload || !payload.userId)
+    if (!payload || !payload.userId) {
+        console.log("payload: ", payload, "payload.userId: ", payload?.userId)
         return reply.code(401).send();
+    }
     const invitedUserId = payload.userId;
 
     const recordIdRaw = (request.params as any).id;

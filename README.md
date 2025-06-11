@@ -21,8 +21,8 @@ Open .env file and fill it with the following variables:
 PORT=5000
 JWT_SECRET=your_secret_key
 JWT_SALT=your_salt
-JWT_ACCESS_EXPIRE=15m
-JWT_REFRESH_EXPIRE=90d
+JWT_ACCESS_EXPIRE_IN=15m
+JWT_REFRESH_EXPIRE_IN=90d
 REDISH_HOST=localhost
 REDISH_PORT=5100
 GOOGLE_CLIENT_ID=<client_id provided by Google>
