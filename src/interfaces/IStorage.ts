@@ -7,16 +7,23 @@ import { InvitationListForm } from '../api/rest/publicHandlers/friends/getInvita
 
 // only signature of method
 interface IStorage {
+
+    // transactions
+    acceptInvitationAndAddFriendsTransaction(recordId: number, invitedUserId: number): UserBaseInfo;
     userRegisterTransaction(form: UserCreateForm): number;
     userRegister(form: UserCreateForm) : number;
+    createInvitationTransaction(senderId: number, receiverId: number): void;
+    updateRatingTransaction(ratings: { id: number; rating: number }[]): void;
+    rejectInvitationTransaction(recordId: number, invitedUserId: number): void;
+    deleteInvitationRecordTransaction(recordId: number): void;
+    deleteFriendTransaction(userId: number, userToDelete: number): void;
+
 
     // setters
     setUserUnavalible(userId: number): void;
     addUserAvatar(userId: number, relativePath: string): void;
     setUserPassword(userId: number, newPassword: string):Promise<void> ;
-    createInvitation(senderId: number, receiverId: number): void;
     addFriends(firstUser:number, secondUser: number):void;
-
 
 
     //getters
@@ -28,12 +35,13 @@ interface IStorage {
     getEmailById(userId: number): string | undefined;
     getRatingLeadres(): Array<{ nickname: string, score: number }> | undefined;
     getInvitationsList(userId: number): InvitationListForm[] | undefined;
+    getInvitationId(user1: number, user2: number): number;
+    getFriendsList(issuerId: number): undefined | UserBaseInfo[] ;
 
     // update
     updateNicknmae(userId: number, nickname: string): void;
     updatePassword(userId: number, oldPassword: string, newPassword: string): Promise<void>;
     updateRating(userId: number, newRating: number): void;
-    updateRatingTransaction(ratings: { id: number; rating: number }[]): void;
     changeInvitationStatus(recordId: number, invitedUserId: number, status: InvitationStatus):void;
     getSender(recordId: number): number;
 
@@ -42,6 +50,7 @@ interface IStorage {
     deleteUserAvatar(userId: number): void;
     deleteUser(userId: number): void;
     deleteFriend(userId: number, userToDelete: number): void;
+    disableInvitation(recordId: number): void ;
 };
 
 export default IStorage

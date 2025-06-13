@@ -8,19 +8,19 @@ export async function deleteFriend(request: FastifyRequest, reply: FastifyReply)
         return reply.code(401).send();
     const userId = payload.userId;
 
-    const userToDeleteRaw = (request.params as any).id;
+    const userToDeleteRaw = (request.params as any).userId;
     const userToDelete = parseInt(userToDeleteRaw, 10);
     if (isNaN(userToDelete)) {
-      return reply.code(400).send({ error: 'Invalid user ID' });
+      return reply.code(400).send({ error: 'Invalid userId' });
     }
 
     const storage = request.server.storage;
 
     try {
-        storage.deleteFriend(userId, userToDelete);
+        storage.deleteFriendTransaction(userId, userToDelete);
     } catch ( error: any) {
-        if (error.message === 'User not found') {
-            return reply.code(400).send();
+        if (error.message === 'User not found' || error.message === 'No such friendship exists' || error.message === 'Failed to get invitation') {
+            return reply.code(404).send();
         } else {
             return reply.code(500).send();
         }

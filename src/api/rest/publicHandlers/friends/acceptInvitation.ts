@@ -8,44 +8,31 @@ export async function acceptInvitation (request: FastifyRequest, reply: FastifyR
 
     const payload = await isTokenValid(request);
     if (!payload || !payload.userId) {
-        console.log("payload: ", payload, "payload.userId: ", payload?.userId)
         return reply.code(401).send();
     }
     const invitedUserId = payload.userId;
 
-    const recordIdRaw = (request.params as any).id;
+    const recordIdRaw = (request.params as any).invitationId;
     const recordId = parseInt(recordIdRaw, 10);
     if (isNaN(recordId)) {
-      return reply.code(400).send({ error: 'Invalid user ID' });
+      return reply.code(400).send({ error: 'Invalid recordId' });
     }
 
     const storage = request.server.storage;
 
+    let senderUserBaseInfo: UserBaseInfo;
     try {
-        storage.acceptInvitation(recordId, invitedUserId, InvitationStatus.REJECT);
-    } catch ( error: any) {
-        if (error.message === 'User not found') {
-            return reply.code(400).send();
-        } else if (error.message === 'Invitation already exists') {
+        senderUserBaseInfo = storage.acceptInvitationAndAddFriendsTransaction(recordId, invitedUserId);
+        console.log("senderUserBaseInfo2: ", senderUserBaseInfo)
+        return reply.code(201).send({"senderUserBaseInfo": senderUserBaseInfo});
+    } catch (error: any) {
+        console.log(error);
+        if (error.message === 'User not found' || error.message === 'Invitation not found') {
+            return reply.code(404).send();
+        } else if (error.message === 'Invitation already exists' || error.message === 'Record already exists') {
             return reply.code(409).send();
         } else {
             return reply.code(500).send();
         }
     }
-    let senderId;
-    try {
-        senderId = storage.getSender(recordId);
-        storage.addFriends(senderId, invitedUserId);
-    } catch ( error: any) {
-        if (error.message === 'User not found') {
-            return reply.code(400).send();
-        } else if (error.message === 'Record already exists') {
-            return reply.code(409).send();
-        } else {
-            return reply.code(500).send();
-        }
-    }
-
-    const userBaseInfo = request.server.storage.getUserById(senderId) as UserBaseInfo;
-    return reply.code(200).send (userBaseInfo);    
 }

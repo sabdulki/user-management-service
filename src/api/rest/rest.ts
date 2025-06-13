@@ -21,6 +21,7 @@ import { getFriends } from './publicHandlers/friends/getFriends'
 import { deleteFriend } from './publicHandlers/friends/deleteFriend'
 import { getInvitations } from './publicHandlers/friends/getInvitations'
 import { getUserById } from './publicHandlers/get/getUserById'
+import { deleteInvitation } from './publicHandlers/friends/deleteInvitation'
 
 const routes: IHandler[] = [
   //        PUBLIC
@@ -86,6 +87,9 @@ const routes: IHandler[] = [
   },
   {
     method: 'DELETE', route: '/auth/api/rest/friends/:userId', handler: deleteFriend
+  },
+  {
+    method: 'DELETE', route: '/auth/api/rest/friends/invite/:recordId', handler: deleteInvitation
   },
 
   

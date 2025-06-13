@@ -275,9 +275,9 @@ export default class DatabaseStorage implements IStorage {
 
     setUserUnavalible(userId: number): void {
         try {
-            const removed_at = Date.now();
+            const removedAt = Math.floor(Date.now() / 1000)
             const stmt = this._db.prepare('UPDATE users SET removed_at = ? WHERE id = ?');
-            const result = stmt.run(removed_at, userId);
+            const result = stmt.run(removedAt, userId);
         
             if (result.changes === 0) {
                 throw new Error("User not found");
@@ -297,35 +297,63 @@ export default class DatabaseStorage implements IStorage {
     }
     
 
-    createInvitation(senderId: number, receiverId: number): void {
-        try {
-            const stmt = this._db.prepare('INSERT INTO invitations (sender_id, receiver_id) VALUES (?, ?)');
-            stmt.run(senderId, receiverId);
-        } catch (error:any) {
-            console.log(error);
-            if (error.code === 'SQLITE_CONSTRAINT_FOREIGNKEY') {
-              throw new Error('User not found');
-            } else if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
-              throw new Error('Invitation already exists');
-            } else {
-              console.error('Other database error:', error.message);
-              throw new Error('DatabaseFailure');
+    createInvitationTransaction(senderId: number, receiverId: number): void {
+
+        const [userA, userB] = [senderId, receiverId].sort((a, b) => a - b); // for friends check
+
+        const txn = this._db.transaction(() => {
+        // 🔍 Проверка на уже существующее активное приглашение
+            const existing = this._db.prepare(`
+                SELECT 1 FROM invitations
+                WHERE ((sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?))
+                  AND status IS NULL
+                  AND disabled_at IS NULL
+            `).get(senderId, receiverId, receiverId, senderId);
+
+            if (existing) {
+                throw new Error('Invitation already exists');
             }
+
+            // 🔍 Проверка, не являются ли уже друзьями
+            const friendship = this._db.prepare(`
+                SELECT 1 FROM friends
+                WHERE user_a = ? AND user_b = ?
+            `).get(userA, userB);
+
+            if (friendship) {
+                throw new Error('Already friends');
+            }
+
+            // ✅ Вставка
+            this._db.prepare(`
+                INSERT INTO invitations (sender_id, receiver_id) VALUES (?, ?)
+            `).run(senderId, receiverId);
+        });
+
+        try {
+            txn();
+        } catch(error: any) {
+            if (error.code === 'SQLITE_CONSTRAINT_FOREIGNKEY') {
+                throw new Error('User not found');
+            } else {
+                throw error;
+            } 
         }
     }
 
     changeInvitationStatus(recordId: number, invitedUserId: number, status: InvitationStatus):void {
+
         const object = this._db.prepare(
-            'SELECT status FROM invitations WHERE id = ?'
-        ).get(recordId) as { status: number } | undefined ;
-        if (!object)
-            throw new Error('DatabaseFailure');
-        if (object.status !== null)
-            throw new Error('Invitation already exists');
+            'SELECT status, sender_id AS senderId FROM invitations WHERE id = ? AND status IS NULL AND disabled_at IS NULL'
+        ).get(recordId) as { status: number, senderId: number } | undefined ;
+        if (!object || object.status === undefined || object.senderId === undefined){
+            console.log("object: ", object, "object.status: ", object?.status, "object.senderId: ", object?.senderId)
+            throw new Error('Invitation not found');
+        }
         try {
             this._db.prepare(
-                'UPDATE invitations SET status = ? WHERE id = ? AND receiver_id = ?'
-            ).run(status, recordId, invitedUserId);
+                'UPDATE invitations SET status = ? WHERE (id = ? AND receiver_id = ? AND sender_id = ? AND disabled_at IS NULL)'
+            ).run(status, recordId, invitedUserId, object.senderId);
         } catch (err:any) {
             throw new Error('DatabaseFailure');
         }
@@ -352,10 +380,11 @@ export default class DatabaseStorage implements IStorage {
 
     getSender(recordId: number): number {
         const object = this._db.prepare(
-            'SELECT sender_id FROM invitations WHERE id = ?'
+            'SELECT sender_id  AS senderId FROM invitations WHERE id = ?'
         ).get(recordId) as { senderId: number } | undefined ;
         if (!object)
             throw new Error('DatabaseFailure');
+        console.log(object);
         if (!object.senderId)
             throw new Error('User not found');
 
@@ -393,23 +422,77 @@ export default class DatabaseStorage implements IStorage {
         }
     }
     
+    getInvitationId(user1: number, user2: number): number {
+        const [userA, userB] = [user1, user2].sort((a, b) => a - b);
+        try {
+            const result = this._db.prepare(`
+                SELECT id AS recordId FROM invitations WHERE (sender_id = ? AND receiver_id = ? AND disabled_at IS NULL)
+                `).get(userA, userB) as { recordId: number } | undefined;
+            if (!result || !result.recordId)
+                throw new Error('Failed to get invitation');
+            console.log("recordId: ", result.recordId);
+            return result.recordId;
+        } catch(error:any) {
+            throw new Error('Failed to get invitation');
+        }
+    }
+
+    disableInvitation(recordId: number): void {
+        try {
+            const disabledAt = Math.floor(Date.now() / 1000)
+            const stmt = this._db.prepare('UPDATE invitations SET disabled_at = ? WHERE id = ? AND disabled_at IS NULL');
+            const result = stmt.run(disabledAt, recordId);
+        
+            if (result.changes === 0) {
+                throw new Error('Record not found');
+            }
+        } catch (error: any) {
+            throw new Error('Failed to disable invitation');
+        }
+    }
+
+    deleteFriendTransaction(userId: number, userToDelete: number): void{
+        const tnx = this._db.transaction(() => {
+            this.deleteFriend(userId, userToDelete);
+            const recordId = this.getInvitationId(userId, userToDelete);
+            this.disableInvitation(recordId);
+        });
+
+        try {
+            tnx();
+        } catch (error: any) {
+            throw error;
+        }
+            // if (error.message === 'User not found') {
+            //     throw new Error('User not found');
+            // } else if (error.message === 'No such friendship exists') {
+            //     throw new Error('User not found');
+            // } else if (error.message === 'Failed to get invitation') {
+            //     throw new Error('Failed to get invitation');
+            // } else if (error.message === 'Failed to disable invitation') {
+            //     throw new Error('Failed to disable invitation');
+            // } else {
+            //     console.error('Failed to remove friend:', error.message);
+            //     throw new Error('DatabaseFailure');
+            // }
+    }
+
     deleteFriend(userId: number, userToDelete: number): void {
         const [userA, userB] = [userId, userToDelete].sort((a, b) => a - b);
         try {
             const stmt = this._db.prepare(
                 'DELETE FROM friends WHERE user_a = ? AND user_b = ?'
-        );
-        const result = stmt.run(userA, userB);
-      
-        if (result.changes === 0) {
-          throw new Error('No such friendship exists');
-          }
+            );
+            const result = stmt.run(userA, userB);
+        
+            if (result.changes === 0) {
+              throw new Error('No such friendship exists');
+            }
         } catch (error: any) {
             if (error.code === 'SQLITE_CONSTRAINT_FOREIGNKEY') {
                 throw new Error('User not found');
             } else {
-                console.error('Failed to remove friend:', error.message);
-                throw new Error('DatabaseFailure');
+                throw error;
             }
         }
     }
@@ -420,10 +503,7 @@ export default class DatabaseStorage implements IStorage {
             const stmt = this._db.prepare(`
                 SELECT 
                   i.id AS recordId,
-                  CASE 
-                    WHEN i.sender_id = ? THEN i.sender_id
-                    ELSE i.receiver_id
-                  END AS senderId,
+                  i.sender_id AS senderId,
                   CASE 
                     WHEN i.sender_id = ? THEN u.nickname  
                     ELSE u.nickname
@@ -434,10 +514,12 @@ export default class DatabaseStorage implements IStorage {
                               WHEN i.sender_id = ? THEN i.receiver_id
                               ELSE i.sender_id
                             END
-                WHERE i.sender_id = ? OR i.receiver_id = ?
+                WHERE (i.sender_id = ? OR i.receiver_id = ?)
+                AND i.status IS NULL
+                AND i.disabled_at IS NULL
               `);
               
-            const rows = stmt.all(userId, userId, userId, userId, userId);
+            const rows = stmt.all(userId, userId, userId, userId);
             invitations = rows as InvitationListForm[];
             console.log(invitations);
             return invitations;
@@ -447,4 +529,52 @@ export default class DatabaseStorage implements IStorage {
 
     }
 
+    deleteInvitationRecordTransaction(recordId: number): void {
+        const deletingTransaction = this._db.transaction(() => {
+            // Step 1: Get the invitation
+            const invitation = this._db.prepare(
+                'SELECT sender_id, receiver_id, status FROM invitations WHERE id = ?'
+            ).get(recordId) as { sender_id: number; receiver_id: number; status: number | null } | undefined;
+    
+            if (!invitation) {
+                throw new Error('Invitation not found');
+            }
+    
+            // Step 2: If accepted (status === 0), delete friendship
+            if (invitation.status === 0) {
+                const [userA, userB] = [invitation.sender_id, invitation.receiver_id].sort((a, b) => a - b);
+                this._db.prepare(
+                    'DELETE FROM friends WHERE user_a = ? AND user_b = ?'
+                ).run(userA, userB);
+            }
+    
+            // Step 3: Delete the invitation
+            this._db.prepare('DELETE FROM invitations WHERE id = ?').run(recordId);
+        });
+
+        deletingTransaction();
+    }
+
+    acceptInvitationAndAddFriendsTransaction(recordId: number, invitedUserId: number): UserBaseInfo {
+        const transaction = this._db.transaction(() => {
+            this.changeInvitationStatus(recordId, invitedUserId, InvitationStatus.ACCEPT);
+            const senderId = this.getSender(recordId);
+            this.addFriends(senderId, invitedUserId);
+            const userBaseInfo = this.getUserById(senderId) as UserBaseInfo;
+            console.log("senderUserBaseInfo1: ", userBaseInfo)
+            if (!userBaseInfo)
+                throw new Error ("DatabaseFailure");
+            return userBaseInfo;
+        });
+    
+        return transaction(); // run the transaction
+    }
+
+
+    rejectInvitationTransaction(recordId: number, invitedUserId: number): void {
+        const transaction = this._db.transaction(() => {
+            this.changeInvitationStatus(recordId, invitedUserId, InvitationStatus.REJECT);
+        });
+        transaction();
+    }
 };
