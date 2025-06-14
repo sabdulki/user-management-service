@@ -5,6 +5,7 @@ import {otpLogic} from './login';
 import { CACHE_KEY } from '../get/getRatingLeaders';
 import app from '../../../../app';
 
+const DEFAULT_AVATAR_REL_PATH = '../../../../../public/avatars/default.png';
 
 export async function deleteLeaderboardCach(): Promise<boolean> {
 	const radishClient = app.cache;
@@ -20,7 +21,8 @@ export async function saveRegisteredUser(form: UserCreateForm): Promise<{userId:
 	let status: number;
 	const storage = app.storage;
 	try {
-	  userId = storage.userRegisterTransaction(form);
+		userId = storage.userRegisterTransaction(form);
+		storage.addUserAvatar(userId, DEFAULT_AVATAR_REL_PATH);
 	} catch (err: any) {
 	    if (err.message === 'UserAlreadyExists') {
 			  console.log('User already exists');

@@ -39,44 +39,11 @@ async function declareCache() {
   })
 }
 
-// do th radish as these one
 async function setupStorage() {
   // const isProduction = process.env.MODE === 'production'
   await declareDataBase();
   await declareCache()
 }
-
-// async function dbConnector(app: FastifyInstance) 
-// {
-//   const db = new Database('./databases.db', { verbose: console.log });
-
-//   db.exec(`
-//     CREATE TABLE IF NOT EXISTS users (
-//       id INTEGER PRIMARY KEY AUTOINCREMENT,
-//       nickname TEXT UNIQUE,
-//       email TEXT UNIQUE,
-//       password TEXT,
-//       avatar TEXT,
-//       removed_at INTEGER DEFAULT null
-//     )
-//     `)
-//   db.exec(`
-//     CREATE TABLE IF NOT EXISTS ratings (
-//       id INTEGER PRIMARY KEY AUTOINCREMENT,
-//       user_id BIGINT NOT NULL,
-//       value INTEGER DEFAULT 1000,
-//       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-//     )
-//   `)
-//   app.decorate('sqlite', db)
-
-//   app.addHook("onClose", (app, done) => {
-//     db.close();
-//     done();
-//   });
-
-//   console.log("Database users and ratings created successfully");
-// }
 
 async function main() 
 {
@@ -125,14 +92,9 @@ async function main()
     console.log(error);
     process.exit(1)
   }
-  // create radish client here
-  // app.addHook('onClose', (app, done) => {
-  //    storage.close()
-  //    done()
-  // })
+  
   const host = configInstance.getHost();
   const port = configInstance.getPort();
-
   app.listen({ host, port }, (err, address) => {
     if (err) {
       app.log.error(err)
