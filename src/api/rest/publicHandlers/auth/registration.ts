@@ -40,7 +40,6 @@ export async function saveRegisteredUser(form: UserCreateForm): Promise<{userId:
 	}
 	// delete radish top5_rating_leader
 	status = 201;
-	console.log("going to call deleteLeaderboardCach!");
 	const deleteStatus = deleteLeaderboardCach();
 	if (!deleteStatus)
 		status = 500;

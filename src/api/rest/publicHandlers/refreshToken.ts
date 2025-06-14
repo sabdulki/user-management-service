@@ -8,7 +8,7 @@ export async function refreshTokensPair(request: FastifyRequest, reply: FastifyR
 		return reply.code(401).send();
 	const userId = payload.userId;
 	if (!request.server.storage.isUserAvailable(userId))
-		return reply.code(404).send();
+		return reply.code(404).send({"message": "user is not avaliable"});
 	try {
 		if (!deleteJwtTokenPair(request, TokensToDelete.RefreshOnly))
 			return reply.code(500).send();

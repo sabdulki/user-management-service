@@ -4,7 +4,7 @@ import RadishClient from '../../../../pkg/client/client';
 import { generateJwtTokenPair, isTokenValid } from '../../../../pkg/jwt/JwtGenerator';
 import UserCreateForm from '../../../../models/UserCreateForm';
 import RadishResponse from 'pkg/client/response';
-import { saveRegisteredUser } from './registration';
+import { deleteLeaderboardCach, saveRegisteredUser } from './registration';
 import app from '../../../../app';
 
 export class OtpManager {
@@ -54,7 +54,6 @@ export class OtpManager {
         }
         if (form) {
             const obj = await saveRegisteredUser(form);
-            console.log("registered!")
             if (obj.status !== 201 || !obj.userId) {
                 status = obj.status;
                 return {userId, status};

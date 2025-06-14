@@ -1,5 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import {isTokenValid, TokenType, getTokenFromRequest, deleteJwtTokenPair} from '../../../../pkg/jwt/JwtGenerator';
+import { deleteLeaderboardCach } from '../auth/registration';
 
 
 export async function deleteUser(request: FastifyRequest, reply: FastifyReply) 
@@ -9,6 +10,9 @@ export async function deleteUser(request: FastifyRequest, reply: FastifyReply)
         request.server.storage.deleteUser(userId);
         if (!deleteJwtTokenPair(request))
             return reply.code(404).send();
+        const deleteStatus = deleteLeaderboardCach();
+        if (!deleteStatus)
+          return reply.code(500).send();
         return reply.code(200).send();
     } catch (error: any) {
         if (error.message === 'Failed to delete user') {

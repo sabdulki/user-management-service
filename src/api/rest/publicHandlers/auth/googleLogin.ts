@@ -1,10 +1,11 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
-import app from 'fastify'
+import app from '../../../../app';
 import UserCreateForm from '../../../../models/UserCreateForm';
 import { AuthProvider } from '../../../../storage/DatabaseStorage';
 import {generateJwtTokenPair} from '../../../../pkg/jwt/JwtGenerator';
 import Config from '../../../../config/Config';
 import { deleteLeaderboardCach } from './registration';
+import { randomInt } from 'crypto';
 
 type GoogleUser = {
   id: string
@@ -20,6 +21,46 @@ interface GoogleTokenResponse {
   scope: string;
   token_type: string;
   id_token?: string;
+}
+
+interface automateRegistartionResponse {
+  userId: number | undefined;
+  code: number;
+}
+
+function generateRandomNumber(): string {
+   return randomInt(0, 10).toString();
+}
+
+
+function automateUserRegistartion(form:UserCreateForm, googleUser: GoogleUser): automateRegistartionResponse {
+  let userId: number | undefined;
+  const MAX_ATTEMPTS = 3;
+  let attempt = 0;
+  let success = false;
+  let code = 201;
+  const storage = app.storage;
+
+  while (attempt < MAX_ATTEMPTS && !success) {
+    try {
+      userId = storage.userRegisterTransaction(form);
+      storage.addUserAvatar(userId, googleUser.picture);
+      success = true;
+    } catch (err: any) {
+      if (err.message === "UserAlreadyExists") {
+        form.nickname += generateRandomNumber();
+        attempt++;
+      } else {
+        code = 500;
+        return {userId, code};
+      }
+    }
+  }
+
+  if (!success) {
+    code = 409;
+  }
+  return {userId, code};
 }
 
 export async function googleLoginExchange(request: FastifyRequest, reply: FastifyReply) {
@@ -83,19 +124,18 @@ export async function googleLoginExchange(request: FastifyRequest, reply: Fastif
           return reply.code(400).send({ message: 'Invalid input data in google login'});
         }
 
-        const storage = request.server.storage;
-        try {
-            userId = storage.userRegisterTransaction(form);
-            storage.addUserAvatar(userId, googleUser.picture);
-        } catch (err: any) {
-            return reply.code(500).send({message: "internal server error"});
-        }
+        let response: automateRegistartionResponse;
+        response = automateUserRegistartion(form, googleUser);
+        if (!response.userId)
+          return reply.code(response.code).send();
 
-        console.log("going to call deleteLeaderboardCach in googleLogin!");
         const deleteStatus = deleteLeaderboardCach();
         if (!deleteStatus)
           return reply.code(500).send();
+        userId = response.userId;
+        console.log("registered user with google login and cleaned the cach of leaders!");
     }
+
 
     // Generate JWT
     if (user)
