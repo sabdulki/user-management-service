@@ -23,17 +23,6 @@ export default class DatabaseStorage implements IStorage {
         //Работает как обычное подключение к SQLite-файлу если файл уже создан
         this._db = new Database('./db/database.db');
         syncMigrations(this._db, './db/migrations');
-        // this was executed on;y ONCE to add avatar column ONLY
-        // const columnExists = this._db
-        //     .prepare(`PRAGMA table_info(users)`)
-        //     .all()
-        //     .some(col => col.name === 'provider')
-
-        // if (!columnExists) {
-            // this._db.exec(`ALTER TABLE users ADD COLUMN removed_at INTEGER DEFAULT null;`)
-            // this._db.exec(`ALTER TABLE users RENAME COLUMN avatar_path TO avatar;`)
-
-        // }
     }
 
     close() {

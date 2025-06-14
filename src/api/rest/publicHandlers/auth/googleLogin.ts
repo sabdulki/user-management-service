@@ -4,21 +4,22 @@ import UserCreateForm from '../../../../models/UserCreateForm';
 import { AuthProvider } from '../../../../storage/DatabaseStorage';
 import {generateJwtTokenPair} from '../../../../pkg/jwt/JwtGenerator';
 import Config from '../../../../config/Config';
+import { deleteLeaderboardCach } from './registration';
 
 type GoogleUser = {
-    id: string
-    email: string
-    given_name: string
-    picture: string
+  id: string
+  email: string
+  given_name: string
+  picture: string
 }
 
 interface GoogleTokenResponse {
-    access_token: string;
-    expires_in: number;
-    refresh_token?: string;
-    scope: string;
-    token_type: string;
-    id_token?: string;
+  access_token: string;
+  expires_in: number;
+  refresh_token?: string;
+  scope: string;
+  token_type: string;
+  id_token?: string;
 }
 
 export async function googleLoginExchange(request: FastifyRequest, reply: FastifyReply) {
@@ -89,6 +90,11 @@ export async function googleLoginExchange(request: FastifyRequest, reply: Fastif
         } catch (err: any) {
             return reply.code(500).send({message: "internal server error"});
         }
+
+        console.log("going to call deleteLeaderboardCach in googleLogin!");
+        const deleteStatus = deleteLeaderboardCach();
+        if (!deleteStatus)
+          return reply.code(500).send();
     }
 
     // Generate JWT

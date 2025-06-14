@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 
-const CACHE_KEY = 'top5_rating_leader';
+export const CACHE_KEY = 'top5_rating_leader';
 
 export async function getRatingLeaders(request: FastifyRequest, reply: FastifyReply) {
 	const cache = request.server.cache;

@@ -54,6 +54,7 @@ export class OtpManager {
         }
         if (form) {
             const obj = await saveRegisteredUser(form);
+            console.log("registered!")
             if (obj.status !== 201 || !obj.userId) {
                 status = obj.status;
                 return {userId, status};

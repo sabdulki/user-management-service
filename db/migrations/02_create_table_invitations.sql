@@ -5,6 +5,6 @@ CREATE TABLE invitations (
   status INTEGER DEFAULT NULL, -- 0 = accepted, 1 = rejected
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   disabled_at INTEGER DEFAULT NULL,
-  FOREIGN KEY (sender_id) REFERENCES users(id),
-  FOREIGN KEY (receiver_id) REFERENCES users(id)
+  FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE
 );

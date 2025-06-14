@@ -7,6 +7,8 @@ export async function deleteUser(request: FastifyRequest, reply: FastifyReply)
     try {
         const {userId} = request.params as {userId : number}; //распаковка
         request.server.storage.deleteUser(userId);
+        if (!deleteJwtTokenPair(request))
+            return reply.code(404).send();
         return reply.code(200).send();
     } catch (error: any) {
         if (error.message === 'Failed to delete user') {
