@@ -41,6 +41,8 @@ RUN npm run build
 # Пробрасываем порт
 EXPOSE 5000
 
+VOLUME ["/user-management-service/db/database", "/user-management-service/public/avatars"]
+
 # Команда для запуска (если используешь ts-node)
 CMD ["sh", "./docker-run.sh"]
 

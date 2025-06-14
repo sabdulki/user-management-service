@@ -7,7 +7,8 @@ import { JwtSignError, JwtCachError, JwtTokenVerificationError, JwtExtractionErr
 import app from '../../app'; 
 
 function setUpJwtGenerator(): void {
-	JwtGenerator.getInstance();
+	const instance = JwtGenerator.getInstance();
+	// instance.setRadishClient(app.cache);
 	console.log("set up JwtGenerator instance successfuly")
 } 
 
@@ -50,6 +51,10 @@ class JwtGenerator {
 		return JwtGenerator.instance;
 	}
 	
+	public setRadishClient(cache: RadishClient) {
+		this.radishClient = cache;
+	}
+
 	private generateToken(payload: JwtPayload, expiresIn: number): string {
 		try {
 			return jwt.sign(payload as jwt.JwtPayload, this.config.secret + this.config.salt, {
@@ -92,7 +97,7 @@ class JwtGenerator {
 
 		const getResponse = await this.radishClient.get(token);
 		if (getResponse.status !== 200) // means token was deleted before or doesnt exists
-			return;
+			throw JwtExtractionError;
 		const deleteResponse = await this.radishClient.delete(token);
 		if (deleteResponse.status !== 200) {
 			throw JwtCachError;
@@ -108,7 +113,7 @@ async function deleteJwtToken(request: FastifyRequest, type: TokenType): Promise
 	}
 	try {
 		const insatnce = JwtGenerator.getInstance();
-		insatnce.deleteToken(`${type}-${token}`);
+		await insatnce.deleteToken(`${type}-${token}`);
 	} catch (err: any) {
 		console.log(err);
 		return false;
