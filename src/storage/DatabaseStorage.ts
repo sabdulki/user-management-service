@@ -195,7 +195,8 @@ export default class DatabaseStorage implements IStorage {
                 ORDER BY r.value DESC
                 LIMIT 5
             `);
-            const topPlayers = stmt.all() as { nickname: string, score: number }[];;
+            const topPlayers = stmt.all() as { nickname: string, score: number }[];
+            console.log("topPlayers:", topPlayers);
             return topPlayers;
         } catch (err: any) {
             console.log("error in db in getRatingLeadres", err);

@@ -14,7 +14,7 @@ export async function getRatingLeaders(request: FastifyRequest, reply: FastifyRe
 	
 	const expireTime = 120; 
 	const setResponse = await cache.set(`${CACHE_KEY}`, `${JSON.stringify(top5Players)}`, expireTime);
-	if (setResponse.status !== 200)
-		return reply.code(500).send();
+	if (setResponse.status !== 201)
+		return reply.code(507).send();
 	return reply.code(200).send(top5Players);
 }
