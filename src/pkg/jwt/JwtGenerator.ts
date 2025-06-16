@@ -1,16 +1,20 @@
 import { FastifyRequest } from 'fastify';
 import jwt from 'jsonwebtoken';
-import RadishClient from "../client/client"
+import RadishClient from "../cache/client/client"
 import Config from "../../config/Config"
 import { JwtGeneratorConfig } from "./JwtGeneratorConfig"
 import { JwtSignError, JwtCachError, JwtTokenVerificationError, JwtExtractionError } from './jwtErrors';
 import app from '../../app'; 
+import { RadishSingleton } from 'pkg/cache/RadishSingleTon';
 
-function setUpJwtGenerator(): void {
-	const instance = JwtGenerator.getInstance();
-	// instance.setRadishClient(app.cache);
+function setUpJwtGenerator(cacheClient: RadishClient): void {
+	JwtGenerator.getInstance().setRadishClient(cacheClient);
 	console.log("set up JwtGenerator instance successfuly")
 } 
+// function setUpJwtGenerator(cacheClient: RadishClient): void {
+// 	JwtGenerator.getInstance().setRadishClient(cacheClient);
+// 	console.log("set up JwtGenerator instance successfuly")
+// } 
 
 interface JwtPayload {
 	userId: number;
@@ -35,13 +39,11 @@ class JwtGenerator {
 
 	private static instance: JwtGenerator;
 	private readonly config: JwtGeneratorConfig;
-	private radishClient: RadishClient;
+	private radishClient!: RadishClient;
 
 	private constructor() {
 		this.config = new JwtGeneratorConfig();
-		const host = Config.getInstance().getRadishHost();
-		const port = Config.getInstance().getRadishPort();
-		this.radishClient = app.cache;
+		// this.radishClient = RadishSingleton.getInstance();
 	}
 
 	public static getInstance(): JwtGenerator {
@@ -52,6 +54,9 @@ class JwtGenerator {
 	}
 	
 	public setRadishClient(cache: RadishClient) {
+		if (this.radishClient) {
+			return ;
+		}
 		this.radishClient = cache;
 	}
 

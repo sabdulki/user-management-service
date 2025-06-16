@@ -1,7 +1,7 @@
 
 import UserBaseInfo from 'types/UserBaseInfo';
 import UserCreateForm from '../models/UserCreateForm'
-import RadishResponse from 'pkg/client/response';
+import RadishResponse from 'pkg/cache/client/response';
 import { InvitationStatus } from 'storage/DatabaseStorage';
 import { InvitationListForm } from '../api/rest/publicHandlers/friends/getInvitations';
 

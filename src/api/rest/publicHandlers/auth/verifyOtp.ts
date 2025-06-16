@@ -1,17 +1,17 @@
 import Config from '../../../../config/Config';
 import { FastifyRequest, FastifyReply } from 'fastify'
-import RadishClient from '../../../../pkg/client/client';
+import RadishClient from '../../../../pkg/cache/client/client';
 import { generateJwtTokenPair, isTokenValid } from '../../../../pkg/jwt/JwtGenerator';
 import UserCreateForm from '../../../../models/UserCreateForm';
-import RadishResponse from 'pkg/client/response';
+import RadishResponse from '../../../../pkg/cache/client/response';
 import { deleteLeaderboardCach, saveRegisteredUser } from './registration';
-import app from '../../../../app';
+import { RadishSingleton } from '../../../../pkg/cache/RadishSingleTon';
 
 export class OtpManager {
     private static instance: OtpManager;
-    private radishClient: RadishClient;
+    private static radishClient: RadishClient;
     private constructor() {
-        this.radishClient = app.cache;
+        OtpManager.radishClient = RadishSingleton.getInstance();
     }
 
     public static getInstance(): OtpManager {
@@ -22,7 +22,7 @@ export class OtpManager {
 	}
 
     public async checkOtpMatch(uuid: string, userOtp: string): Promise<{userId: number | undefined, status: number}>{
-        const response = await this.radishClient.get(`uuid-${uuid}`);
+        const response = await OtpManager.radishClient.get(`uuid-${uuid}`);
         let userId = undefined;
         let form: UserCreateForm | undefined = undefined;
         let status: number;
@@ -62,7 +62,7 @@ export class OtpManager {
         }
 
         status = 200;
-        const radishResponse = await this.radishClient.delete(`uuid-${uuid}`);
+        const radishResponse = await OtpManager.radishClient.delete(`uuid-${uuid}`);
         if (radishResponse.status !== 200) {
             status = 403;
             return {userId, status};
@@ -75,11 +75,11 @@ export class OtpManager {
         let response: RadishResponse;
         if (identifier.userId) {
             const userId = identifier.userId;
-            response = await this.radishClient.set(`uuid-${uuid}`, JSON.stringify({otp, userId}), expireTime);
+            response = await OtpManager.radishClient.set(`uuid-${uuid}`, JSON.stringify({otp, userId}), expireTime);
         }
         else if (identifier.form) {
             const form = identifier.form;
-            response = await this.radishClient.set(`uuid-${uuid}`, JSON.stringify({otp, form}), expireTime);
+            response = await OtpManager.radishClient.set(`uuid-${uuid}`, JSON.stringify({otp, form}), expireTime);
         }
         else {
             console.log("Neither userId nor form provided");
@@ -95,6 +95,8 @@ export class OtpManager {
     }
 }
 
+
+
 export async function verifyOtp (request: FastifyRequest, reply: FastifyReply) {
     const body = request.body as { uuid: string, otp: string}
     const uuid = body.uuid;
@@ -103,6 +105,7 @@ export async function verifyOtp (request: FastifyRequest, reply: FastifyReply) {
         return reply.code(400).send(); // bad request
 
     const OtpManagerInstance = OtpManager.getInstance();
+
     const obj = await OtpManagerInstance.checkOtpMatch(uuid, userOtp);
     if (obj.status !== 200 || !obj.userId)
         return reply.code(400).send(); // internal server error or forbiden

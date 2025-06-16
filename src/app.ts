@@ -11,7 +11,18 @@ import loggerMiddleware from "./pkg/middlewares/loggerMiddleware"
 import { setUpJwtGenerator } from './pkg/jwt/JwtGenerator';
 import Config from './config/Config';
 import path, {dirname} from 'path'
-import RadishClient from './pkg/client/client';
+import RadishClient from './pkg/cache/client/client';
+import { RadishSingleton } from './pkg/cache/RadishSingleTon';
+
+
+// export function setupRadishClientFromConfig(): RadishClient {
+//   const configInstance = Config.getInstance();
+//   const cacheClient = new RadishClient({
+//       host: configInstance.getRadishHost(),
+//       port: configInstance.getRadishPort(),
+//     })
+//   return cacheClient;
+// }
 
 dotenv.config();
 
@@ -66,7 +77,15 @@ async function main()
     }
   });
   
-  const configInstance =  Config.getInstance()
+  try {
+    const cache = RadishSingleton.getInstance();
+    setUpJwtGenerator(cache);
+  } catch (error : any) {
+    console.log(error);
+    process.exit(1)
+  }
+
+  const configInstance = Config.getInstance()
   const googleClientId = configInstance.getGoogleClientId();
   const googleClientSecret = configInstance.getGoogleClientSecret();
   const googleCallbackUrl = configInstance.getGoogleCallbackUrl();
@@ -86,12 +105,7 @@ async function main()
   });
   app.addHook('onRequest', loggerMiddleware)
 
-  try {
-    setUpJwtGenerator();
-  } catch (error : any) {
-    console.log(error);
-    process.exit(1)
-  }
+  
   
   const host = configInstance.getHost();
   const port = configInstance.getPort();

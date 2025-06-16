@@ -3,7 +3,7 @@ import Database from 'better-sqlite3'
 import IStorage from '../models/storage'
 import '@fastify/oauth2'
 import { FastifyOAuth2Namespace } from '@fastify/oauth2'
-import RadishClient from 'pkg/client/client'
+import RadishClient from 'pkg/cache/client/client'
 
 
 declare module 'fastify' {
