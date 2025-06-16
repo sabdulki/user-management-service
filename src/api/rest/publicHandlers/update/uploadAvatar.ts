@@ -6,15 +6,16 @@ import { randomUUID } from 'crypto';
 import path from 'path'
 import fs from 'fs'
 import IStorage from 'interfaces/IStorage';
+import Config from '../../../../config/Config';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
-
+const backPath = '/../../../../../public'
 async function deleteFile(path: string): Promise<boolean> {
 	try {
 	  await unlink(path);
 	  console.log('File deleted successfully');
 	  return true;
-	} catch (err) {
+	} catch (err: any) {
 	  console.error('Error deleting file:', err);
 	  return false;
 	}
@@ -22,8 +23,8 @@ async function deleteFile(path: string): Promise<boolean> {
 
 export async function deleteAvatar(userId: number, userAvatar: string, storage: IStorage) {
 	if (!userAvatar.includes("https://lh3.googleusercontent.com/")) {
-		const userAvatarFullPath = path.join(__dirname, '../../../../public', userAvatar);
-		console.log("userAvatarFullPath: ", userAvatarFullPath)
+		const userAvatarFullPath = path.join(__dirname, backPath, userAvatar);
+		console.log("userAvatarFullPath to be deleted: ", userAvatarFullPath)
 		const isDeleted = await deleteFile(userAvatarFullPath);
 		if (!isDeleted) { // delete file if it exists ????? {
 			console.log("Failed to delete file");
@@ -39,6 +40,7 @@ export async function uploadAvatar(request: FastifyRequest, reply: FastifyReply)
 
  	const userId = payload.userId;
 	const storage = request.server.storage;
+	let fullPathPart: string;
 	let userAvatar: string | undefined;
 
 	try {
@@ -67,12 +69,19 @@ export async function uploadAvatar(request: FastifyRequest, reply: FastifyReply)
 		}
 		const filename = `${randomUUID()}-${userId}-${originalFilename}`;
 		relativePath = `avatars/${filename}`;
-		const fullPath = path.join(__dirname, '../../../../public', relativePath);
+		if (Config.getInstance().getMode() === 'develop') {
+			fullPathPart = backPath;
+		}
+		else {
+			fullPathPart = '/../../../../../public';
+		}
+		const fullPath = path.join(__dirname, fullPathPart, relativePath);
+		console.log("path for image: ", fullPath);
 		fs.mkdirSync(path.dirname(fullPath), { recursive: true });
 		try {
 			const writeStream = fs.createWriteStream(fullPath);
 			await pipeline(fileStream, writeStream);
-		  } catch (err) {
+		  } catch (err: any) {
 			console.error('Error saving file:', err);
 			return reply.code(500).send({ message: 'Failed to save file' });
 		  }
@@ -87,10 +96,11 @@ export async function uploadAvatar(request: FastifyRequest, reply: FastifyReply)
 	}
  	
 	if (userAvatar && !userAvatar.includes("https://lh3.googleusercontent.com/")) {
-		deleteAvatar(userId, userAvatar, storage);
+		await deleteAvatar(userId, userAvatar, storage);
 	}
 
 	try {
+		console.log("here!!!!");
 		storage.addUserAvatar(userId, relativePath);
 	} catch (error: any) {
 		return reply.code(500).send({ message: 'Failed to record avatar in storage' });

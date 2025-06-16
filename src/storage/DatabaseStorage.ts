@@ -244,6 +244,7 @@ export default class DatabaseStorage implements IStorage {
 
     addUserAvatar(userId: number, relativePath: string): void {
         try {
+            console.log("relativePath in db: ", relativePath);
             const stmt = this._db.prepare('UPDATE users SET avatar = ? WHERE id = ?');
             stmt.run(relativePath, userId) 
         } catch (error: any) {

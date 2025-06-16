@@ -5,7 +5,7 @@ import {otpLogic} from './login';
 import { CACHE_KEY } from '../get/getRatingLeaders';
 import app from '../../../../app';
 
-const DEFAULT_AVATAR_REL_PATH = '../../../../../public/avatars/default.png';
+const DEFAULT_AVATAR_REL_PATH = 'avatars/default.png';
 
 export async function deleteLeaderboardCach(): Promise<boolean> {
 	const radishClient = app.cache;
