@@ -1,13 +1,13 @@
-# Игнорировать все файлы в папке public/avatars
+# Игнорировать все файлы в avatars, кроме default.png
 /public/avatars/*
-
-# Но НЕ игнорировать default.png
+!/public/avatars/
+/public/avatars/**/*
 !/public/avatars/default.png
+
 
 node_modules
 instruction.txt
 .env
 insights
-avatars
 databases.db
 database.db
