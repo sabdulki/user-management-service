@@ -12,7 +12,7 @@ import { setUpJwtGenerator } from './pkg/jwt/JwtGenerator';
 import Config from './config/Config';
 import path, {dirname} from 'path'
 import RadishClient from './pkg/cache/client/client';
-import { RadishSingleton } from './pkg/cache/RadishSingleTon';
+import { RadishSingleton } from './pkg/cache/RadishSingleton';
 
 
 // export function setupRadishClientFromConfig(): RadishClient {

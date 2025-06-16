@@ -1,4 +1,4 @@
-import { RadishSingleton } from '../../../../pkg/cache/RadishSingleTon';
+import { RadishSingleton } from '../../../../pkg/cache/RadishSingleton';
 import { FastifyRequest, FastifyReply } from 'fastify'
 
 export const CACHE_KEY = 'top5_rating_leader';

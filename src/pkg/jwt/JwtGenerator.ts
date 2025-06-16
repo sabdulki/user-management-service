@@ -5,7 +5,7 @@ import Config from "../../config/Config"
 import { JwtGeneratorConfig } from "./JwtGeneratorConfig"
 import { JwtSignError, JwtCachError, JwtTokenVerificationError, JwtExtractionError } from './jwtErrors';
 import app from '../../app'; 
-import { RadishSingleton } from 'pkg/cache/RadishSingleTon';
+import { RadishSingleton } from 'pkg/cache/RadishSingleton';
 
 function setUpJwtGenerator(cacheClient: RadishClient): void {
 	JwtGenerator.getInstance().setRadishClient(cacheClient);
