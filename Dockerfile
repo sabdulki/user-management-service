@@ -34,6 +34,9 @@ RUN npm install
 # Копируем остальные файлы
 COPY . .
 
+COPY ./db/migrations /app/db/migrations
+COPY ./public/avatars /app/public/avatars
+
 # Компилируем TypeScript, если у тебя есть tsconfig.json
 # Убери если не используешь сборку и запускаешь через ts-node
 RUN npm run build
