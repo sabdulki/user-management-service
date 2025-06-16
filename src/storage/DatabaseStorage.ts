@@ -5,6 +5,7 @@ import UserBaseInfo from "types/UserBaseInfo";
 import bcrypt from "bcryptjs";
 import { syncMigrations } from "./migrate";
 import { InvitationListForm } from "../api/rest/publicHandlers/friends/getInvitations";
+import Config from "../config/Config";
 
 export enum AuthProvider {
     LOCAL = 0,
@@ -21,8 +22,17 @@ export default class DatabaseStorage implements IStorage {
 
     constructor() {
         //Работает как обычное подключение к SQLite-файлу если файл уже создан
-        this._db = new Database('./db/database.db');
-        syncMigrations(this._db, './db/migrations');
+        let dbPath: string;
+        let migrationsPath: string;
+        if (Config.getInstance().getMode() === "develop") {
+            dbPath = './db/database.db'
+            migrationsPath = './db/migrations'
+        } else {
+            dbPath = '/app/db/database.db'
+            migrationsPath = '/app/db/migrations'
+        }
+        this._db = new Database(dbPath);
+        syncMigrations(this._db, migrationsPath);
     }
 
     close() {
@@ -112,7 +122,7 @@ export default class DatabaseStorage implements IStorage {
         let user;
         try {
             const stmt = this._db.prepare(`
-                SELECT u.id, u.nickname, u.avatar, r.value as rating
+                SELECT u.id, u.nickname, u.avatar, u.is_online, r.value as rating
                 FROM users u
                 JOIN ratings r ON u.id = r.user_id
                 WHERE u.id = ? AND u.removed_at IS NULL
@@ -389,6 +399,7 @@ export default class DatabaseStorage implements IStorage {
                     u.id,
                     u.nickname,
                     u.avatar,
+                    u.is_online,
                     u.removed_at,
                     r.value AS rating
                 FROM users u
@@ -551,7 +562,6 @@ export default class DatabaseStorage implements IStorage {
             const senderId = this.getSender(recordId);
             this.addFriends(senderId, invitedUserId);
             const userBaseInfo = this.getUserById(senderId) as UserBaseInfo;
-            console.log("senderUserBaseInfo1: ", userBaseInfo)
             if (!userBaseInfo)
                 throw new Error ("DatabaseFailure");
             return userBaseInfo;

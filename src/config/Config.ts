@@ -34,6 +34,9 @@ export default class Config {
     return Config.instance;
   }
 
+  public getMode(): string {
+    return this.mode;
+  }
   public getRadishHost(): string {
     return this.radishHost;
   }
