@@ -7,7 +7,6 @@ export async function getUserInfo(request: FastifyRequest, reply: FastifyReply)
     try {
         const payload = await isTokenValid(request);
         if (!payload || !payload.userId) {
-            console.log("payload: ", payload, "payload.userId: ", payload?.userId)
             return reply.code(401).send();
         }
 

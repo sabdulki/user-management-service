@@ -2,7 +2,7 @@
 import UserBaseInfo from 'types/UserBaseInfo';
 import UserCreateForm from '../models/UserCreateForm'
 import RadishResponse from 'pkg/cache/client/response';
-import { InvitationStatus } from 'storage/DatabaseStorage';
+import { InvitationStatus, StateValue } from '../storage/DatabaseStorage';
 import { InvitationListForm } from '../api/rest/publicHandlers/friends/getInvitations';
 
 // only signature of method
@@ -24,6 +24,7 @@ interface IStorage {
     addUserAvatar(userId: number, relativePath: string): void;
     setUserPassword(userId: number, newPassword: string):Promise<void> ;
     addFriends(firstUser:number, secondUser: number):void;
+    changeUserState(userId: number, state: StateValue):void;
 
 
     //getters

@@ -16,6 +16,10 @@ export enum InvitationStatus {
     ACCEPT = 0,
     REJECT = 1
 }
+export enum StateValue {
+    OFFLINE = 0,
+    ONLINE = 1
+}
 
 export default class DatabaseStorage implements IStorage {
     private _db: DatabaseType
@@ -576,5 +580,15 @@ export default class DatabaseStorage implements IStorage {
             this.changeInvitationStatus(recordId, invitedUserId, InvitationStatus.REJECT);
         });
         transaction();
+    }
+
+    changeUserState(userId: number, state: StateValue):void {
+        try {
+            this._db.prepare(
+                'UPDATE users SET is_online = ? WHERE id = ? AND removed_at IS NULL)'
+            ).run(state, userId);
+        } catch (err:any) {
+            throw new Error('DatabaseFailure');
+        }
     }
 };
