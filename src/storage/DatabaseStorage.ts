@@ -302,7 +302,7 @@ export default class DatabaseStorage implements IStorage {
     }
     
 
-    createInvitationTransaction(senderId: number, receiverId: number): void {
+    createInvitationTransaction(senderId: number, receiverId: number): number {
 
         const [userA, userB] = [senderId, receiverId].sort((a, b) => a - b); // for friends check
 
@@ -330,13 +330,15 @@ export default class DatabaseStorage implements IStorage {
             }
 
             // ✅ Вставка
-            this._db.prepare(`
+            const result = this._db.prepare(`
                 INSERT INTO invitations (sender_id, receiver_id) VALUES (?, ?)
             `).run(senderId, receiverId);
+
+            return result.lastInsertRowid as number;
         });
 
         try {
-            txn();
+            return txn();
         } catch(error: any) {
             if (error.code === 'SQLITE_CONSTRAINT_FOREIGNKEY') {
                 throw new Error('User not found');

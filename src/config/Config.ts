@@ -13,6 +13,7 @@ export default class Config {
   private readonly googleCallbackUrl: string;
   private readonly essHost: string;
   private readonly essPort: number;
+  private readonly websiteUrl: string;
   // ess
 
   private constructor() {
@@ -25,6 +26,7 @@ export default class Config {
     this.googleCallbackUrl = process.env.GOOGLE_CALLBACK_URL!;
     this.essHost = process.env.ESS_HOST || "localhost"; //EmailSenderService
     this.essPort = Number(process.env.ESS_PORT) || 5200; // EmailSenderService
+    this.websiteUrl = process.env.WEBSITE_URL!;
   }
 
   public static getInstance(): Config {
@@ -37,6 +39,7 @@ export default class Config {
   public getMode(): string {
     return this.mode;
   }
+
   public getRadishHost(): string {
     return this.radishHost;
   }
@@ -74,5 +77,8 @@ export default class Config {
 
   public getEssPort(): number {
     return this.essPort;
+  }
+  public getWebsiteUrl(): string {
+    return this.websiteUrl;
   }
 };

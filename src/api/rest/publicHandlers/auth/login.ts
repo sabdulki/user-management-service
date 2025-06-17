@@ -14,18 +14,23 @@ function generateUuid() : string {
   return randomUUID();
 }
 
-async function sendOtpToEmail(otp: string, userEmail: string) : Promise<number> {
-  
-  const bodyContent = {
-    email: userEmail,
-    template: 'otp',
-    data: {"code": otp}
-  }
-
+export function getEssUrl(): string {
   const emailSenderServiceHost = Config.getInstance().getEssHost();
   const emailSenderServicePort = Config.getInstance().getEssPort();
   const emailSenderServiceAddress = `${emailSenderServiceHost}:${emailSenderServicePort}`;
   const url = 'http://' + emailSenderServiceAddress + '/ess/api/rest/email/send';
+  return url;
+}
+
+export interface emailBodyContent {
+  email: string,
+  template: string,
+  data: {}
+}
+
+export async function sendToEmail(bodyContent: emailBodyContent) : Promise<number> {
+
+  const url = getEssUrl();
 
   const response = await fetch(url, {
     method: 'POST',
@@ -37,6 +42,7 @@ async function sendOtpToEmail(otp: string, userEmail: string) : Promise<number> 
 
   const data = await response.json() as { error?: string; status?: number; };
   if (response.status !== 202) {
+    console.log("error data: ", data);
     return 400;
   }
 
@@ -52,7 +58,12 @@ export async function otpLogic(identifier: { userId?: number; form?: UserCreateF
   if (!otp || !uuid)
     return undefined;
 
-  const sendStatus = await sendOtpToEmail(otp, userEmail);
+  const bodyContent = {
+    email: userEmail,
+    template: 'otp',
+    data: {"code": otp}
+  }
+  const sendStatus = await sendToEmail(bodyContent);
   if (sendStatus !== 202)
     return undefined;
 

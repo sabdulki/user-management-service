@@ -12,7 +12,7 @@ interface IStorage {
     acceptInvitationAndAddFriendsTransaction(recordId: number, invitedUserId: number): UserBaseInfo;
     userRegisterTransaction(form: UserCreateForm): number;
     userRegister(form: UserCreateForm) : number;
-    createInvitationTransaction(senderId: number, receiverId: number): void;
+    createInvitationTransaction(senderId: number, receiverId: number): number;
     updateRatingTransaction(ratings: { id: number; rating: number }[]): void;
     rejectInvitationTransaction(recordId: number, invitedUserId: number): void;
     deleteInvitationRecordTransaction(recordId: number): void;
