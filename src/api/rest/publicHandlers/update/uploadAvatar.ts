@@ -8,8 +8,10 @@ import fs from 'fs'
 import IStorage from 'interfaces/IStorage';
 import Config from '../../../../config/Config';
 
+export const DEFAULT_AVATAR = 'avatars/default.png'
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 const backPath = '/../../../../../public'
+
 async function deleteFile(path: string): Promise<boolean> {
 	try {
 	  await unlink(path);
@@ -94,8 +96,8 @@ export async function uploadAvatar(request: FastifyRequest, reply: FastifyReply)
 	if (!relativePath) {
 		return reply.code(400).send({ message: 'No file uploaded' });
 	}
- 	
-	if (userAvatar && !userAvatar.includes("https://lh3.googleusercontent.com/")) {
+ 	console.log("userAvatar: ", userAvatar, "DEFAULT_AVATAR: ", DEFAULT_AVATAR);
+	if (userAvatar && !userAvatar.includes("https://lh3.googleusercontent.com/") && userAvatar !== DEFAULT_AVATAR) {
 		await deleteAvatar(userId, userAvatar, storage);
 	}
 

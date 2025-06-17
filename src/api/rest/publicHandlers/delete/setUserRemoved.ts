@@ -3,6 +3,9 @@ import {isTokenValid, TokenType, getTokenFromRequest, deleteJwtTokenPair} from '
 import { JwtPayload } from 'jsonwebtoken';
 import { deleteAvatar } from './../update/uploadAvatar';
 
+import { DEFAULT_AVATAR } from '../update/uploadAvatar';
+import { deleteLeaderboardCach } from '../auth/registration';
+
 export async function setUserRemoved(request: FastifyRequest, reply: FastifyReply) {
     const payload = await isTokenValid(request) as JwtPayload;
     if (!payload || !payload.userId)
@@ -15,9 +18,12 @@ export async function setUserRemoved(request: FastifyRequest, reply: FastifyRepl
         if (!deleteJwtTokenPair(request))
             return reply.code(404).send();
         const avatarPath = request.server.storage.getUserAvatar(userId);
-        if (avatarPath) {
+        if (avatarPath && avatarPath !== DEFAULT_AVATAR) {
             deleteAvatar(userId, avatarPath, request.server.storage);
         }
+        const deleteStatus = deleteLeaderboardCach();
+        if (!deleteStatus)
+          return reply.code(500).send()
         return reply.code(200).send();
     } catch (error: any) {
         return reply.code(404).send({ error });
