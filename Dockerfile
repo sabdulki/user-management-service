@@ -23,6 +23,7 @@ ENV GOOGLE_CLIENT_SECRET=google_client_secret
 ENV GOOGLE_CALLBACK_URL=http://localhost:5000/auth/api/rest/google/login/callback
 ENV ESS_HOST=localhost
 ENV ESS_PORT=5200
+ENV WEBSITE_URL=http://localhost:3000
 # add alć new env
 
 # Копируем package.json и package-lock.json
