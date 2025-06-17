@@ -9,8 +9,8 @@ import IStorage from 'interfaces/IStorage';
 import Config from '../../../../config/Config';
 
 export const DEFAULT_AVATAR = 'avatars/default.png'
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 const backPath = '/../../../../../public'
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 
 async function deleteFile(path: string): Promise<boolean> {
 	try {
@@ -62,7 +62,7 @@ export async function uploadAvatar(request: FastifyRequest, reply: FastifyReply)
  	  if ('file' in part && typeof part.file === 'object') {
 		if (!ALLOWED_TYPES.includes(part.mimetype)) {
 			return reply.code(400).send({ message: 'Unsupported file type' });
-		  }
+		}
  	    originalFilename = part.filename;
  	    fileStream = part.file;
 		
@@ -78,17 +78,17 @@ export async function uploadAvatar(request: FastifyRequest, reply: FastifyReply)
 			fullPathPart = '/../../../../../public';
 		}
 		const fullPath = path.join(__dirname, fullPathPart, relativePath);
-		console.log("path for image: ", fullPath);
+		// console.log("path for image: ", fullPath);
 		fs.mkdirSync(path.dirname(fullPath), { recursive: true });
 		try {
 			const writeStream = fs.createWriteStream(fullPath);
 			await pipeline(fileStream, writeStream);
 		  } catch (err: any) {
-			console.error('Error saving file:', err);
+			// console.error('Error saving file:', err);
 			return reply.code(500).send({ message: 'Failed to save file' });
 		  }
  	  } else {
- 	    console.log('Expected a file part but got a field.');
+ 	    // console.log('Expected a file part but got a field.');
  	    return reply.code(400).send({ message: 'No file provided' });
  	  }
  	}

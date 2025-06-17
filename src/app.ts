@@ -74,7 +74,8 @@ async function main()
   await app.register(fastifyMultipart, {
     limits: {
       fileSize: 2 * 1024 * 1024 // Optional: enforce 2MB at plugin level too
-    }
+    },
+    throwFileSizeLimit: true,
   });
   
   try {
