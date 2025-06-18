@@ -30,7 +30,7 @@ ENV WEBSITE_URL=http://localhost:3000
 COPY package*.json ./
 
 # Устанавливаем зависимости
-RUN npm install
+RUN apt-get install && apt-get update && npm install && apt-get install sqlite3
 
 # Копируем остальные файлы
 COPY . .
