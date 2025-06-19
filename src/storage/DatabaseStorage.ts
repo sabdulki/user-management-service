@@ -111,15 +111,17 @@ export default class DatabaseStorage implements IStorage {
     }
 
     getUserByEmail(email: string): UserBaseInfo | undefined {
-        // try {
+        try {
             const user = this._db.prepare('SELECT * FROM users WHERE email = ?').get(email) as UserBaseInfo;
             if (!user)
                 return undefined;
             const userId = user.id;
             return this.getUserById(userId);
-        // } catch (error) {
-        //     throw new Error('Failed to get user');
-        // }
+        } catch (error:any) {
+            if (error.message === "UserNotFound")
+                throw new Error('UserNotFound');
+            throw new Error('Failed to get user');
+        }
     }
 
     getUserById(id: number): UserBaseInfo {
@@ -220,6 +222,7 @@ export default class DatabaseStorage implements IStorage {
                 SELECT u.nickname, r.value
                 FROM ratings r
                 JOIN users u ON u.id = r.user_id
+                 WHERE u.removed_at IS NULL
                 ORDER BY r.value DESC
                 LIMIT 5
             `);

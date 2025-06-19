@@ -1,5 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { deleteLeaderboardCach } from "../publicHandlers/auth/registration";
+import { deleteLeaderboardCach } from "../publicHandlers/get/getRatingLeaders";
+
 
 export async function updateRating(request: FastifyRequest, reply: FastifyReply) {
     const payload = request.body as Array<{ id: number; rating: number }>;

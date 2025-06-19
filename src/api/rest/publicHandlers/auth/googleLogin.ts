@@ -4,8 +4,8 @@ import UserCreateForm from '../../../../models/UserCreateForm';
 import { AuthProvider } from '../../../../storage/DatabaseStorage';
 import {generateJwtTokenPair} from '../../../../pkg/jwt/JwtGenerator';
 import Config from '../../../../config/Config';
-import { deleteLeaderboardCach } from './registration';
 import { randomInt } from 'crypto';
+import { deleteLeaderboardCach } from '../get/getRatingLeaders';
 
 type GoogleUser = {
   id: string
@@ -111,15 +111,21 @@ export async function googleLoginExchange(request: FastifyRequest, reply: Fastif
   const storage = request.server.storage;
 
   let user = undefined;
+  // if user doesn't exist, it will return undefined. 
+  // //if it exist and removed_at IS NOT NULL, it will throw error UserNotFound
   try {
     user = storage.getUserByEmail(email);
   } catch (err:any) {
-    return reply.code(500).send();
+    if (err.message === "UserNotFound")
+      return reply.code(409).send();
+    else
+      return reply.code(500).send();
   }
-
-  const isAvalaibe = storage.isUserAvailable(user.id);
-  if (!isAvalaibe) // this email alredy exist in db, but user has removed_at != null
-    return reply.code(409).send();
+  
+  // const isAvalaibe = storage.isUserAvailable(user.id);
+  // console.log("isAvalaibe: ", isAvalaibe);
+  // if (!isAvalaibe) // this email alredy exist in db, but user has removed_at != null
+  //   return reply.code(409).send();
 
   let userId = undefined;
   if (!user) { // register new user
@@ -134,20 +140,39 @@ export async function googleLoginExchange(request: FastifyRequest, reply: Fastif
     } catch (error: any) {
       return reply.code(400).send({ message: 'Invalid input data in google login'});
     }
+
+    let response: automateRegistartionResponse;
+    response = automateUserRegistartion(form, googleUser);
+    if (!response.userId)
+      return reply.code(response.code).send();
+
+    const deleteStatus = deleteLeaderboardCach();
+    if (!deleteStatus)
+      return reply.code(500).send();
+    userId = response.userId;
+    console.log("registered user with google login and cleaned the cach of leaders!");
   }
 
     // Generate JWT
-    if (user)
-      userId = user.id;
-    const tokenPair = await generateJwtTokenPair( {userId} );
-    if (!tokenPair) {
-      return reply.code(500).send();
-    }
+  if (user && user.id) // it's alredy registered, just have to be logged in 
+    userId = user.id;
 
-    // return 200 if just logged in (did not create new data)
-    return reply.code(201).send({
-        accessToken: tokenPair.accessToken,
-        refreshToken: tokenPair.refreshToken
-      });
+  const tokenPair = await generateJwtTokenPair( {userId} );
+  if (!tokenPair) {
+    return reply.code(500).send();
+  }
+
+  // return 200 if just logged in (did not create new data)
+  let status: number;
+  if (user)
+    status = 200;
+  else
+  status = 201;
+
+  return reply.code(status).send({
+      accessToken: tokenPair.accessToken,
+      refreshToken: tokenPair.refreshToken
+    });
+
 
 }

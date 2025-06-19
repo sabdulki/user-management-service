@@ -2,19 +2,13 @@ import { FastifyRequest, FastifyReply } from 'fastify'
 import UserCreateForm from '../../../../models/UserCreateForm';
 import {generateJwtTokenPair} from '../../../../pkg/jwt/JwtGenerator';
 import {otpLogic} from './login';
-import { CACHE_KEY } from '../get/getRatingLeaders';
+import { deleteLeaderboardCach } from '../get/getRatingLeaders';
 import app from '../../../../app';
+
 
 const DEFAULT_AVATAR_REL_PATH = 'avatars/default.png';
 
-export async function deleteLeaderboardCach(): Promise<boolean> {
-	const radishClient = app.cache;
-	const response = await radishClient.delete(CACHE_KEY);
-	if (response.status != 200)
-		return false;
-	console.log("deleted! CACHE_KEY");
-	return true;
-}
+
 
 export async function saveRegisteredUser(form: UserCreateForm): Promise<{userId: number | undefined, status: number}>{
 	let userId = undefined;

@@ -2,9 +2,9 @@ import { FastifyRequest, FastifyReply } from 'fastify'
 import {isTokenValid, TokenType, getTokenFromRequest, deleteJwtTokenPair} from '../../../../pkg/jwt/JwtGenerator';
 import { JwtPayload } from 'jsonwebtoken';
 import { deleteAvatar } from './../update/uploadAvatar';
+import { deleteLeaderboardCach } from '../get/getRatingLeaders';
 
 import { DEFAULT_AVATAR } from '../update/uploadAvatar';
-import { deleteLeaderboardCach } from '../auth/registration';
 
 export async function setUserRemoved(request: FastifyRequest, reply: FastifyReply) {
     const payload = await isTokenValid(request) as JwtPayload;
@@ -24,8 +24,8 @@ export async function setUserRemoved(request: FastifyRequest, reply: FastifyRepl
         const deleteStatus = deleteLeaderboardCach();
         if (!deleteStatus)
           return reply.code(500).send()
-        return reply.code(200).send();
     } catch (error: any) {
         return reply.code(404).send({ error });
     }
+    return reply.code(200).send();
 }

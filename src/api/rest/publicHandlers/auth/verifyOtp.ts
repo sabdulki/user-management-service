@@ -4,7 +4,7 @@ import RadishClient from '../../../../pkg/cache/client/client';
 import { generateJwtTokenPair, isTokenValid } from '../../../../pkg/jwt/JwtGenerator';
 import UserCreateForm from '../../../../models/UserCreateForm';
 import RadishResponse from '../../../../pkg/cache/client/response';
-import { deleteLeaderboardCach, saveRegisteredUser } from './registration';
+import { saveRegisteredUser } from './registration';
 import { RadishSingleton } from '../../../../pkg/cache/RadishSingleton';
 
 export class OtpManager {

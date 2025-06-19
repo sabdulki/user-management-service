@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import {isTokenValid, TokenType, getTokenFromRequest, deleteJwtTokenPair} from '../../../../pkg/jwt/JwtGenerator';
-import { deleteLeaderboardCach } from '../auth/registration';
+import { deleteLeaderboardCach } from '../get/getRatingLeaders';
 
 
 export async function deleteUser(request: FastifyRequest, reply: FastifyReply) 
