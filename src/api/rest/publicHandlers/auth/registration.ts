@@ -50,12 +50,18 @@ export async function saveRegisteredUser(form: UserCreateForm): Promise<{userId:
 
 function isFormDataValid(form: UserCreateForm): boolean {
 
-	const nickname = app.storage.getUserByNickname(form.nickname);
-	if (nickname != undefined)
+	try {
+		const nickname = app.storage.getUserByNickname(form.nickname);
+		if (nickname !== undefined)
+			return false;
+		const email = app.storage.getUserByEmail(form.email);
+		if (email !== undefined)
+			return false;
+	} catch (err:any) {
+		// console.log(err);
+		// if (err.message === 'UserNotFound')
 		return false;
-	const email = app.storage.getUserByEmail(form.email);
-	if (email != undefined)
-		return false;
+	}
 	return true;
 }
 

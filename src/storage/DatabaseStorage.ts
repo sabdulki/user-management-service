@@ -123,29 +123,49 @@ export default class DatabaseStorage implements IStorage {
     }
 
     getUserById(id: number): UserBaseInfo {
-        let user: any;
+        let user;
         try {
             const stmt = this._db.prepare(`
-                SELECT u.id, u.nickname, u.avatar, u.is_online, u.removed_at, r.value as rating
+                SELECT u.id, u.nickname, u.avatar, u.is_online, r.value as rating
                 FROM users u
                 JOIN ratings r ON u.id = r.user_id
-                WHERE u.id = ?
+                WHERE u.id = ? AND u.removed_at IS NULL
             `);
             user = stmt.get(id); 
         } catch (err: any) {
-            throw new Error('DatabaseFailure');
+            throw new Error('Failed to get user');
         }
-    
-        if (!user) { // if user doesn't exist
+
+        if (!user) {
             throw new Error('UserNotFound');
         }
-    
-        if (user.removed_at !== null) {
-            throw new Error('UserIsRemoved');
-        }
-    
         return user as UserBaseInfo;
     }
+
+    // getUserById(id: number): UserBaseInfo {
+    //     let user: any;
+    //     try {
+    //         const stmt = this._db.prepare(`
+    //             SELECT u.id, u.nickname, u.avatar, u.is_online, u.removed_at, r.value as rating
+    //             FROM users u
+    //             JOIN ratings r ON u.id = r.user_id
+    //             WHERE u.id = ?
+    //         `);
+    //         user = stmt.get(id); 
+    //     } catch (err: any) {
+    //         throw new Error('DatabaseFailure');
+    //     }
+    
+    //     if (!user) { // if user doesn't exist
+    //         throw new Error('UserNotFound');
+    //     }
+    
+    //     if (user.removed_at !== null) {
+    //         throw new Error('UserIsRemoved');
+    //     }
+    
+    //     return user as UserBaseInfo;
+    // }
     
     getEmailById(userId: number): string | undefined {
         const result = this._db.prepare('SELECT email FROM users WHERE id = ?').get(userId) as { email: string } | undefined;
@@ -297,6 +317,9 @@ export default class DatabaseStorage implements IStorage {
         }
     }
     
+    // it return false, if user doesn't exist ot removed_at IS NOT NULL
+    // !!{} → true
+    // !!undefined → false
     isUserAvailable(userId: number): boolean {
         // Оператор !! преобразует значение в логическое: true, если объект существует, и false, если нет.
         const stmt = this._db.prepare(`

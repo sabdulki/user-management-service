@@ -109,15 +109,17 @@ export async function googleLoginExchange(request: FastifyRequest, reply: Fastif
   
   // Check if user exists in DB
   const storage = request.server.storage;
+
   let user = undefined;
   try {
     user = storage.getUserByEmail(email);
   } catch (err:any) {
-    if (err.message === "UserIsRemoved")
-      return reply.code(409).send(); // or another code
-    else if (err.message === "DatabaseFailure")
-      return reply.code(500).send(); // or another code
+    return reply.code(500).send();
   }
+
+  const isAvalaibe = storage.isUserAvailable(user.id);
+  if (!isAvalaibe) // this email alredy exist in db, but user has removed_at != null
+    return reply.code(409).send();
 
   let userId = undefined;
   if (!user) { // register new user
