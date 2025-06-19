@@ -111,34 +111,39 @@ export default class DatabaseStorage implements IStorage {
     }
 
     getUserByEmail(email: string): UserBaseInfo | undefined {
-        // try {
+        try {
             const user = this._db.prepare('SELECT * FROM users WHERE email = ?').get(email) as UserBaseInfo;
             if (!user)
                 return undefined;
             const userId = user.id;
             return this.getUserById(userId);
-        // } catch (error) {
-        //     throw new Error('Failed to get user');
-        // }
+        } catch (error) {
+           throw error;
+        }
     }
 
     getUserById(id: number): UserBaseInfo {
-        let user;
+        let user: any;
         try {
             const stmt = this._db.prepare(`
-                SELECT u.id, u.nickname, u.avatar, u.is_online, r.value as rating
+                SELECT u.id, u.nickname, u.avatar, u.is_online, u.removed_at, r.value as rating
                 FROM users u
                 JOIN ratings r ON u.id = r.user_id
-                WHERE u.id = ? AND u.removed_at IS NULL
+                WHERE u.id = ?
             `);
             user = stmt.get(id); 
         } catch (err: any) {
-            throw new Error('Failed to get user');
+            throw new Error('DatabaseFailure');
         }
-
-        if (!user) {
+    
+        if (!user) { // if user doesn't exist
             throw new Error('UserNotFound');
         }
+    
+        if (user.removed_at !== null) {
+            throw new Error('UserIsRemoved');
+        }
+    
         return user as UserBaseInfo;
     }
     
@@ -181,10 +186,10 @@ export default class DatabaseStorage implements IStorage {
         }
     }
 
-    getUserProvider(userId: number): number {
+    getUserProvider(userId: number): number | undefined{
         const object = this._db.prepare('SELECT provider FROM users WHERE id = ?').get(userId) as { provider: number } | undefined ;
         if (!object) {
-            throw new Error('UserNotFound');
+            return undefined;
         }
         return object.provider;
     }
@@ -195,12 +200,12 @@ export default class DatabaseStorage implements IStorage {
                 SELECT u.nickname, r.value
                 FROM ratings r
                 JOIN users u ON u.id = r.user_id
+                WHERE u.removed_at IS NULL
                 ORDER BY r.value DESC
                 LIMIT 5
             `);
             const topPlayers = stmt.all() as { nickname: string, score: number }[];
-            console.log("topPlayers:", topPlayers);
-            return topPlayers;
+            return topPlayers; // if no users, returns empty list []
         } catch (err: any) {
             console.log("error in db in getRatingLeadres", err);
             return undefined;

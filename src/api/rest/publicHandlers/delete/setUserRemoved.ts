@@ -24,6 +24,7 @@ export async function setUserRemoved(request: FastifyRequest, reply: FastifyRepl
         const deleteStatus = deleteLeaderboardCach();
         if (!deleteStatus)
           return reply.code(500).send()
+        console.log("deleteLeaderboardCach in setUserRemoved");
         return reply.code(200).send();
     } catch (error: any) {
         return reply.code(404).send({ error });
