@@ -65,44 +65,44 @@ function automateUserRegistartion(form:UserCreateForm, googleUser: GoogleUser): 
 
 export async function googleLoginExchange(request: FastifyRequest, reply: FastifyReply) {
 
-  const body = request.body as { code: string, codeVerifier: string, redirectUri: string}
-  const code = body.code;
-  const codeVerifier = body.codeVerifier;
-  const redirectUri = body.redirectUri;
-  if (!code || !codeVerifier || !redirectUri)
-      return reply.code(400).send({ error: 'bad request' });
-  const configInstance = Config.getInstance();
+    const body = request.body as { code: string, codeVerifier: string, redirectUri: string}
+    const code = body.code;
+    const codeVerifier = body.codeVerifier;
+    const redirectUri = body.redirectUri;
+    if (!code || !codeVerifier || !redirectUri)
+        return reply.code(400).send({ error: 'bad request' });
+    const configInstance = Config.getInstance();
 
-  let userInfoRes;
-  try {
-    // Exchange code + verifier for access token
-    const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        client_id: configInstance.getGoogleClientId(),
-        client_secret: configInstance.getGoogleClientSecret(),
-        code,
-        code_verifier: codeVerifier,
-        grant_type: 'authorization_code',
-        redirect_uri: redirectUri
-      }).toString()
-    });
+    let userInfoRes;
+    try {
+        // Exchange code + verifier for access token
+        const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({
+            client_id: configInstance.getGoogleClientId(),
+            client_secret: configInstance.getGoogleClientSecret(),
+            code,
+            code_verifier: codeVerifier,
+            grant_type: 'authorization_code',
+            redirect_uri: redirectUri
+          }).toString()
+        });
 
-    const token = await tokenRes.json() as GoogleTokenResponse;
+        const token = await tokenRes.json() as GoogleTokenResponse;
 
-    if (!token || !token.access_token) {
-      return reply.status(400).send({ error: 'Token exchange failed' });
-    }
-    
-    userInfoRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-        headers: {
-            Authorization: `Bearer ${token.access_token}`
+        if (!token || !token.access_token) {
+          return reply.status(400).send({ error: 'Token exchange failed' });
         }
-    })
-  } catch (err: any) {
-    return reply.code(500).send(); // or another code
-  }
+        
+        userInfoRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+            headers: {
+                Authorization: `Bearer ${token.access_token}`
+            }
+        })
+    } catch (err: any) {
+        return reply.code(500).send(); // or another code
+    }
     
   const googleUser = await userInfoRes.json() as GoogleUser;
   const email = googleUser.email;
@@ -134,39 +134,20 @@ export async function googleLoginExchange(request: FastifyRequest, reply: Fastif
     } catch (error: any) {
       return reply.code(400).send({ message: 'Invalid input data in google login'});
     }
+  }
 
-    let response: automateRegistartionResponse;
-    response = automateUserRegistartion(form, googleUser);
-    if (!response.userId)
-      return reply.code(response.code).send();
-
-    const deleteStatus = deleteLeaderboardCach();
-    if (!deleteStatus)
+    // Generate JWT
+    if (user)
+      userId = user.id;
+    const tokenPair = await generateJwtTokenPair( {userId} );
+    if (!tokenPair) {
       return reply.code(500).send();
-    userId = response.userId;
-    console.log("registered user with google login and cleaned the cach of leaders!");
-  }
+    }
 
-  if (user && user.id) // it's alredy registered, just have to be logged in 
-    userId = user.id;
-  else 
-    return reply.code(500).send({"message": "userid is not defined"});
-
-  const tokenPair = await generateJwtTokenPair( {userId} );
-  if (!tokenPair) {
-    return reply.code(500).send();
-  }
-
-  // return 200 if just logged in (did not create new data)
-  let status: number;
-  if (user)
-    status = 200;
-  else
-  status = 201;
-
-  return reply.code(status).send({
-      accessToken: tokenPair.accessToken,
-      refreshToken: tokenPair.refreshToken
-    });
+    // return 200 if just logged in (did not create new data)
+    return reply.code(201).send({
+        accessToken: tokenPair.accessToken,
+        refreshToken: tokenPair.refreshToken
+      });
 
 }

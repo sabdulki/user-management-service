@@ -111,15 +111,15 @@ export default class DatabaseStorage implements IStorage {
     }
 
     getUserByEmail(email: string): UserBaseInfo | undefined {
-        try {
+        // try {
             const user = this._db.prepare('SELECT * FROM users WHERE email = ?').get(email) as UserBaseInfo;
             if (!user)
                 return undefined;
             const userId = user.id;
             return this.getUserById(userId);
-        } catch (error) {
-           throw error;
-        }
+        // } catch (error) {
+        //     throw new Error('Failed to get user');
+        // }
     }
 
     getUserById(id: number): UserBaseInfo {
@@ -206,10 +206,10 @@ export default class DatabaseStorage implements IStorage {
         }
     }
 
-    getUserProvider(userId: number): number | undefined{
+    getUserProvider(userId: number): number {
         const object = this._db.prepare('SELECT provider FROM users WHERE id = ?').get(userId) as { provider: number } | undefined ;
         if (!object) {
-            return undefined;
+            throw new Error('UserNotFound');
         }
         return object.provider;
     }
@@ -220,12 +220,12 @@ export default class DatabaseStorage implements IStorage {
                 SELECT u.nickname, r.value
                 FROM ratings r
                 JOIN users u ON u.id = r.user_id
-                WHERE u.removed_at IS NULL
                 ORDER BY r.value DESC
                 LIMIT 5
             `);
             const topPlayers = stmt.all() as { nickname: string, score: number }[];
-            return topPlayers; // if no users, returns empty list []
+            console.log("topPlayers:", topPlayers);
+            return topPlayers;
         } catch (err: any) {
             console.log("error in db in getRatingLeadres", err);
             return undefined;

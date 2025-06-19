@@ -39,10 +39,7 @@ export async function updateUserPassword(request: FastifyRequest, reply: Fastify
         return reply.code(400).send(); // bad request
 
     const provider = storage.getUserProvider(userId);
-    if (!provider) {
-        status = 404;
-    }
-    else if (provider === 1 && !oldPassword) {
+    if (provider === 1 && !oldPassword) {
         status = setNewUserPassword(storage, userId, newPassword);
     }
     else if ((provider === 0 && !oldPassword) || !oldPassword) {

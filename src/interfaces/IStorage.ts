@@ -38,7 +38,6 @@ interface IStorage {
     getInvitationsList(userId: number): InvitationListForm[] | undefined;
     getInvitationId(user1: number, user2: number): number;
     getFriendsList(issuerId: number): undefined | UserBaseInfo[] ;
-    getUserProvider(userId: number): number | undefined;
 
     // update
     updateNicknmae(userId: number, nickname: string): void;
