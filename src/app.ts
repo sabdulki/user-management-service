@@ -5,7 +5,6 @@ import cors from '@fastify/cors'
 import fastifyOauth2 from '@fastify/oauth2'
 import fastifyStatic from '@fastify/static'
 import fastifyMultipart from '@fastify/multipart'
-import multipart from '@fastify/multipart'
 import { registerRestRoutes } from './api/rest/rest'
 import DatabaseStorage from './storage/DatabaseStorage'
 import loggerMiddleware from "./pkg/middlewares/loggerMiddleware"
@@ -59,10 +58,6 @@ async function setupStorage() {
   await declareCache()
 }
 
-
-
-
-
 async function main() 
 {
   await app.register(dbConnectorPlugin);
@@ -79,7 +74,6 @@ async function main()
     root: path.join(__dirname, '../public'), // ROOT
     prefix: '/auth/public/', // ALWAYS END WITH '/'
   });
-  // await app.register(multipart)
   await app.register(fastifyMultipart, {
     limits: {
       fileSize: 2 * 1024 * 1024 // Optional: enforce 2MB at plugin level too
@@ -87,19 +81,6 @@ async function main()
     throwFileSizeLimit: true,
   });
   
-  app.setErrorHandler((error, request, reply) => {
-    if (
-      error.code === 'FST_REQ_FILE_TOO_LARGE' || // this is thrown when file is too big
-      error.message?.includes('File too large')
-    ) {
-      return reply.code(413).send({ message: 'File too large (max 2MB)' });
-    }
-  
-    // fallback: log and rethrow
-    request.log.error(error);
-    return reply.code(500).send({ message: 'Internal Server Error' });
-  });
-
   try {
     const cache = RadishSingleton.getInstance();
     setUpJwtGenerator(cache);
@@ -142,9 +123,5 @@ async function main()
 }
 
 main()
-
-
-
-
 
 export default app;
