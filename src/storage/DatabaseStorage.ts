@@ -612,6 +612,7 @@ export default class DatabaseStorage implements IStorage {
     rejectInvitationTransaction(recordId: number, invitedUserId: number): void {
         const transaction = this._db.transaction(() => {
             this.changeInvitationStatus(recordId, invitedUserId, InvitationStatus.REJECT);
+            this.disableInvitation(recordId);
         });
         transaction();
     }
