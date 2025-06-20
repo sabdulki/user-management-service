@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { plainToInstance } from 'class-transformer';
-import { validateOrReject } from 'class-validator';
+import { Matches, validateOrReject } from 'class-validator';
 import { IsEmail, IsString, MinLength, MaxLength, IsNotEmpty } from 'class-validator';
 import bcrypt from 'bcryptjs';
 import app from '../app'
@@ -11,6 +11,7 @@ import IStorage from 'interfaces/IStorage';
 // POST
 class UserLoginForm {
     @IsString()
+    @Matches(/^\S+$/, { message: 'Nickname must not contain whitespace' })
     nickname: string;
     
     @IsString()

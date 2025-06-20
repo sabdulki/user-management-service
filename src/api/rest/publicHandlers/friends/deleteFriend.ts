@@ -18,7 +18,7 @@ export async function deleteFriend(request: FastifyRequest, reply: FastifyReply)
 
     try {
         storage.deleteFriendTransaction(userId, userToDelete);
-    } catch ( error: any) {
+    } catch (error: any) {
         if (error.message === 'User not found' || error.message === 'No such friendship exists' || error.message === 'Failed to get invitation') {
             return reply.code(404).send();
         } else {

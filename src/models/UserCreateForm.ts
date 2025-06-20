@@ -1,6 +1,5 @@
 import { plainToInstance } from 'class-transformer';
-import { isNumber, validateOrReject } from 'class-validator';
-import { IsEmail, IsString, MinLength, IsInt, IsIn, ValidateIf, MaxLength, IsNotEmpty } from 'class-validator';
+import { validateOrReject, IsEmail, IsString, MinLength, IsInt, IsIn, ValidateIf, Matches, MaxLength, IsNotEmpty } from 'class-validator';
 import bcrypt from 'bcryptjs';
 import { AuthProvider } from './../storage/DatabaseStorage';
 
@@ -13,6 +12,7 @@ export default class UserCreateForm {
     provider: number;
 
     @IsString()
+    @Matches(/^\S+$/, { message: 'Nickname must not contain whitespace' })
     nickname: string;
   
     @IsEmail()
