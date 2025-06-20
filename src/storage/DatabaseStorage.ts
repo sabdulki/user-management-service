@@ -136,7 +136,7 @@ export default class DatabaseStorage implements IStorage {
         let user;
         try {
             const stmt = this._db.prepare(`
-                SELECT u.id, u.nickname, u.avatar, u.is_online, r.value as rating
+                SELECT u.id, u.nickname, u.avatar, u.is_online AS isOnline, r.value as rating
                 FROM users u
                 JOIN ratings r ON u.id = r.user_id
                 WHERE u.id = ? AND u.removed_at IS NULL
