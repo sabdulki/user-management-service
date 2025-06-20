@@ -13,6 +13,7 @@ import Config from './config/Config';
 import path, {dirname} from 'path'
 import RadishClient from './pkg/cache/client/client';
 import { RadishSingleton } from './pkg/cache/RadishSingleton';
+import registerWebSocketRoutes from './api/ws/ws';
 
 
 // export function setupRadishClientFromConfig(): RadishClient {
@@ -28,6 +29,7 @@ dotenv.config();
 
 const app = Fastify()
 const registerRoutesPlugin = fp(registerRestRoutes)
+const registerWSRoutesPlugin = fp(registerWebSocketRoutes)
 const dbConnectorPlugin = fp(setupStorage)
 
 async function declareDataBase() {
@@ -60,6 +62,7 @@ async function main()
 {
   await app.register(dbConnectorPlugin);
   await app.register(registerRoutesPlugin);
+  await app.register(registerWSRoutesPlugin);
   await app.register(cors, {
     origin: true, // разрешить ВСЕ источники
     methods: ['GET', 'POST', 'PUT',' PATCH', 'DELETE', 'OPTIONS']

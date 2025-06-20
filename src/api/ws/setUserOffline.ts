@@ -1,9 +1,9 @@
-import Client from "pkg/ws/client";
+import Client from "../../pkg/ws/client";
 import WebSocketRequest from "pkg/ws/request";
-import { sendError, WS_CLIENT } from "./ws";
+import { sendError, WS_CLIENT } from "./wsSetup";
 import { isTokenValid } from "pkg/jwt/JwtGenerator";
-import { StateValue } from "storage/DatabaseStorage";
-import app from "app";
+import { StateValue } from "../../storage/DatabaseStorage";
+import app from "../../app";
 
 
 export async function setUserOffline(client:Client) {
