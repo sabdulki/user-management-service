@@ -29,8 +29,9 @@ export async function inviteFriend (request: FastifyRequest, reply: FastifyReply
     
     const storage = request.server.storage;
     let senderNickname: string;
+    let senderUser: UserBaseInfo;
     try {
-        const senderUser = storage.getUserById(payload.userId) as UserBaseInfo;
+        senderUser = storage.getUserById(payload.userId) as UserBaseInfo;
         senderNickname = senderUser.nickname;
     } catch(err: any) {
         if (err.message === 'User not found') {
@@ -51,6 +52,10 @@ export async function inviteFriend (request: FastifyRequest, reply: FastifyReply
         recieverEmail = storage.getEmailById(recieverId);
     } catch (err: any) {
         return reply.code(404).send({message: "Failed to get reciever data"});
+    }
+
+    if (senderUser.id === recieverId) {
+        return reply.code(400).send({message: "Cannot invite yourself"});
     }
 
     try {
