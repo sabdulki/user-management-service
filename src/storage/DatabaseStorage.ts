@@ -408,6 +408,7 @@ export default class DatabaseStorage implements IStorage {
     addFriends(firstUser:number, secondUser: number):void {
         const [userA, userB] = [firstUser, secondUser].sort((a, b) => a - b);
         try {
+            console.log("about to add friends: userA: ", userA, ", userB:", userB);
             this._db.prepare(
                 'INSERT INTO friends (user_a, user_b) VALUES (?, ?)'
             ).run(userA, userB);
@@ -477,11 +478,12 @@ export default class DatabaseStorage implements IStorage {
     }
     
     getInvitationId(user1: number, user2: number): number {
-        const [userA, userB] = [user1, user2].sort((a, b) => a - b);
         try {
             const result = this._db.prepare(`
-                SELECT id AS recordId FROM invitations WHERE (sender_id = ? AND receiver_id = ? AND disabled_at IS NULL)
-                `).get(userA, userB) as { recordId: number } | undefined;
+                SELECT id AS recordId FROM invitations
+                WHERE ((sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?))
+                AND disabled_at IS NULL
+            `).get(user1, user2, user2, user1) as { recordId: number } | undefined;
             if (!result || !result.recordId)
                 throw new Error('Failed to get invitation');
             console.log("recordId: ", result.recordId);
