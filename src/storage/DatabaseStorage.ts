@@ -16,10 +16,18 @@ export enum InvitationStatus {
     ACCEPT = 0,
     REJECT = 1
 }
+
 export enum StateValue {
     OFFLINE = 0,
-    ONLINE = 1
+    ONLINE = 1,
 }
+
+// export const StateValue = {
+//     OFFLINE: false,
+//     ONLINE: true,
+// } as const;
+  
+// export type StateValue = typeof StateValue[keyof typeof StateValue];
 
 export default class DatabaseStorage implements IStorage {
     private _db: DatabaseType
@@ -452,8 +460,15 @@ export default class DatabaseStorage implements IStorage {
                     WHERE user_a = ? OR user_b = ?
                 )
             `);
-            const rows = stmt.all(issuerId, issuerId, issuerId);
-            friends = rows as UserBaseInfo[];
+            const rawRows = stmt.all(issuerId, issuerId, issuerId);
+            friends = rawRows.map((row: any) => ({
+                id: row.id,
+                nickname: row.nickname,
+                avatar: row.avatar,
+                removed_at: row.removed_at,
+                rating: row.rating,
+                isOnline: Boolean(row.is_online),
+              })) as UserBaseInfo[];
             console.log(friends);
             return friends;
         } catch (err:any) {
@@ -618,9 +633,10 @@ export default class DatabaseStorage implements IStorage {
     }
 
     changeUserState(userId: number, state: StateValue):void {
+        console.log('Changing state for userId:', userId, 'to:', state);
         try {
             this._db.prepare(
-                'UPDATE users SET is_online = ? WHERE id = ? AND removed_at IS NULL)'
+               'UPDATE users SET is_online = ? WHERE id = ? AND removed_at IS NULL'
             ).run(state, userId);
         } catch (err:any) {
             throw new Error('DatabaseFailure');
