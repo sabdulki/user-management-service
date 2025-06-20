@@ -117,7 +117,7 @@ export async function googleLoginExchange(request: FastifyRequest, reply: Fastif
     user = storage.getUserByEmail(email);
   } catch (err:any) {
     if (err.message === "UserNotFound")
-      return reply.code(409).send();
+      return reply.code(403).send();
     else
       return reply.code(500).send();
   }
