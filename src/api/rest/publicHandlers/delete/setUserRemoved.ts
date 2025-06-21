@@ -14,7 +14,7 @@ export async function setUserRemoved(request: FastifyRequest, reply: FastifyRepl
     if (!request.server.storage.isUserAvailable(userId))
         return reply.code(404).send({error: "user is not avaliable"});
     try {
-        request.server.storage.setUserUnavalible(userId);
+        request.server.storage.setUserUnavalibleTransaction(userId);
         if (!deleteJwtTokenPair(request))
             return reply.code(404).send();
         const avatarPath = request.server.storage.getUserAvatar(userId);

@@ -17,6 +17,7 @@ interface IStorage {
     rejectInvitationTransaction(recordId: number, invitedUserId: number): void;
     deleteInvitationRecordTransaction(recordId: number): void;
     deleteFriendTransaction(userId: number, userToDelete: number): void;
+    setUserUnavalibleTransaction(userId: number): void ;
 
 
     // setters

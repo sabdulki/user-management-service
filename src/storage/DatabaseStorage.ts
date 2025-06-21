@@ -315,6 +315,15 @@ export default class DatabaseStorage implements IStorage {
     }
 
 
+    setUserUnavalibleTransaction(userId: number): void {
+        const tnx = this._db.transaction(() => {
+            this.changeUserState(userId, StateValue.OFFLINE);
+            this.setUserUnavalible(userId);
+        });
+
+        tnx();
+    }
+
     setUserUnavalible(userId: number): void {
         try {
             const removedAt = Math.floor(Date.now() / 1000)
