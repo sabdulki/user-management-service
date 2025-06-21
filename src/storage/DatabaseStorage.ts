@@ -583,6 +583,7 @@ export default class DatabaseStorage implements IStorage {
                 WHERE (i.sender_id = ? OR i.receiver_id = ?)
                 AND i.status IS NULL
                 AND i.disabled_at IS NULL
+                AND u.removed_at IS NULL
               `);
               
             const rows = stmt.all(userId, userId, userId, userId);
