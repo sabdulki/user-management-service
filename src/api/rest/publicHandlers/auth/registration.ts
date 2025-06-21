@@ -7,7 +7,8 @@ import app from '../../../../app';
 
 
 const DEFAULT_AVATAR_REL_PATH = 'avatars/default.png';
-
+export const MAX_NICKNAME_LENGTH = 20;
+export const NICKNAME_REGEX = /^[a-z0-9_]+$/;
 
 
 export async function saveRegisteredUser(form: UserCreateForm): Promise<{userId: number | undefined, status: number}>{

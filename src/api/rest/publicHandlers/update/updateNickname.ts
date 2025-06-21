@@ -1,10 +1,10 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { isTokenValid } from '../../../../pkg/jwt/JwtGenerator'
 import UserBaseInfo from 'types/UserBaseInfo';
+import { MAX_NICKNAME_LENGTH, NICKNAME_REGEX } from '../auth/registration';
 
 function isNicknameValid(nickname: string): boolean {
-    const nicknameRegex = /^[a-z0-9_]+$/;
-    return nickname.length <= 12 && nicknameRegex.test(nickname);
+    return nickname.length <= MAX_NICKNAME_LENGTH && NICKNAME_REGEX.test(nickname);
 }
 
 export async function updateUserNickname(request: FastifyRequest, reply: FastifyReply) 

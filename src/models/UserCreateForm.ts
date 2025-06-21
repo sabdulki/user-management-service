@@ -2,6 +2,7 @@ import { plainToInstance } from 'class-transformer';
 import { validateOrReject, IsEmail, IsString, MinLength, IsInt, IsIn, ValidateIf, Matches, MaxLength, IsNotEmpty } from 'class-validator';
 import bcrypt from 'bcryptjs';
 import { AuthProvider } from './../storage/DatabaseStorage';
+import { MAX_NICKNAME_LENGTH, NICKNAME_REGEX } from '../api/rest/publicHandlers/auth/registration';
 
 //  in JavaScript/TypeScript, setters are called whenever you assign a value to a property.
 
@@ -12,8 +13,8 @@ export default class UserCreateForm {
     provider: number;
 
     @IsString()
-    @Matches(/^[a-z0-9_]+$/, { message: 'Nickname must contain only lowercase letters, numbers, or underscores' })
-    @MaxLength(12, { message: 'Nickname must be at most 12 characters long' })
+    @Matches(NICKNAME_REGEX, { message: 'Nickname must contain only lowercase letters, numbers, or underscores' })
+    @MaxLength(MAX_NICKNAME_LENGTH, { message: 'Nickname must be at most 12 characters long' })
     nickname: string;
   
     @IsEmail()

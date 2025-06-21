@@ -5,14 +5,15 @@ import { IsEmail, IsString, MinLength, MaxLength, IsNotEmpty } from 'class-valid
 import bcrypt from 'bcryptjs';
 import app from '../app'
 import IStorage from 'interfaces/IStorage';
+import { MAX_NICKNAME_LENGTH, NICKNAME_REGEX } from '../api/rest/publicHandlers/auth/registration';
 
 //  in JavaScript/TypeScript, setters are called whenever you assign a value to a property.
 
 // POST
 class UserLoginForm {
   @IsString()
-  @Matches(/^[a-z0-9_]+$/, { message: 'Nickname must contain only lowercase letters, numbers, or underscores' })
-  @MaxLength(12, { message: 'Nickname must be at most 12 characters long' })
+  @Matches(NICKNAME_REGEX, { message: 'Nickname must contain only lowercase letters, numbers, or underscores' })
+  @MaxLength(MAX_NICKNAME_LENGTH, { message: 'Nickname must be at most 12 characters long' })
   nickname: string;
     
   @IsString()
@@ -44,6 +45,7 @@ class UserLoginForm {
         return new UserLoginForm(form.nickname, form.password)
       } catch (errors) {
         // which status code should be and how errors should be treated?
+        console.log(errors);
         throw new Error("Invalid data");
       }
   }

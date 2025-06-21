@@ -7,6 +7,8 @@ import Config from '../../../../config/Config';
 import { randomInt } from 'crypto';
 import { deleteLeaderboardCach } from '../get/getRatingLeaders';
 
+const INVALID_NICKNAME_CHARS_REGEX = /[^a-z0-9_]/g;
+
 type GoogleUser = {
   id: string
   email: string
@@ -127,13 +129,19 @@ export async function googleLoginExchange(request: FastifyRequest, reply: Fastif
   // if (!isAvalaibe) // this email alredy exist in db, but user has removed_at != null
   //   return reply.code(409).send();
 
+  const rawNickname = email.split('@')[0];           // "crazy.owl-3728"
+  const sanitizedNickname = rawNickname.replace(INVALID_NICKNAME_CHARS_REGEX, '_'); 
+  const finalNickname = sanitizedNickname.slice(0, 20);
+
+  console.log("sanitizedNickname:", sanitizedNickname);
+
   let userId = undefined;
   if (!user) { // register new user
     let form : UserCreateForm;
     try {
         form = await UserCreateForm.create({
             email: googleUser.email,
-            nickname: googleUser.email.split('@')[0],
+            nickname: finalNickname,
             password: '', // или undefined
             provider: AuthProvider.GOOGLE
           });
