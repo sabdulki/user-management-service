@@ -12,7 +12,8 @@ export default class UserCreateForm {
     provider: number;
 
     @IsString()
-    @Matches(/^\S+$/, { message: 'Nickname must not contain whitespace' })
+    @Matches(/^[a-z0-9_]+$/, { message: 'Nickname must contain only lowercase letters, numbers, or underscores' })
+    @MaxLength(12, { message: 'Nickname must be at most 12 characters long' })
     nickname: string;
   
     @IsEmail()
