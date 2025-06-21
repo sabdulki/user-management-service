@@ -94,6 +94,7 @@ export async function loginHandler(request: FastifyRequest, reply: FastifyReply)
   try {
     form = await UserLoginForm.create(request.body) as UserLoginForm;
   } catch (error: any) {
+    console.log("here1");
     return reply.code(400).send({ message: 'Invalid input data'});
   }
   let user;
@@ -112,8 +113,10 @@ export async function loginHandler(request: FastifyRequest, reply: FastifyReply)
   }
   const userEmail = request.server.storage.getEmailById(userId);
   const uuid = await otpLogic({userId}, userEmail);
-  if (!uuid) // generation/saving in redis/sending to email failed
+  if (!uuid) {// generation/saving in redis/sending to email failed
+    console.log("here2")
     return reply.code(400).send();
+  }
   return reply.code(200).send({"key": uuid});
 }
 
