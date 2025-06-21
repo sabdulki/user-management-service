@@ -218,6 +218,7 @@ export default class DatabaseStorage implements IStorage {
 
     getUserProvider(userId: number): number {
         const object = this._db.prepare('SELECT provider FROM users WHERE id = ?').get(userId) as { provider: number } | undefined ;
+        console.log("object: ", object, ", object.provider: ", object?.provider);
         if (!object) {
             throw new Error('UserNotFound');
         }
