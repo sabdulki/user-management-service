@@ -15,16 +15,6 @@ import RadishClient from './pkg/cache/client/client';
 import { RadishSingleton } from './pkg/cache/RadishSingleton';
 import registerWebSocketRoutes from './api/ws/ws';
 
-
-// export function setupRadishClientFromConfig(): RadishClient {
-//   const configInstance = Config.getInstance();
-//   const cacheClient = new RadishClient({
-//       host: configInstance.getRadishHost(),
-//       port: configInstance.getRadishPort(),
-//     })
-//   return cacheClient;
-// }
-
 dotenv.config();
 
 const app = Fastify()
@@ -53,7 +43,6 @@ async function declareCache() {
 }
 
 async function setupStorage() {
-  // const isProduction = process.env.MODE === 'production'
   await declareDataBase();
   await declareCache()
 }
@@ -64,19 +53,17 @@ async function main()
   await app.register(registerRoutesPlugin);
   await app.register(registerWSRoutesPlugin);
   await app.register(cors, {
-    origin: true, // разрешить ВСЕ источники
+    origin: true,
     methods: ['GET', 'POST', 'PUT',' PATCH', 'DELETE', 'OPTIONS']
   });
 
-  // Берёт root — /path/to/project/public (твой ../public из __dirname)
-  // Склеивает root и путь после префикса
   await app.register(fastifyStatic, {
-    root: path.join(__dirname, '../public'), // ROOT
-    prefix: '/auth/public/', // ALWAYS END WITH '/'
+    root: path.join(__dirname, '../public'),
+    prefix: '/auth/public/',
   });
   await app.register(fastifyMultipart, {
     limits: {
-      fileSize: 2 * 1024 * 1024 // Optional: enforce 2MB at plugin level too
+      fileSize: 2 * 1024 * 1024
     },
     throwFileSizeLimit: true,
   });
@@ -103,7 +90,6 @@ async function main()
       },
       auth: fastifyOauth2.GOOGLE_CONFIGURATION
     },
-    // startRedirectPath: '/auth/api/rest/google/login',
     callbackUri: googleCallbackUrl,
     scope: ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile', 'openid']
   });
@@ -122,19 +108,16 @@ async function main()
   })
 
   process.on('SIGINT', async () => {
-    console.log('\nReceived SIGINT (Ctrl+C). Shutting down gracefully...')
     await app.close()
     process.exit(0)
   })
   
   process.on('SIGTERM', async () => {
-    console.log('\nReceived SIGTERM. Shutting down gracefully...')
     await app.close()
     process.exit(0)
   })
   
   process.on('uncaughtException', (err) => {
-    console.error('Uncaught Exception:', err)
     process.exit(1)
   })
 }
