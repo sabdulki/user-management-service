@@ -327,6 +327,16 @@ export default class DatabaseStorage implements IStorage {
             if (result.changes === 0) {
                 throw new Error("User not found");
             }
+            const invitations = this._db.prepare(`
+                SELECT id FROM invitations
+                WHERE (sender_id = ? OR receiver_id = ?)
+                  AND disabled_at IS NULL
+            `).all(userId, userId) as { id: number }[];
+    
+            for (const invite of invitations) {
+                this.disableInvitation(invite.id);
+            }
+    
         } catch (error) {
             throw new Error('Failed to delete user');
         }
