@@ -88,7 +88,7 @@ class JwtGenerator {
 		const status = await this.radishClient.get(key);
 		const value = status?.value;
 		if (status.status != 200) {
-			console.log(status);
+			// console.log(status);
 			throw JwtCachError;
 		}
 		try {
@@ -113,14 +113,14 @@ class JwtGenerator {
 async function deleteJwtToken(request: FastifyRequest, type: TokenType): Promise<boolean> {
 	const token = await getTokenFromRequest(request, type);
 	if (!token) {
-		console.log(`${type} token extraction from request failed`);
+		// console.log(`${type} token extraction from request failed`);
 		return false;
 	}
 	try {
 		const insatnce = JwtGenerator.getInstance();
 		await insatnce.deleteToken(`${type}-${token}`);
 	} catch (err: any) {
-		console.log(err);
+		// console.log(err);
 		return false;
 	}
 	return true;
@@ -162,7 +162,7 @@ async function isTokenValid(request: FastifyRequest | string, type: TokenType = 
 	}
 
 	if (!token) {
-		console.log(`${type} token extraction from request failed`);
+		// console.log(`${type} token extraction from request failed`);
 		return undefined;
 	}
 	try {
