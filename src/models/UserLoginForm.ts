@@ -44,8 +44,6 @@ class UserLoginForm {
         await validateOrReject(form);
         return new UserLoginForm(form.nickname, form.password)
       } catch (errors) {
-        // which status code should be and how errors should be treated?
-        console.log(errors);
         throw new Error("Invalid data");
       }
   }

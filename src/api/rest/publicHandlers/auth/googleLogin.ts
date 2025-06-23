@@ -133,7 +133,6 @@ export async function googleLoginExchange(request: FastifyRequest, reply: Fastif
   const sanitizedNickname = rawNickname.replace(INVALID_NICKNAME_CHARS_REGEX, '_'); 
   const finalNickname = sanitizedNickname.slice(0, 20);
 
-  console.log("sanitizedNickname:", sanitizedNickname);
 
   let userId = undefined;
   if (!user) { // register new user
@@ -158,7 +157,6 @@ export async function googleLoginExchange(request: FastifyRequest, reply: Fastif
     if (!deleteStatus)
       return reply.code(500).send();
     userId = response.userId;
-    console.log("registered user with google login and cleaned the cach of leaders!");
   }
 
     // Generate JWT

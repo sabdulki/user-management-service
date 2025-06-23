@@ -37,23 +37,17 @@ export async function updateUserPassword(request: FastifyRequest, reply: Fastify
     const { oldPassword, newPassword } = body;
     if (!newPassword)
         return reply.code(400).send(); // bad request
-    console.log("newPassword: '", newPassword, "', oldPassword: '", oldPassword, "'");
     const provider = storage.getUserProvider(userId);
-    console.log("provider: ", provider);
     if (provider === undefined) {
-        console.log("here");
         status = 404;
     }
     else if (provider === 1 && !oldPassword) {
-        console.log("here1");
         status = setNewUserPassword(storage, userId, newPassword);
     }
     else if ((provider === 0 && !oldPassword) || !oldPassword) {
-        console.log("here2");
         status = 400;
     }
     else {
-        console.log("here3");
        status = await updatePassword(storage, userId, newPassword, oldPassword);
     }
     return reply.code(status).send();

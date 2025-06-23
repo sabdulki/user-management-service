@@ -15,10 +15,10 @@ const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 async function deleteFile(path: string): Promise<boolean> {
 	try {
 	  await unlink(path);
-	  console.log('File deleted successfully');
+	//   console.log('File deleted successfully');
 	  return true;
 	} catch (err: any) {
-	  console.error('Error deleting file:', err);
+	//   console.error('Error deleting file:', err);
 	  return false;
 	}
 }
@@ -26,10 +26,10 @@ async function deleteFile(path: string): Promise<boolean> {
 export async function deleteAvatar(userId: number, userAvatar: string, storage: IStorage) {
 	if (!userAvatar.includes("https://lh3.googleusercontent.com/")) {
 		const userAvatarFullPath = path.join(__dirname, backPath, userAvatar);
-		console.log("userAvatarFullPath to be deleted: ", userAvatarFullPath)
+		// console.log("userAvatarFullPath to be deleted: ", userAvatarFullPath)
 		const isDeleted = await deleteFile(userAvatarFullPath);
 		if (!isDeleted) { // delete file if it exists ????? {
-			console.log("Failed to delete file");
+			// console.log("Failed to delete file");
 		}
 	}
 	storage.deleteUserAvatar(userId);
@@ -48,7 +48,6 @@ export async function uploadAvatar(request: FastifyRequest, reply: FastifyReply)
 	try {
 		userAvatar = storage.getUserAvatar(userId);
 	} catch (err: any) {
-		console.log(err);
 		return reply.code(401).send();
 	}
 
@@ -96,13 +95,12 @@ export async function uploadAvatar(request: FastifyRequest, reply: FastifyReply)
 	if (!relativePath) {
 		return reply.code(400).send({ message: 'No file uploaded' });
 	}
- 	console.log("userAvatar: ", userAvatar, "DEFAULT_AVATAR: ", DEFAULT_AVATAR);
+ 	// console.log("userAvatar: ", userAvatar, "DEFAULT_AVATAR: ", DEFAULT_AVATAR);
 	if (userAvatar && !userAvatar.includes("https://lh3.googleusercontent.com/") && userAvatar !== DEFAULT_AVATAR) {
 		await deleteAvatar(userId, userAvatar, storage);
 	}
 
 	try {
-		console.log("here!!!!");
 		storage.addUserAvatar(userId, relativePath);
 	} catch (error: any) {
 		return reply.code(500).send({ message: 'Failed to record avatar in storage' });

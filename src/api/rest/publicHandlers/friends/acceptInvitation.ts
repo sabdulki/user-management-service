@@ -23,10 +23,8 @@ export async function acceptInvitation (request: FastifyRequest, reply: FastifyR
     let senderUserBaseInfo: UserBaseInfo;
     try {
         senderUserBaseInfo = storage.acceptInvitationAndAddFriendsTransaction(recordId, invitedUserId);
-        console.log("senderUserBaseInfo2: ", senderUserBaseInfo)
         return reply.code(201).send({"senderUserBaseInfo": senderUserBaseInfo});
     } catch (error: any) {
-        console.log(error);
         if (error.message === 'User not found' || error.message === 'Invitation not found') {
             return reply.code(404).send();
         } else if (error.message === 'Invitation already exists' || error.message === 'Record already exists') {

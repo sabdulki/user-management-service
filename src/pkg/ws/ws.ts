@@ -51,10 +51,10 @@ export default class WebSocketProvider<T> {
         });
 
         console.log(`
-WebSocketProvider registered at route: '${this.route}'
-with this listeners:
-* ${[...this.listeners.keys()].map(key => `'${key}'\t--> ${this.listeners.get(key)?.name}`).join('\n* ')}\n
-`)
+            WebSocketProvider registered at route: '${this.route}'
+            with this listeners:
+            * ${[...this.listeners.keys()].map(key => `'${key}'\t--> ${this.listeners.get(key)?.name}`).join('\n* ')}\n
+        `)
     }
 
     private onConnectHandler(client: Client) {

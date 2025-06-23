@@ -33,6 +33,5 @@ export async function deleteLeaderboardCach(): Promise<boolean> {
 	const response = await radishClient.delete(CACHE_KEY);
 	if (response.status != 200)
 		return false;
-	console.log("deleted! CACHE_KEY");
 	return true;
 }

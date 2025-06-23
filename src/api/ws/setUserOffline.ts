@@ -15,7 +15,6 @@ export async function setUserOffline(client:Client) {
     try {
         app.storage.changeUserState(userId, StateValue.OFFLINE);
     } catch (err:any) {
-        console.log(err);
         sendError(client, "Failed to save state in db");
     }
 

@@ -42,7 +42,6 @@ export async function sendToEmail(bodyContent: emailBodyContent) : Promise<numbe
 
   const data = await response.json() as { error?: string; status?: number; };
   if (response.status !== 202) {
-    console.log("error data: ", data);
     return 400;
   }
 
@@ -77,11 +76,11 @@ export async function otpLogic(identifier: { userId?: number; form?: UserCreateF
     saveStatus = await OtpManagerInstance.saveUuidInRadish({ form: identifier.form }, uuid, otp, expireTime);
   }
   else {
-    console.log('Must provide either id or form');
+    // console.log('Must provide either id or form');
     return undefined;
   }
   if (saveStatus !== 200) {// saving in redis failed
-    console.log("saveUuidInRadish failed");
+    // console.log("saveUuidInRadish failed");
     return undefined;
   }
   return uuid;
@@ -94,7 +93,6 @@ export async function loginHandler(request: FastifyRequest, reply: FastifyReply)
   try {
     form = await UserLoginForm.create(request.body) as UserLoginForm;
   } catch (error: any) {
-    console.log("here1");
     return reply.code(400).send({ message: 'Invalid input data'});
   }
   let user;
@@ -114,7 +112,6 @@ export async function loginHandler(request: FastifyRequest, reply: FastifyReply)
   const userEmail = request.server.storage.getEmailById(userId);
   const uuid = await otpLogic({userId}, userEmail);
   if (!uuid) {// generation/saving in redis/sending to email failed
-    console.log("here2")
     return reply.code(400).send();
   }
   return reply.code(200).send({"key": uuid});

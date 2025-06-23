@@ -72,7 +72,6 @@ export default class DatabaseStorage implements IStorage {
               // This means nickname or email already exists (assuming there's a UNIQUE constraint)
               throw new Error('UserAlreadyExists');
             }
-            console.log('DatabaseFailure', error)
             throw new Error('DatabaseFailure');
             
           }
@@ -218,7 +217,6 @@ export default class DatabaseStorage implements IStorage {
 
     getUserProvider(userId: number): number {
         const object = this._db.prepare('SELECT provider FROM users WHERE id = ?').get(userId) as { provider: number } | undefined ;
-        console.log("object: ", object, ", object.provider: ", object?.provider);
         if (!object) {
             throw new Error('UserNotFound');
         }
@@ -236,10 +234,9 @@ export default class DatabaseStorage implements IStorage {
                 LIMIT 5
             `);
             const topPlayers = stmt.all() as { nickname: string, score: number }[];
-            console.log("topPlayers:", topPlayers);
+            // console.log("topPlayers:", topPlayers);
             return topPlayers;
         } catch (err: any) {
-            console.log("error in db in getRatingLeadres", err);
             return undefined;
             // throw new Error ("Failed to get leaders");
         }
@@ -281,7 +278,6 @@ export default class DatabaseStorage implements IStorage {
 
     addUserAvatar(userId: number, relativePath: string): void {
         try {
-            console.log("relativePath in db: ", relativePath);
             const stmt = this._db.prepare('UPDATE users SET avatar = ? WHERE id = ?');
             stmt.run(relativePath, userId) 
         } catch (error: any) {
@@ -301,7 +297,6 @@ export default class DatabaseStorage implements IStorage {
         try {
             this._db.prepare('UPDATE users SET avatar = NULL WHERE id = ?').run(userId);
         } catch (err:any) {
-            console.log(err);
         }
     }
 
@@ -309,7 +304,6 @@ export default class DatabaseStorage implements IStorage {
         try {
             this._db.prepare('DELETE FROM users WHERE id = ?').run(userId);
         } catch (err:any) {
-            console.log(err);
             throw new Error('Failed to delete user');
         }
     }
@@ -403,7 +397,6 @@ export default class DatabaseStorage implements IStorage {
             'SELECT status, sender_id AS senderId FROM invitations WHERE id = ? AND status IS NULL AND disabled_at IS NULL'
         ).get(recordId) as { status: number, senderId: number } | undefined ;
         if (!object || object.status === undefined || object.senderId === undefined){
-            console.log("object: ", object, "object.status: ", object?.status, "object.senderId: ", object?.senderId)
             throw new Error('Invitation not found');
         }
         try {
@@ -418,12 +411,10 @@ export default class DatabaseStorage implements IStorage {
     addFriends(firstUser:number, secondUser: number):void {
         const [userA, userB] = [firstUser, secondUser].sort((a, b) => a - b);
         try {
-            console.log("about to add friends: userA: ", userA, ", userB:", userB);
             this._db.prepare(
                 'INSERT INTO friends (user_a, user_b) VALUES (?, ?)'
             ).run(userA, userB);
         } catch (error: any) {
-            console.log(error);
             if (error.code === 'SQLITE_CONSTRAINT_FOREIGNKEY') {
               throw new Error('User not found');
             } else if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
@@ -441,7 +432,6 @@ export default class DatabaseStorage implements IStorage {
         ).get(recordId) as { senderId: number } | undefined ;
         if (!object)
             throw new Error('DatabaseFailure');
-        console.log(object);
         if (!object.senderId)
             throw new Error('User not found');
 
@@ -480,7 +470,7 @@ export default class DatabaseStorage implements IStorage {
                 rating: row.rating,
                 isOnline: Boolean(row.is_online),
               })) as UserBaseInfo[];
-            console.log(friends);
+            // console.log(friends);
             return friends;
         } catch (err:any) {
             throw new Error('DatabaseFailure');
@@ -496,7 +486,6 @@ export default class DatabaseStorage implements IStorage {
             `).get(user1, user2, user2, user1) as { recordId: number } | undefined;
             if (!result || !result.recordId)
                 throw new Error('Failed to get invitation');
-            console.log("recordId: ", result.recordId);
             return result.recordId;
         } catch(error:any) {
             throw new Error('Failed to get invitation');
@@ -588,7 +577,7 @@ export default class DatabaseStorage implements IStorage {
               
             const rows = stmt.all(userId, userId, userId, userId);
             invitations = rows as InvitationListForm[];
-            console.log(invitations);
+            // console.log(invitations);
             return invitations;
         } catch (err:any) {
             throw new Error('DatabaseFailure');
@@ -646,7 +635,7 @@ export default class DatabaseStorage implements IStorage {
     }
 
     changeUserState(userId: number, state: StateValue):void {
-        console.log('Changing state for userId:', userId, 'to:', state);
+        // console.log('Changing state for userId:', userId, 'to:', state);
         try {
             this._db.prepare(
                'UPDATE users SET is_online = ? WHERE id = ? AND removed_at IS NULL'

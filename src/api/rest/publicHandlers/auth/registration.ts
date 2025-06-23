@@ -20,17 +20,14 @@ export async function saveRegisteredUser(form: UserCreateForm): Promise<{userId:
 		storage.addUserAvatar(userId, DEFAULT_AVATAR_REL_PATH);
 	} catch (err: any) {
 	    if (err.message === 'UserAlreadyExists') {
-			  console.log('User already exists');
 			  status = 409;
 			return {userId, status};
 	    }
 	    if (err.message === 'DatabaseFailure') {
-			  console.log('DatabaseFailure');
 			  status = 500;
 			return {userId, status};
 	    }
 	    else {
-			  console.log(`Invalid data: ${err}`);
 			  status = 400;
 			return {userId, status};
 	    }

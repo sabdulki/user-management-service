@@ -33,7 +33,7 @@ export class OtpManager {
         const obj = JSON.parse(response?.value);
         if (!obj.otp) {
             status = 500;
-            console.log("otp is not provided in cash");
+            // console.log("otp is not provided in cash");
             return {userId, status};
         }
         if (obj.form) {
@@ -43,7 +43,7 @@ export class OtpManager {
             userId = obj.userId;
         else {
             status = 400;
-            console.log("neither userId nor form is provided in cash");
+            // console.log("neither userId nor form is provided in cash");
             return {userId, status};
         }
         
@@ -82,12 +82,12 @@ export class OtpManager {
             response = await OtpManager.radishClient.set(`uuid-${uuid}`, JSON.stringify({otp, form}), expireTime);
         }
         else {
-            console.log("Neither userId nor form provided");
+            // console.log("Neither userId nor form provided");
             return 400; // or throw an error
         }
 
         if (response.status !== 201){
-            console.log("radishClient set failed")
+            // console.log("radishClient set failed")
             return 500;
         }
 

@@ -8,7 +8,6 @@ import { emailBodyContent, sendToEmail } from '../auth/login';
 function setEmailBodyContent(recieverEmail: string, recieverNickname: string, senderNickname: string) {
     const websiteUrl = Config.getInstance().getWebsiteUrl(); 
     let bodyContent: emailBodyContent;
-    console.log("recieverEmail: ", recieverEmail, "recieverNickname: ", recieverNickname, "senderNickname: ", senderNickname,  "websiteUrl: ", websiteUrl)
     bodyContent = {
         email: recieverEmail,
         template: 'invitation',
@@ -61,7 +60,6 @@ export async function inviteFriend (request: FastifyRequest, reply: FastifyReply
     try {
         storage.createInvitationTransaction(payload.userId, recieverId);
     } catch (error: any) {
-        console.log(error)
         if (error.message === 'User not found') {
             return reply.code(404).send();
         } else if (error.message === 'Invitation already exists' || error.message === 'Already friends') {

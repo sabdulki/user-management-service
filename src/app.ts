@@ -72,7 +72,7 @@ async function main()
     const cache = RadishSingleton.getInstance();
     setUpJwtGenerator(cache);
   } catch (error : any) {
-    console.log(error);
+    // console.log(error);
     process.exit(1)
   }
 

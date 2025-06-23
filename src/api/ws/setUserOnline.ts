@@ -25,7 +25,6 @@ export async function setUserOnline(client:Client, request: WebSocketRequest<WS_
     try {
         app.storage.changeUserState(userId, StateValue.ONLINE);
     } catch (err:any) {
-        console.log(err);
         sendError(client, "Failed to save state in db");
     }
 
