@@ -1,6 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { isTokenValid } from '../../../../pkg/jwt/JwtGenerator'
-import UserBaseInfo from 'types/UserBaseInfo';
 import IStorage from 'interfaces/IStorage';
 
 function setNewUserPassword(storage: IStorage, userId: number, newPassword: string): number {

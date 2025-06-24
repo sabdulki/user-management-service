@@ -1,6 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import {isTokenValid}  from '../../../../pkg/jwt/JwtGenerator';
-import {InvitationStatus }from '../../../../storage/DatabaseStorage';
 import UserBaseInfo from 'types/UserBaseInfo';
 
 export async function getFriends(request: FastifyRequest, reply: FastifyReply) {

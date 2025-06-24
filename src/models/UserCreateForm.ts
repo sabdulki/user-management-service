@@ -1,5 +1,5 @@
 import { plainToInstance } from 'class-transformer';
-import { validateOrReject, IsEmail, IsString, MinLength, IsInt, IsIn, ValidateIf, Matches, MaxLength, IsNotEmpty } from 'class-validator';
+import { validateOrReject, IsEmail, IsString, MinLength, IsInt, IsIn, ValidateIf, Matches, MaxLength } from 'class-validator';
 import bcrypt from 'bcryptjs';
 import { AuthProvider } from './../storage/DatabaseStorage';
 import { MAX_NICKNAME_LENGTH, NICKNAME_REGEX } from '../api/rest/publicHandlers/auth/registration';

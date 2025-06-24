@@ -1,7 +1,6 @@
-import Config from '../../../../config/Config';
 import { FastifyRequest, FastifyReply } from 'fastify'
 import RadishClient from '../../../../pkg/cache/client/client';
-import { generateJwtTokenPair, isTokenValid } from '../../../../pkg/jwt/JwtGenerator';
+import { generateJwtTokenPair } from '../../../../pkg/jwt/JwtGenerator';
 import UserCreateForm from '../../../../models/UserCreateForm';
 import RadishResponse from '../../../../pkg/cache/client/response';
 import { saveRegisteredUser } from './registration';

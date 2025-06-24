@@ -1,6 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { isTokenValid } from '../../../../pkg/jwt/JwtGenerator'
-import UserBaseInfo from 'types/UserBaseInfo';
 import { MAX_NICKNAME_LENGTH, NICKNAME_REGEX } from '../auth/registration';
 import { deleteLeaderboardCach } from '../get/getRatingLeaders';
 

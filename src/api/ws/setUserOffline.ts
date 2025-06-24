@@ -1,7 +1,5 @@
 import Client from "../../pkg/ws/client";
-import WebSocketRequest from "pkg/ws/request";
-import { sendError, WS_CLIENT } from "./wsSetup";
-import { isTokenValid } from "pkg/jwt/JwtGenerator";
+import { sendError } from "./wsSetup";
 import { StateValue } from "../../storage/DatabaseStorage";
 import app from "../../app";
 

@@ -1,20 +1,13 @@
 import { FastifyRequest } from 'fastify';
 import jwt from 'jsonwebtoken';
 import RadishClient from "../cache/client/client"
-import Config from "../../config/Config"
 import { JwtGeneratorConfig } from "./JwtGeneratorConfig"
 import { JwtSignError, JwtCachError, JwtTokenVerificationError, JwtExtractionError } from './jwtErrors';
-import app from '../../app'; 
-import { RadishSingleton } from 'pkg/cache/RadishSingleton';
 
 function setUpJwtGenerator(cacheClient: RadishClient): void {
 	JwtGenerator.getInstance().setRadishClient(cacheClient);
 	console.log("set up JwtGenerator instance successfuly")
 } 
-// function setUpJwtGenerator(cacheClient: RadishClient): void {
-// 	JwtGenerator.getInstance().setRadishClient(cacheClient);
-// 	console.log("set up JwtGenerator instance successfuly")
-// } 
 
 interface JwtPayload {
 	userId: number;

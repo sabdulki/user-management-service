@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
-import {isTokenValid, TokenType, getTokenFromRequest, deleteJwtTokenPair} from '../../../../pkg/jwt/JwtGenerator';
+import {deleteJwtTokenPair} from '../../../../pkg/jwt/JwtGenerator';
 import { deleteLeaderboardCach } from '../get/getRatingLeaders';
 
 

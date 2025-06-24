@@ -1,6 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import UserCreateForm from '../../../../models/UserCreateForm';
-import {generateJwtTokenPair} from '../../../../pkg/jwt/JwtGenerator';
 import {otpLogic} from './login';
 import { deleteLeaderboardCach } from '../get/getRatingLeaders';
 import app from '../../../../app';

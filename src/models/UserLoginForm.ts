@@ -1,10 +1,8 @@
-import { FastifyRequest, FastifyReply } from 'fastify'
 import { plainToInstance } from 'class-transformer';
 import { Matches, validateOrReject } from 'class-validator';
-import { IsEmail, IsString, MinLength, MaxLength, IsNotEmpty } from 'class-validator';
+import { IsString, MinLength, MaxLength } from 'class-validator';
 import bcrypt from 'bcryptjs';
 import app from '../app'
-import IStorage from 'interfaces/IStorage';
 import { MAX_NICKNAME_LENGTH, NICKNAME_REGEX } from '../api/rest/publicHandlers/auth/registration';
 
 //  in JavaScript/TypeScript, setters are called whenever you assign a value to a property.
