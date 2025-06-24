@@ -40,8 +40,15 @@ export async function updateUserPassword(request: FastifyRequest, reply: Fastify
     if (provider === undefined) {
         status = 404;
     }
-    else if (provider === 1 && !oldPassword) {
-        status = setNewUserPassword(storage, userId, newPassword);
+    else if (provider === 1) {
+        const userHasPassword = storage.hasUserPassword(userId);
+        if (!userHasPassword && !oldPassword) {
+            status = setNewUserPassword(storage, userId, newPassword);
+        } else if (userHasPassword && !oldPassword) {
+            status = 400; // old password required if one exists
+        } else {
+            status = await updatePassword(storage, userId, newPassword, oldPassword!);
+        }
     }
     else if ((provider === 0 && !oldPassword) || !oldPassword) {
         status = 400;

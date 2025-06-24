@@ -40,6 +40,7 @@ interface IStorage {
     getInvitationId(user1: number, user2: number): number;
     getFriendsList(issuerId: number): undefined | UserBaseInfo[] ;
     getUserProvider(userId: number): number | undefined;
+    hasUserPassword(userId: number): boolean;
 
     // update
     updateNicknmae(userId: number, nickname: string): void;

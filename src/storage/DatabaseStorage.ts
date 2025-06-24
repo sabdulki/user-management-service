@@ -654,4 +654,14 @@ export default class DatabaseStorage implements IStorage {
             throw new Error('DatabaseFailure');
         }
     }
+
+    hasUserPassword(userId: number): boolean {
+        try {
+            const password = this.getUserPassword({ id: userId });
+            return !!password; // true if password exists
+        } catch {
+            return false; // user has no password set yet
+        }
+    }
+    
 };
